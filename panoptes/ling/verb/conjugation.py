@@ -81,7 +81,7 @@ class SuffixTransformCache(object):
         return self.key2transform[key]
 
 
-class VerbDeriver(object):
+class VerbDerivation(object):
     """
     A set of transformations on a lemma.
     """
@@ -110,7 +110,7 @@ class VerbDeriver(object):
         past_part = t(verb.past_part)
         nonpast = map(t, verb.nonpast)
         past = map(t, verb.past)
-        return Verb(verb.lemma, pres_part, past_part, nonpast, past)
+        return VerbDerivation(pres_part, past_part, nonpast, past)
 
     def to_d(self):
         return {
@@ -158,10 +158,10 @@ def collect_verb_derivations(vv):
     unique_derivs = []
     s2lemmas = defaultdict(set)
     for v in vv:
-        deriv = VerbDeriver.from_verb(v, transform_cache)
+        deriv = VerbDerivation.from_verb(v, transform_cache)
         s = str(deriv.to_d())
         if s not in s2lemmas:
-            unique_derivs.append(d)
+            unique_derivs.append(deriv)
         assert v.lemma not in s2lemmas[s]
         s2lemmas[s].add(v.lemma)
 
@@ -176,8 +176,8 @@ def collect_verb_derivations(vv):
 
     # Build verb -> derivation mapping.
     lemma2deriv_index = {}
-    for i, d in enumerate(derivs):
-        s = str(t.to_d())
+    for i, deriv in enumerate(derivs):
+        s = str(deriv.to_d())
         for lemma in s2lemmas[s]:
             assert lemma not in lemma2deriv_index
             lemma2deriv_index[lemma] = i
@@ -191,9 +191,9 @@ class Conjugator(object):
     """
 
     def __init__(self, verbs):
-        """
-        list of Verb ->
-        """
+        self.identify_word_cache = {}
+        self.verb_cache = {}
+
         self.derivs, self.lemma2deriv_index = collect_verb_derivations(verbs)
 
         self.deriv_index_picker = \
@@ -204,6 +204,9 @@ class Conjugator(object):
         self.to_do = self.derive_verb('do')
 
     def derive_verb(self, lemma):
+        """
+        lemma -> Verb
+        """
         verb = self.verb_cache.get(lemma)
         if verb:
             return verb

@@ -51,7 +51,7 @@ class SuffixGeneralizingMap(object):
     def __init__(self, key2value, pick_value):
         self.max_key_len = max(map(len, key2value))
 
-        for key in key2val:
+        for key in key2value:
             assert '^' not in key
 
         # Build list of initial todos, which are (padded key, value).
