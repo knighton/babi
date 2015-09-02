@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from base.suffix_transform import SuffixTransform
 from base.suffix_generalizing_map import SuffixGeneralizingMap
 from ling.verb.annotation import annotate_as_aux
@@ -6,7 +8,7 @@ from ling.verb.annotation import annotate_as_aux
 MAGIC_INTS_LEMMA = '<ints>'
 
 
-class ConjugationMap(object):
+class Verb(object):
     """
     Object that knows all the inflections of a verb.
     """
@@ -46,9 +48,9 @@ class ConjugationMap(object):
         Tell auxiliary 'have' apart from regular 'have' because one of them
         forms contractions and the other doens't.
         """
-        return ConjugationMap(
-            self.lemma, self.pres_part, self.past_part,
-            map(annotate_as_aux, self.nonpast), map(annotate_as_aux, self.past))
+        return Verb(self.lemma, self.pres_part, self.past_part,
+                    map(annotate_as_aux, self.nonpast),
+                    map(annotate_as_aux, self.past))
 
 
 def conjugations_from_file(fn):
@@ -57,14 +59,31 @@ def conjugations_from_file(fn):
         for line in f:
             ss = map(lambda s: s if '|' not in s else s.split('|'),
                      line.split())
-            r = ConjugationMap(*ss)
+            r = Verb(*ss)
             rr.append(r)
     return rr
 
 
-class ConjugationMapDerivation(object):
+class SuffixTransformCache(object):
     """
-    Mapping of lemma -> ConjugationMap.  A set of transformations on a lemma.
+    Computing these is (a) nontrivial and (b) sometimes repetitive, and (c) the
+    results are not modified.
+    """
+
+    def __init__(self):
+        self.key2transform = {}
+
+    def get(self, before, after):
+        key = (before, after)
+        if key not in self.key2transform:
+            self.key2transform[key] = \
+                SuffixTransform.from_before_after(before, after)
+        return self.key2transform[key]
+
+
+class VerbDeriver(object):
+    """
+    A set of transformations on a lemma.
     """
 
     def __init__(self, pres_part, past_part, nonpast, past):
@@ -83,15 +102,15 @@ class ConjugationMapDerivation(object):
             assert isinstance(t, SuffixTransform)
 
     @staticmethod
-    def from_conjugation_map(conj_map, suffix_transform_cache):
-        def get(transform_to):
-            return suffix_transform_cache.get(conj_map.lemma, transform_to)
+    def from_verb(verb, suffix_transform_cache):
+        def t(transform_to):
+            return suffix_transform_cache.get(verb.lemma, transform_to)
 
-        pres_part = get(conj_map.pres_part)
-        past_part = get(conj_map.past_part)
-        nonpast = map(get, conj_map.nonpast)
-        past = map(get, conj_map.past)
-        return ConjugationMap(lemma, pres_part, past_part, nonpast, past)
+        pres_part = t(verb.pres_part)
+        past_part = t(verb.past_part)
+        nonpast = map(t, verb.nonpast)
+        past = map(t, verb.past)
+        return Verb(verb.lemma, pres_part, past_part, nonpast, past)
 
     def to_d(self):
         return {
@@ -101,12 +120,12 @@ class ConjugationMapDerivation(object):
             'past': map(lambda t: t.to_d(), self.past),
         }
 
-    def derive_conjugation_map(self, lemma):
+    def derive_verb(self, lemma):
         pres_part = self.pres_part.transform(lemma)
         past_part = self.past_part.transform(lemma)
         nonpast = map(lambda t: t.transform(lemma), self.nonpast)
         past = map(lambda t: t.transform(lemma), self.past)
-        return ConjugationMap(lemma, pres_part, past_part, nonpast, past)
+        return Verb(lemma, pres_part, past_part, nonpast, past)
 
     def identify_word(self, conjugated):
         rr = []
@@ -132,32 +151,14 @@ class ConjugationMapDerivation(object):
         return rr
 
 
-class SuffixTransformCache(object):
-    """
-    Computing these is (a) nontrivial and (b) sometimes repetitive, and (c) the
-    results are not modified.
-    """
-
-    def __init__(self):
-        self.key2transform = {}
-
-    def get(self, before, after):
-        key = (before, after)
-        if key not in self.key2transform:
-            self.key2transform[key] = \
-                SuffixTransform.from_before_after(before, after)
-        return self.key2transform[key]
-
-
-def collect_conjugation_map_derivations(vv):
+def collect_verb_derivations(vv):
     # List the unique conjugation map derivations, and the verbs handled by each
     # derivation.
     transform_cache = SuffixTransformCache()
     unique_derivs = []
     s2lemmas = defaultdict(set)
     for v in vv:
-        deriv = \
-            ConjugationMapDerivation.from_conjugation_map(v, transform_cache)
+        deriv = VerbDeriver.from_verb(v, transform_cache)
         s = str(deriv.to_d())
         if s not in s2lemmas:
             unique_derivs.append(d)
@@ -189,34 +190,30 @@ class Conjugator(object):
     Conjugates and un-conjugates verbs.
     """
 
-    def __init__(self, conj_maps):
+    def __init__(self, verbs):
         """
-        list of ConjugationMap ->
+        list of Verb ->
         """
-        self.derivs, self.lemma2deriv_index = \
-            collect_verb_derivations(conj_maps)
+        self.derivs, self.lemma2deriv_index = collect_verb_derivations(verbs)
 
         self.deriv_index_picker = \
             SuffixGeneralizingMap(self.lemma2deriv_index, min)
 
-        self.to_be = self.derive_conjugation_map('be')
-        self.to_have = self.derive_conjugation_map('have').annotated_as_aux()
-        self.to_do = self.derive_conjugation_map('do')
+        self.to_be = self.derive_verb('be')
+        self.to_have = self.derive_verb('have').annotated_as_aux()
+        self.to_do = self.derive_verb('do')
 
-    def derive_conjugation_map(self, lemma):
-        conj_map = self.conj_map_cache.get(lemma)
-        if conj_map:
-            return conj_map
+    def derive_verb(self, lemma):
+        verb = self.verb_cache.get(lemma)
+        if verb:
+            return verb
 
         if lemma == MAGIC_INTS_LEMMA:
-            conj_map = ConjugationMap(
-                '0', '1', '2', map(str, range(3, 3 + 6)),
-                map(str, range(9, 9 + 6)))
+            verb = Verb('0', '1', '2', map(str, range(3, 3 + 6)),
+                        map(str, range(9, 9 + 6)))
         else:
             deriv_index = self.deriv_index_picker.get(lemma)
             d = self.derivs[deriv_index]
-            conj_map = d.derive_conjugation_map(lemma)
-        self.conj_map_cache[lemma] = conj_map
-        return conj_map
-
-
+            verb = d.derive_verb(lemma)
+        self.verb_cache[lemma] = verb
+        return verb
