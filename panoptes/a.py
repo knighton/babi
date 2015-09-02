@@ -6,6 +6,9 @@ def main():
     cc = conjugations_from_file(fn)
     print len(cc)
     conj = Conjugator(cc)
+    print conj.identify_word('batting')
+    print conj.identify_word('bat')
+    print conj.identify_word('bats')
 
 
 if __name__ == '__main__':

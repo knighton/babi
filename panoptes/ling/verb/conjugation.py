@@ -194,16 +194,19 @@ class Conjugator(object):
         self.identify_word_cache = {}
         self.verb_cache = {}
 
-        self.derivs, self.lemma2deriv_index = collect_verb_derivations(verbs)
+        self.verb_derivations, self.lemma2deriv_index = \
+            collect_verb_derivations(verbs)
 
         self.deriv_index_picker = \
             SuffixGeneralizingMap(self.lemma2deriv_index, min)
 
-        self.to_be = self.derive_verb('be')
-        self.to_have = self.derive_verb('have').annotated_as_aux()
-        self.to_do = self.derive_verb('do')
+        """
+        self.to_be = self.create_verb('be')
+        self.to_have = self.create_verb('have').annotated_as_aux()
+        self.to_do = self.create_verb('do')
+        """
 
-    def derive_verb(self, lemma):
+    def create_verb(self, lemma):
         """
         lemma -> Verb
         """
@@ -216,7 +219,46 @@ class Conjugator(object):
                         map(str, range(9, 9 + 6)))
         else:
             deriv_index = self.deriv_index_picker.get(lemma)
-            d = self.derivs[deriv_index]
-            verb = d.derive_verb(lemma)
+            deriv = self.verb_derivations[deriv_index]
+            verb = deriv.derive_verb(lemma)
         self.verb_cache[lemma] = verb
         return verb
+
+    def identify_word(self, word, is_picky_about_verbs=True):
+        """
+        conjugated word, is picky -> list of (lemma, verb field index)
+        """
+        key = (word, is_picky_about_verbs)
+        lemmas_indexes = self.identify_word_cache.get(key)
+        if lemmas_indexes is not None:
+            return lemmas_indexes
+
+        # For each verb derivation, undo the conjugation in order to get the
+        # hypothetical original lemma.
+        #
+        # If the generalizing suffix map picks the same verb derivation we used
+        # for that lemma, it's a match.
+        lemmas_indexes = []
+        for i, deriv in enumerate(self.verb_derivations):
+            for lemma, field_index in deriv.identify_word(word):
+                if self.deriv_index_picker.get(lemma) == i:
+                    lemmas_indexes.append((lemma, field_index))
+
+        # If we're picky, and we have some results that contain known verbs,
+        # forget about the results with unknown verbs.
+        if is_picky_about_verbs:
+            has_known = False
+            for lemma, field_index in lemmas_indexes:
+                if lemma in self.lemma2deriv_index:
+                    has_known = True
+                    break
+            if has_known:
+                lemmas_indexes = filter(
+                    lambda (lemma, index): lemma in self.lemma2deriv_index,
+                    lemmas_indexes)
+
+        lemmas_indexes.append((word, 0))
+
+        key = (word, is_picky_about_verbs)
+        self.identify_word_cache[key] = lemmas_indexes
+        return lemmas_indexes
