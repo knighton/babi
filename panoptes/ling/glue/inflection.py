@@ -20,6 +20,10 @@ Person = enum.new('Person = FIRST SECOND THIRD')
 Conjugation = enum.new('Conjugation = S1 S2 S3 P1 P2 P3')
 
 
+CONJ2INDEX = dict(zip(sorted(Conjugation.values),
+                      range(len(Conjugation.values))))
+
+
 Gender = enum.new('Gender = MALE FEMALE NEUTER')
 
 

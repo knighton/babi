@@ -200,12 +200,6 @@ class Conjugator(object):
         self.deriv_index_picker = \
             SuffixGeneralizingMap(self.lemma2deriv_index, min)
 
-        """
-        self.to_be = self.create_verb('be')
-        self.to_have = self.create_verb('have').annotated_as_aux()
-        self.to_do = self.create_verb('do')
-        """
-
     def create_verb(self, lemma):
         """
         lemma -> Verb

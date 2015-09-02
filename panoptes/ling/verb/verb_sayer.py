@@ -1,6 +1,7 @@
 from collections import defaultdict
 
-from ling.glue.inflection import Conjugation
+from ling.glue.inflection import CONJ2INDEX, Conjugation
+from ling.verb.conjugation import Conjugator
 from ling.verb.verb import ModalFlavor, Modality, SurfaceVerb, VerbForm, Voice
 
 
@@ -33,6 +34,16 @@ EphemeralTense = enums.new(
 # (this matters for saying/parsing).
 EphemeralVerbForm = enums.new("""EphemeralVerbForm =
     NORMAL_FINITE ZERO_REL_CLAUSE_FINITE BARE_INF TO_INF GERUND""")
+
+
+# Ephemeral verb form -> whether finite.
+EPHEMERAL_VERB_FORM2IS_FINITE = {
+    EphemeralVerbForm.NORMAL_FINITE: True,
+    EphemeralVerbForm.ZERO_REL_CLAUSE_FINITE: True,
+    EphemeralVerbForm.BARE_INF: False,
+    EphemeralVerbForm.TO_INF: False,
+    EphemeralVerbForm.GERUND: False,
+}
 
 
 # Linguistic mood.
@@ -91,44 +102,6 @@ class EphemeralVerb(object):
 
         self.use_were_sbj = use_were_sbj
         assert isinstance(self.use_were_sbj, bool)
-
-
-def make_modal2indtense2mstr_perf():
-    text = """
-        MODAL  PAST        NONPAST
-        can    could       can
-        could  could_have  could
-        may    may_have    may
-        might  might_have  might
-        should should_have should
-        must   must_have   must
-        will   would       will
-        would  would_have  would
-    """
-
-    modal2indtense2mstr_perf = {}
-    for line in text.strip().split('\n'):
-        modal, past, nonpast_modal = line.split()
-
-        assert modal.islower()
-
-        ss = past.split('_')
-        if len(ss) == 1:
-            past_modal, have = past, False
-        elif len(ss) == 2:
-            past_modal, have = ss[0], True
-            assert ss[1] == 'have'
-        else:
-            assert False
-
-        assert nonpast_modal.islower()
-
-        modal2indtense2mstr_perf[modal] = {
-            EphemeralTense.PAST: (past_modal, have),
-            EphemeralTense.NONPAST: (nonpast_modal, have),
-        }
-
-    return modal2indtense2mstr_perf
 
 
 def make_flavor_cond2modals_moods(known_modals):
@@ -203,9 +176,9 @@ def make_mood2tense2etense():
     return mood2tense2etense
 
 
-class VerbSayer(object):
+class VerbEphemeralizer(object):
     """
-    SurfaceVerb -> words
+    Converts SurfaceVerb to EphemeralVerb for saying.
     """
 
     def __init__(self):
@@ -273,7 +246,7 @@ class VerbSayer(object):
 
     def say(self, v):
         """
-        SurfaceVerb -> yields (pre words, main words)
+        SurfaceVerb -> yields EphemeralVerb
         """
         assert isinstance(v, SurfaceVerb)
         v.check(allow_wildcards=False)
@@ -313,8 +286,214 @@ class VerbSayer(object):
                 v.intrinsics.modality.flavor, v.intrinsics.modality.is_cond,
                 v.intrinsics.tense):
             use_were_sbj = v.sbj_handling == SubjunctiveHandling.WERE_SBJ
-            ev = EphemeralVerb(
+            yield EphemeralVerb(
                 v.intrinsics.lemma, whether, modal, v.voice, ephemeral_tense,
                 aspect, mood, v.conj, ephemeral_verb_form, v.split_inf,
                 use_were_sbj)
-            yield self.say_ephemeral(ev)
+
+
+def make_modal2indtense2mstr_perf():
+    text = """
+        MODAL  PAST        NONPAST
+        can    could       can
+        could  could_have  could
+        may    may_have    may
+        might  might_have  might
+        should should_have should
+        must   must_have   must
+        will   would       will
+        would  would_have  would
+    """
+
+    modal2indtense2mstr_perf = {}
+    for line in text.strip().split('\n'):
+        modal, past, nonpast_modal = line.split()
+
+        assert modal.islower()
+
+        ss = past.split('_')
+        if len(ss) == 1:
+            past_modal, have = past, False
+        elif len(ss) == 2:
+            past_modal, have = ss[0], True
+            assert ss[1] == 'have'
+        else:
+            assert False
+
+        assert nonpast_modal.islower()
+
+        modal2indtense2mstr_perf[modal] = {
+            EphemeralTense.PAST: (past_modal, have),
+            EphemeralTense.NONPAST: (nonpast_modal, have),
+        }
+
+    return modal2indtense2mstr_perf
+
+
+class EphemeralSayer(object):
+    def __init__(self, conjugator):
+        self.conjugator = conjugator
+
+        # Modal -> indicative EphemeralTense -> (modal, is perf).
+        self.modal2indtense2mstr_perf = make_modal2indtense2mstr_perf()
+
+        # Keep auxiliaries around for quick access.
+        self.to_be = self.create_verb('be')
+        self.to_have_aux = self.create_verb('have').annotated_as_aux()
+        self.to_do = self.create_verb('do')
+
+
+    def say(self, v):
+        assert isinstance(v, EphemeralVerb)
+
+        # Reason for hallucinate_is_perf:
+        #
+        # Typically, you use conjugation to tell past tense (eg, "go" ->
+        # "went").  But if there's a modal in front, there goes your opportunity
+        # to tell past tense that way.  So instead you say it as perfective
+        # (regardless of whether it is actually perfective or not).
+        #
+        # Get the actually said forms of modals, and whether to hallucinate
+        # perfective.  Eg, "I go" -> "I should go", but "I went" -> "I should
+        # have gone".
+        if v.modal and v.tense in (EphemeralTense.PAST, EphemeralTense.NONPAST):
+            actual_modal, hallucinate_is_perf = \
+                self.modal2indtense2mstr_perf[v.modal][v.tense]
+        else:
+            actual_modal, hallucinate_is_perf = v.modal, False
+        use_perf = hallucinate_is_perf or v.aspect.is_perf
+
+        # Get the conjugation plan for the verb.
+        to_verb = self.conjugator.create_verb(v.lemma)
+
+        # List the verb conjugation mappings to pick the correct forms of.
+        rr = []
+        if actual_modal:
+            rr.append(actual_modal)
+        if use_perf:
+            rr.append(self.to_have_aux)
+        if v.aspect.is_prog:
+            rr.append(self.to_be)
+        if v.voice == Voice.PASSIVE:
+            rr.apepnd(self.to_be)
+        rr.append(to_verb)
+
+        if v.mood == Mood.SBJ_CF and v.tense == EphemeralTense.SBJ_FUT:
+            # SBJ_CF future uses the "to be" future, unlike anything else below,
+            # we do it separately up here.
+            said_conj = Conjugation.P2 if v.use_were_sbj else v.conj
+            were_or_was = self.to_be.past[CONJ2INDEX[said_conj]]
+            rr = [were_or_was, 'to'] + rr
+
+            if v.whether == Whether.NO:
+                notx = 2 if v.split_inf else 1
+                rr = rr[:notx] + ['not'] + rr[notx:]
+        else:
+            is_finite = EPHEMERAL_VERB_FORM2IS_FINITE[v.verb_form]
+
+            # Add "do".
+            if is_finite:
+                if v.whether in (Whether.NO, Whether.EMPH):
+                    mood_ok = v.mood == Mood.NORMAL
+                    already_has_an_aux = \
+                        actual_modal or use_perf or v.aspect.is_prog
+                    can_use_do = \
+                        to_verb.has_do_support and voice == Voice.ACTIVE
+                    if mood_ok and not already_has_an_aux and can_use_do:
+                        rr = [self.to_do] + rr
+
+            # Add "to".
+            if v.verb_form == EphemeralVerbForm.TO_INF:
+                rr = ['to'] + rr
+
+            # Add "not".
+            if v.whether == Whether.NO:
+                # Decide where to correctly put the 'not'.
+                if is_finite:
+                    if v.mood in (Mood.NORMAL, Mood.SBJ_CF):
+                        notx = 1
+                    else:
+                        notx = 0
+                else:
+                    if v.verb_form == EphemeralVerbForm.TO_INF:
+                        notx = 1 if v.split_inf else 0
+                    else:
+                        notx = 0
+
+                # Actually insert it.
+                rr = rr[:notx] + ['not'] + rr[notx:]
+
+        # Conjugate the front word depending on mood, tense, etc., if it isn't a
+        # modal, 'not', 'to', etc.  Leftovers are automatically converted to
+        # their lemmas, so in a few cases we just do nothing.
+        if is_finite:
+            if v.mood == Mood.NORMAL:
+                conjx = 0  # If there is a not, it's at index 1.
+                if not isinstance(rr[conjx], str):
+                    if v.tense == EphemeralTense.NONPAST:
+                        rr[0] = rr[0].nonpast[CONJ2INDEX[v.conj]]
+                    elif v.tense == EphemeralTense.PAST:
+                        rr[0] = rr[0].past[CONJ2INDEX[v.conj]]
+                    else:
+                        assert False
+            elif v.mood == Mood.SBJ_CF:
+                if v.tense == EphemeralTense.SBJ_PAST:
+                    said_conj = Conjugation.P2 if v.use_were_sbj else v.conj
+                    rr[0] = rr[0].past[CONJ2INDEX[said_conj]]
+                else:
+                    # SBJ_FUT (the other option) is covered separately above.
+                    assert False
+            else:
+                # IMP, SBJ_IMP.
+                pass
+        else:
+            if v.verb_form == EphemeralVerbForm.GERUND:
+                conjx = 1 if v.whether == Whether.NO else 0
+                rr[conjx] = rr[conjx].pres_part
+
+        # Index of end of infinitives (exclusive).
+        z = len(rr)
+
+        # If passive voice, use past participle of the last verb.
+        if v.voice == Voice.PASSIVE:
+            z -= 1
+            zz[z] = rr[z].past_part
+
+        # Conjugate for aspect on the preceding words, if applicable.
+        if v.aspect.is_prog:
+            z -= 1
+            rr[z] = rr[z].pres_part
+
+        if use_perf:
+            z -= 1
+            rr[z] = rr[z].past_part
+
+        # The remaining verb words in the middle are left in lemma form.
+        for x in range(0, z):
+            if not isinstance(rr[x], str):
+                rr[x] = rr[x].lemma
+
+        # Finally, there are two types of finite.  Make modifications for the
+        # weird kind of finite if necessary, involving dropping leading 'to be'
+        # forms when inside relative clauses with the zero relative pronoun, eg.
+        #   "the cat that [was seen] by you"
+        # vs
+        #   "the cat [seen] by you"
+        if v.verb_form == EphemeralVerbForm.ZERO_REL_CLAUSE_FINITE:
+            if rr[0] in ('is', 'are', 'was', 'were'):  # So passive voice.
+                rr = rr[1:]
+
+        return rr
+
+
+class VerbSayer(object):
+    def __init__(self):
+        self.verb_ephemeralizer = VerbEphemeralizer()
+
+        self.conjugator = Conjugator()
+        self.ephemeral_sayer = EphemeralSayer(conjugator)
+
+    def say(self, v):
+        assert isinstance(v, SurfaceVerb)
+        for e in self.ephemeralizer.convert(v):
+            yield self.ephemeral_sayer.say(e)
