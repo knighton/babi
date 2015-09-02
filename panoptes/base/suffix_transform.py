@@ -60,9 +60,11 @@ class SuffixTransform(object):
         Reverse the transformation.
         """
         s = transformed
-        assert s.endswith(self.append)
+        if not s.endswith(self.append):
+            return None
         s = s[:len(s) - len(self.append)]
         if self.repeat:
-            assert s.endswith(s[-1] * self.repeat)
+            if not s or not s.endswith(s[-1] * self.repeat):
+                return None
             s = s[:-self.repeat]
         return s + self.truncate
