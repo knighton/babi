@@ -5,9 +5,8 @@ from base import enum
 from lang.glue.grammatical_number import N2
 
 
-Declension = enum.new("""
-Declension = I WE YOU YALL HE SHE IT THEY1 ONE WHO1 WHO2 THEY2 WHOEVER1
-WHOEVER2""")
+Declension = enum.new("""Declension =
+    I WE YOU YALL HE SHE IT THEY1 ONE WHO1 WHO2 THEY2 WHOEVER1 WHOEVER2""")
 
 
 def is_declension_q(d):
