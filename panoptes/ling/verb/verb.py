@@ -38,6 +38,7 @@ class Aspect(object):
     def __init__(self, is_perf, is_prog):
         self.is_perf = is_perf
         self.is_prog = is_prog
+        self.check()
 
     def check(self, allow_wildcards=True):
         assert isinstance(self.is_perf, bool)

@@ -1,6 +1,7 @@
 from collections import defaultdict
 
-from ling.verb.verb import ModalFlavor, Modality, VerbForm
+from ling.glue.inflection import Conjugation
+from ling.verb.verb import ModalFlavor, Modality, SurfaceVerb, VerbForm, Voice
 
 
 # Whether.
@@ -31,7 +32,7 @@ EphemeralTense = enums.new(
 # Distinguishes finites that are in zero-relative pronoun relative clauses
 # (this matters for saying/parsing).
 EphemeralVerbForm = enums.new("""EphemeralVerbForm =
-    NORMAL_FINITE ZERO_RELCLAUSE_FINITE BARE_INF TO_INF GERUND""")
+    NORMAL_FINITE ZERO_REL_CLAUSE_FINITE BARE_INF TO_INF GERUND""")
 
 
 # Linguistic mood.
@@ -41,6 +42,55 @@ EphemeralVerbForm = enums.new("""EphemeralVerbForm =
 # SBJ_IMP  subjunctive-imperative
 # SBJ_CF   subjunctive-counterfactual
 Mood = enums.new('Mood = NORMAL IMP SBJ_IMP SBJ_CF')
+
+
+class EphemeralVerb(object):
+    """
+    Ephemeral structure created during the process of saying verbs.
+
+    This exists in order to capture all the quirkiness of English so
+    surface/deep structure doesn't have to deal with it.
+
+    Note that some combinations of fields are invalid, which will be discovered
+    during saying.
+    """
+
+    def __init__(self, lemma, whether, modal, voice, tense, aspect, mood, conj,
+                 verb_form, split_inf, use_were_sbj):
+        self.lemma = lemma
+        assert self.lemma
+        assert isinstance(self.lemma, str)
+
+        self.whether = whether
+        assert Whether.is_valid(self.whether)
+
+        if self.modal is not None:
+            assert self.modal
+            assert isinstance(self.modal, str)
+
+        self.voice = voice
+        assert Voice.is_valid(self.voice)
+
+        self.tense = tense
+        assert EphemeralTense.is_valid(tense)
+
+        self.aspect = aspect
+        assert isinstance(self.aspect, Aspect)
+
+        self.mood = mood
+        assert Mood.is_valid(self.mood)
+
+        self.conj = conj
+        assert Conjugation.is_valid(self.conj)
+
+        self.verb_form = verb_form
+        assert EphemeralVerbForm.is_valid(self.verb_form)
+
+        self.split_inf = split_inf
+        assert isinstance(self.split_inf, bool)
+
+        self.use_were_sbj = use_were_sbj
+        assert isinstance(self.use_were_sbj, bool)
 
 
 def make_modal2indtense2mstr_perf():
@@ -159,6 +209,17 @@ class VerbSayer(object):
     """
 
     def __init__(self):
+        # VerbForm -> EphemeralVerbForm.
+        #
+        # Only for when not in a relative clause.
+        self.nonrel_verbform2everbform = {
+            VerbForm.FINITE:          EphemeralVerbForm.NORMAL_FINITE,
+            VerbForm.BARE_INF:        EphemeralVerbForm.BARE_INF,
+            VerbForm.TO_INF:          EphemeralVerbForm.TO_INF,
+            VerbForm.GERUND:          EphemeralVerbForm.GERUND,
+            VerbForm.SUBJLESS_GERUND: EphemeralVerbForm.GERUND,
+        }
+
         # (ModalFlavor, is conditional) -> list of (modal verb, mood).
         #
         # Does not include the indicative future exception ("will").
@@ -168,14 +229,20 @@ class VerbSayer(object):
         # Mood -> Tense -> EphemeralTense.
         self.mood2tense2etense = make_mood2tense2etense()
 
-        # VerbForm -> EphemeralVerbForm.
-        self.vf2evf = {
-            VerbForm.FINITE:          EphemeralVerbForm.NORMAL_FINITE,
-            VerbForm.BARE_INF:        EphemeralVerbForm.BARE_INF,
-            VerbForm.TO_INF:          EphemeralVerbForm.TO_INF,
-            VerbForm.GERUND:          EphemeralVerbForm.GERUND,
-            VerbForm.SUBJLESS_GERUND: EphemeralVerbForm.GERUND,
-        }
+    def everbform_from_verbform_relcont(self, verb_form, rel_cont):
+        in_relative_clause = rel_cont != RelativeContainment.NOT_REL
+        is_finite = verb_form == VerbForm.FINITE
+        if in_relative_clause and not is_finite:
+            raise VerbConfigError('Relative clause verbs must be finite')
+
+        if rel_cont == RelativeContainment.ZERO:
+            r = EphemeralVerbForm.ZERO_REL_CLAUSE_FINITE
+        elif rel_cont == RelativeContainment.WORD:
+            r = EphemeralVerbForm.NORMAL_FINITE
+        elif rel_cont == RelativeContainment.NOT_REL:
+            r = self.nonrel_verbform2everbform[verb_form]
+        else:
+            assert False
 
     def moods_modals_etenses_from_flavor_cond_tense(
             self, modal_flavor, is_cond, tense):
@@ -203,3 +270,51 @@ class VerbSayer(object):
             etense = self.mood2tense2etense[mood][tense]
 
             yield mood, modal, etense
+
+    def say(self, v):
+        """
+        SurfaceVerb -> yields (pre words, main words)
+        """
+        assert isinstance(v, SurfaceVerb)
+        v.check(allow_wildcards=False)
+
+        if v.is_split and v.intrinsics.verb_form != VerbForm.FINITE:
+            raise VerbConfigError('Can only split words of finite verbs')
+
+        # Polarity, etc. -> Whether.
+        if v.intrinsics.polarity.tf:
+            # "No, she *does* write."
+            if v.intrinsics.polarity.is_contrary:
+                w = Whether.EMPH
+
+            # "Does she write?"
+            elif v.is_split:
+                w = Whether.EMPH
+
+            # "Yes, she does."
+            elif v.intrinsics.is_pro_verb:
+                w = Whether.EMPH
+
+            # "She writes."
+            else:
+                w = Whether.YES
+        else:
+            # "She doesn't write."
+            w = Whether.NO
+        whether = w
+
+        # VerbForm, RelativeContainment -> EphemeralVerbForm.
+        ephemeral_verb_form = \
+            self.everbform_from_verbform_relcont(
+                v.instrincs.verb_form, v.rel_cont)
+
+        for mood, modal, ephemeral_tense in \
+            self.moods_modals_etenses_from_flavor_cond_tense(
+                v.intrinsics.modality.flavor, v.intrinsics.modality.is_cond,
+                v.intrinsics.tense):
+            use_were_sbj = v.sbj_handling == SubjunctiveHandling.WERE_SBJ
+            ev = EphemeralVerb(
+                v.intrinsics.lemma, whether, modal, v.voice, ephemeral_tense,
+                aspect, mood, v.conj, ephemeral_verb_form, v.split_inf,
+                use_were_sbj)
+            yield self.say_ephemeral(ev)
