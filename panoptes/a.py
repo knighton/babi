@@ -9,6 +9,7 @@ def main():
     print conj.identify_word('batting')
     print conj.identify_word('bat')
     print conj.identify_word('bats')
+    print conj.identify_word('lose')
 
 
 if __name__ == '__main__':
