@@ -12,13 +12,20 @@ class Polarity(object):
         #
         # "You said" vs "You didn't say".
         self.tf = tf
-        assert isinstance(self.tf, bool)
 
         # Whether the truth value is contrary to expectations.
         #
         # "You said X" vs "You *did* say X".
         self.is_contrary = is_contrary
-        assert self.is_contrary in (None, False, True)
+
+        self.check()
+
+    def check(self, allow_wildcards=True):
+        assert isinstance(self.tf, bool)
+        if allow_wildcards:
+            assert self.is_contrary in (None, False, True)
+        else:
+            assert isinstance(self.is_contrary, bool)
 
 
 class Aspect(object):
@@ -30,9 +37,10 @@ class Aspect(object):
 
     def __init__(self, is_perf, is_prog):
         self.is_perf = is_perf
-        assert isinstance(self.is_perf, bool)
-
         self.is_prog = is_prog
+
+    def check(self, allow_wildcards=True):
+        assert isinstance(self.is_perf, bool)
         assert isinstance(self.is_prog, bool)
 
 
@@ -72,9 +80,11 @@ ModalFlavor = enum.new("""ModalFlavor =
 class Modality(object):
     def __init__(self, flavor, is_cond):
         self.flavor = flavor
-        assert ModalFlavor.is_valid(self.flavor)
-
         self.is_cond = is_cond
+        self.check()
+
+    def check(self, allow_wildcards=True):
+        assert ModalFlavor.is_valid(self.flavor)
         assert isinstance(self.is_cond, bool)
 
     def is_indicative(self):
@@ -96,34 +106,34 @@ class DeepVerb(object):
 
     Used in deep structure.
 
-    Note that there are combinations of values that are invalid.
+    Note that there are combinations of fields that are invalid.
     """
 
     def __init__(self, lemma, polarity, tense, aspect, modality, verb_form,
                  is_pro_verb):
         # Lemma is blank if it's a pro-verb.
         self.lemma = lemma
+        self.polarity = polarity
+        self.tense = tense
+        self.aspect = aspect
+        self.modality = modality
+        self.verb_form = verb_form
+        self.is_pro_verb = is_pro_verb
+        self.check()
+
+    def check(self, allow_wildcards=True):
         if self.lemma is not None:
             assert self.lemma
             assert isinstance(self.lemma, str)
             assert self.lemma.islower()
-
-        self.polarity = polarity
         assert isinstance(self.polarity, Polarity)
-
-        self.tense = tense
+        self.polarity.check(allow_wildcards)
         assert self.tense is None or Tense.is_valid(self.tense)
-
-        self.aspect = aspect
         assert isinstance(self.aspect, Aspect)
-
-        self.modality = modality
+        self.aspect.check(allow_wildcards)
         assert isinstance(self.modality, Modality)
-
-        self.verb_form = verb_form
+        self.modality.check(allow_wildcards)
         assert VerbForm.is_valid(self.verb_form)
-
-        self.is_pro_verb = is_pro_verb
         assert isinstance(self.is_pro_verb, bool)
 
 
@@ -172,31 +182,36 @@ class SurfaceVerb(object):
     surroundings instead of the verb itself, like voice, conjugation, and so on.
 
     Used in surface structure.
+
+    Note that there are combinations of fields that are invalid.
     """
 
     def __init__(self, intrinsics, voice, conj, is_split, relative_cont,
                  contract_not, split_inf, sbj_handling):
         self.intrinsics = intrinsics
-        assert isinstance(self.intrinsics, DeepVerb)
-
         self.voice = voice
-        assert Voice.is_valid(self.voice)
-
         self.conj = conj
-        assert conj is None or Conjugation.is_valid(self.conj)
-
         self.is_split = is_split
-        assert isinstance(self.is_split, bool)
-
         self.relative_cont = relative_cont
-        assert RelativeContainment.is_valid(self.relative_cont)
-
         self.contract_not = contract_not
-        assert self.contract_not in (None, False, True)
-
         self.split_inf = split_inf
-        assert self.split_inf in (None, False, True)
-
         self.sbj_handling = sbj_handling
-        assert self.sbj_handling is None or \
-            SubjunctiveHandling.is_valid(self.sbj_handling)
+        self.check()
+
+    def check(self, allow_wildcards=True):
+        assert isinstance(self.intrinsics, DeepVerb)
+        self.intrinsics.check(allow_wildcards)
+        assert Voice.is_valid(self.voice)
+        assert isinstance(self.is_split, bool)
+        assert RelativeContainment.is_valid(self.relative_cont)
+        if allow_wildcards:
+            assert conj is None or Conjugation.is_valid(self.conj)
+            assert self.contract_not in (None, False, True)
+            assert self.split_inf in (None, False, True)
+            assert self.sbj_handling is None or \
+                SubjunctiveHandling.is_valid(self.sbj_handling)
+        else:
+            assert Conjugation.is_valid(self.conj)
+            assert isinstance(self.contract_not, bool)
+            assert isinstance(self.split_inf, bool)
+            assert SubjunctiveHandling.is_valid(self.sbj_handling)
