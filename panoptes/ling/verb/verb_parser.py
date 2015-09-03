@@ -1,4 +1,5 @@
 from collections import defaultdict
+import cPickle
 from itertools import chain
 
 from base.combinatorics import each_choose_one_from_each
@@ -21,14 +22,20 @@ def save_lookup_tables(be, pro, deverbed, f):
     """
     be, pro, deverbed, f -> None
     """
-    assert False  # XXX
+    d = {
+        'be': be,
+        'pro-verb': pro,
+        'deverbed': deverbed,
+    }
+    cPickle.dump(d, open(f, 'wb'))
 
 
 def load_lookup_tables(f):
     """
     f -> be, pro, deverbed
     """
-    assert False  # XXX
+    d = cPickle.load(open(f))
+    return d['be'], d['pro-verb'], d['deverbed']
 
 
 def construct_one_lookup_table(verb_sayer, lemmas, is_pro_verbs):
@@ -41,19 +48,22 @@ def construct_one_lookup_table(verb_sayer, lemmas, is_pro_verbs):
         for sss in verb_sayer.get_all_say_options(v):
             sss = (tuple(sss[0]), tuple(sss[1]))
             sss2vv[sss].append(v)
-
-    print len(sss2vv)
-
-    assert False  # XXX
+    return sss2vv
 
 
 def construct_lookup_tables(sayer):
     """
     None -> be, pro, deverbed
     """
+    from time import time
+    t0 = time()
+    print 'be', time() - t0
     be = construct_one_lookup_table(sayer, ['be'], [False, True])
+    print 'pro-verb', time() - t0
     pro = construct_one_lookup_table(sayer, ['see'], [True])
+    print 'deverbed', time() - t0
     deverbed = construct_one_lookup_table(sayer, [MAGIC_INTS_LEMMA], [False])
+    print 'done', time() - t0
     return be, pro, deverbed
 
 
@@ -65,8 +75,8 @@ class VerbParser(object):
         # (pre words, main words) -> list of SurfaceVerb.
         #
         # The "to be" table.  "To be" conjugates specially.
-        self.to_be_sss2vv = to_be_sss2vv
-        assert isinstance(self.to_be_sss2vv, defaultdict)
+        self.be_sss2vv = be_sss2vv
+        assert isinstance(self.be_sss2vv, defaultdict)
 
         # (pre words, main words) -> list of SurfaceVerb.
         #
@@ -143,7 +153,7 @@ class VerbParser(object):
         (pre words tuple, main words tuple) -> list of SurfaceVerb
         """
         rr = []
-        rr += self.to_be_sss2vv[sss]
+        rr += self.be_sss2vv[sss]
         rr += self.pro_verb_sss2vv[sss]
         rr += self.parse_field_index_replacing(sss)
         return rr
