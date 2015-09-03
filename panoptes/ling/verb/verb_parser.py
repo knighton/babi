@@ -1,6 +1,9 @@
 from collections import defaultdict
+from itertools import chain
 
-from lang.verb.conjugation import Conjugator
+from base.combinatorics import each_choose_one_from_each
+from ling.verb.conjugation import Conjugator, MAGIC_INTS_LEMMA
+from ling.verb.verb import SurfaceVerb
 
 
 def remove_lemma_specific_word(sss):
@@ -14,29 +17,48 @@ def deverb(sss):
     return tuple(sss[0]), tuple(sss[1][:-1])
 
 
-def save_lookup_tables(be, pro, main, f):
+def save_lookup_tables(be, pro, deverbed, f):
     """
-    be, pro, main, f -> None
+    be, pro, deverbed, f -> None
     """
     assert False  # XXX
 
 
 def load_lookup_tables(f):
     """
-    f -> be, pro, main
+    f -> be, pro, deverbed
     """
     assert False  # XXX
 
 
-def construct_lookup_tables():
-    """
-    None -> be, pro, main
-    """
+def construct_one_lookup_table(verb_sayer, lemmas, is_pro_verbs):
+    finite_options = SurfaceVerb.finite_options(lemmas, is_pro_verbs)
+    nonfinite_options = SurfaceVerb.nonfinite_options(lemmas, is_pro_verbs)
+    sss2vv = defaultdict(list)
+    for aa in chain(each_choose_one_from_each(finite_options),
+                    each_choose_one_from_each(nonfinite_options)):
+        v = SurfaceVerb.from_tuple(aa)
+        for sss in verb_sayer.get_all_say_options(v):
+            sss = tuple(tuple(sss[0]), tuple(sss[1]))
+            sss2vv[sss].append(v)
+
+    print len(sss2vv)
+
     assert False  # XXX
+
+
+def construct_lookup_tables(sayer):
+    """
+    None -> be, pro, deverbed
+    """
+    be = construct_one_lookup_table(sayer, ['be'], [False, True])
+    pro = construct_one_lookup_table(sayer, ['see'], [True])
+    deverbed = construct_one_lookup_table(sayer, [MAGIC_INTS_LEMMA], [False])
+    return be, pro, deverbed
 
 
 class VerbParser(object):
-    def __init__(self, conjugator, be_sss2vv, pro_verb_sss2vv, main_sss2vv):
+    def __init__(self, conjugator, be_sss2vv, pro_verb_sss2vv, deverbed_sss2vv):
         self.conjugator = conjugator
         assert isinstance(self.conjugator, Conjugator)
 
@@ -56,30 +78,31 @@ class VerbParser(object):
         #
         # Table for everything else.  Replace conjugated lemma-specific word
         # with its field index to use.
-        self.main_sss2vv = main_sss2vv
-        assert isinstance(self.main_sss2vv, defaultdict)
+        self.deverbed_sss2vv = deverbed_sss2vv
+        assert isinstance(self.deverbed_sss2vv, defaultdict)
 
         # Used by main_sss2vv parsing.
         self.deverbed_sss_set = \
-            set(filter(bool, map(remove_lemma_specific_word, self.main_sss2vv)))
+            set(filter(bool, map(remove_lemma_specific_word,
+                                 self.deverbed_sss2vv)))
 
     @staticmethod
     def load(conjugator, f):
-        be, pro, main = load_lookup_tables(f)
-        return VerbParser(conjugator, be, pro, main)
+        be, pro, deverbed = load_lookup_tables(f)
+        return VerbParser(conjugator, be, pro, deverbed)
 
     @staticmethod
-    def construct(conjugator, f):
-        be, pro, main = construct_lookup_tables()
-        save_lookup_tables(be, pro, main, f)
-        return VerbParser(conjugator, be, pro, main)
+    def construct(verb_sayer, f):
+        be, pro, deverbed = construct_lookup_tables(verb_sayer)
+        save_lookup_tables(be, pro, deverbed, f)
+        return VerbParser(verb_sayer.conjugator, be, pro, deverbed)
 
     @staticmethod
-    def load_or_construct(conjugator, f):
+    def load_or_construct(verb_sayer, f):
         try:
-            return VerbParser.load(conjugator, f)
+            return VerbParser.load(verb_sayer.conjugator, f)
         except:
-            return VerbParser.construct(conjugator, f)
+            return VerbParser.construct(verb_sayer, f)
 
     def parse_field_index_replacing(self, sss):
         """
@@ -106,7 +129,7 @@ class VerbParser(object):
         for lemma, field_index in self.conjugator.identify_word(last):
             # Look up the field index-replaced form in the table.
             key = (deverbed_sss[0], tuple(deverbed_sss[1] + [str(field_index)]))
-            sub_rr = self.main_sss2vv[key]
+            sub_rr = self.deverbed_sss2vv[key]
 
             # Put our lemma into the results found.
             for r in sub_rr:

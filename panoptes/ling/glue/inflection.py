@@ -2,7 +2,7 @@
 # conjugation, personal pronoun, etc.
 
 from base import enum
-from lang.glue.grammatical_number import N2
+from ling.glue.grammatical_number import N2
 
 
 Declension = enum.new("""Declension =

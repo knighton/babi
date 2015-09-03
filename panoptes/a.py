@@ -1,4 +1,5 @@
 from ling.verb.conjugation import conjugations_from_file, Conjugator
+from ling.verb.verb_parser import VerbParser
 
 
 def main():
