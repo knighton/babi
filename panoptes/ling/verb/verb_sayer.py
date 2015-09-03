@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 from ling.glue.inflection import CONJ2INDEX, Conjugation
+from ling.verb.annotation import annotate_as_pro_verb
 from ling.verb.conjugation import Conjugator
 from ling.verb.verb import ModalFlavor, Modality, SurfaceVerb, VerbForm, Voice
 
@@ -266,14 +267,15 @@ class VerbEphemeralizer(object):
 
             yield mood, modal, etense
 
-    def say(self, v):
+    def convert(self, v, ignore_invalid_configs=False):
         """
         SurfaceVerb -> yields EphemeralVerb
         """
         assert isinstance(v, SurfaceVerb)
         v.check(allow_wildcards=False)
 
-        if v.is_split and v.intrinsics.verb_form != VerbForm.FINITE:
+        if v.is_split and v.intrinsics.verb_form != VerbForm.FINITE and \
+                not ignore_invalid_configs:
             raise VerbConfigError('Can only split words of finite verbs')
 
         # Polarity, etc. -> Whether.
@@ -543,6 +545,66 @@ class EphemeralSayer(object):
         return rr
 
 
+def slice_verb_words(v, ss):
+    """
+    SurfaceVerb, joined words -> pre words, main words
+
+    Determine where to split the verb words and where to end if pro-verb.
+
+    Normal:          "[don't] you [like] apples?"  "i [don't like] apples."
+    Pro-verbs:       "[have] you [not]?"  "[are n't] you?"
+    Not-contraction: "[do] you [not like] it?" vs "[do n't] you [like] it?"
+    """
+
+    # Some non-finite cases.
+    # Eg, "she requests that you [not come]".
+    not_at_0 = 1 <= len(ss) and ss[0] == 'not'
+
+    # Normal 'not' cases.
+    # Eg, "i [do not like] you".
+    not_at_1 = 2 <= len(ss) and ss[1] == 'not'
+
+    # Future subjunctive 'not' cases.
+    # Eg, "if you [were to not go]".
+    not_at_2 = 3 <= len(ss) and ss[2] == 'not'
+
+    # There can be at most one "not".
+    assert sum([not_at_0, not_at_1, not_at_2]) in (0, 1)
+
+    # Determine pre-words ("do" of "[do] you [not like]").
+    if v.is_split:
+        if not_at_1:
+            i = 2 if v.contract_not else 1
+        else:
+            i = 1  # "Not" at 0 or 2, or not present.
+    else:
+        i = 0
+
+    # Determine rest-words ("not like" in "[do] you [not like]").
+    if v.intrinsics.is_pro_verb:
+        if not_at_0:
+            z = 1
+        elif not_at_1:
+            z = 2
+        elif not_at_2:
+            z = 3
+        else:
+            assert 'not' not in ss[2:]
+            z = 1
+    else:
+        z = len(ss)
+
+    # Get the ranges.
+    a, b = ss[:i], ss[i:z]
+
+    # If it's a pro-verb, mark the words as pro-verb words.
+    if v.intrinsics.is_pro_verb:
+        a = map(annotate_as_pro_verb, a)
+        b = map(annotate_as_pro_verb, b)
+
+    return a, b
+
+
 class VerbSayer(object):
     def __init__(self):
         self.verb_ephemeralizer = VerbEphemeralizer()
@@ -552,5 +614,16 @@ class VerbSayer(object):
 
     def say(self, v):
         assert isinstance(v, SurfaceVerb)
-        for e in self.ephemeralizer.convert(v):
-            yield self.ephemeral_sayer.say(e)
+        for ev in self.ephemeralizer.convert(v, ignore_invalid_configs=False):
+            ss = self.ephemeral_sayer.say(ev)
+            return slice_verb_words(v, ss)
+        raise VerbConfigError('No say options found for verb')
+
+    def get_all_say_options(self, v):
+        assert isinstance(v, SurfaceVerb)
+        for ev in self.ephemeralizer.convert(v, ignore_invalid_configs=True):
+            try:
+                ss = self.ephemeral_sayer.say(ev)
+            except VerbConfigError:
+                pass
+            yield slice_verb_words(v, ss)
