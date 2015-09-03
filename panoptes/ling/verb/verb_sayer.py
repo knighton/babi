@@ -55,6 +55,15 @@ EPHEMERAL_VERB_FORM2IS_FINITE = {
 Mood = enums.new('Mood = NORMAL IMP SBJ_IMP SBJ_CF')
 
 
+# Mood -> list of possible EphemeralTenses.
+MOOD2VALID_ETENSES = {
+    Mood.NORMAL: [EphemeralTense.PAST, EphemeralTense.NONPAST],
+    Mood.SBJ_CF: [EphemeralTense.SBJ_PAST, EphemeralTense.SBJ_FUT],
+    Mood.SBJ_IMP: [EphemeralTense.SBJ_PRES],
+    Mood.IMP: [EphemeralTense.NONPAST],
+}
+
+
 class EphemeralVerb(object):
     """
     Ephemeral structure created during the process of saying verbs.
@@ -174,6 +183,19 @@ def make_mood2tense2etense():
             etenses))
 
     return mood2tense2etense
+
+
+class VerbConfigError(Exception):
+    """
+    Raised when some combination of verb fields is not valid (individual fields
+    are checked with assertions).
+
+    When generating a lookup table by permuting all combinations of field
+    values, catch and drop these exceptions.
+
+    Outside of that, this error will never be encountered in correct code.
+    """
+    pass
 
 
 class VerbEphemeralizer(object):
@@ -342,9 +364,44 @@ class EphemeralSayer(object):
         self.to_have_aux = self.create_verb('have').annotated_as_aux()
         self.to_do = self.create_verb('do')
 
+    def check(self, v):
+        # Modality is handled as either a mood or a modal verb, the other being
+        # set to the default.
+        if v.modal and v.mood != Mood.NORMAL:
+            raise VerbConfigError('Cannot use both a modal verb and a mood')
+
+        # Imperatives are second-person only.
+        if v.mood == Mood.IMP and \
+                v.conj not in (Conjugation.S2, Conjugation.P2):
+            raise VerbConfigError('Imperatives are second-person only')
+
+        # Check that the partially mood-specific EphemeralTense works with mood.
+        if v.tense not in MOOD2VALID_ETENSES[v.mood]:
+            raise VerbConfigError('Mood and ephemeral tense do not jive')
+
+        # Note: there are probably a number of verbs that have similar meanings/
+        # functions as modals and thereby can't logically be used as imperatives
+        # (eg, "Ought to do that!"), but there's no nice way to check for that.
+
+        # If verb is non-finite, only default mood/modal is allowed.
+        if not EPHEMERAL_VERB_FORM2IS_FINITE[v.verb_form]:
+            if v.modal:
+                raise VerbConfigError('Non-finite verbs cannot use modals')
+
+            if v.mood != Mood.NORMAL:
+                raise VerbConfigError(
+                    'Non-finite verbs must have indicative mood')
+
+        # Zero means passive (eg, "the dog [walked] by me is here")
+        if v.verb_form == EphemeralVerbForm.ZERO_REL_CLAUSE_FINITE and \
+                v.voice != Voice.PASSIVE:
+            raise VerbConfigError(
+                'Relative clauses with the zero relative pronoun must be '
+                'passive')
 
     def say(self, v):
         assert isinstance(v, EphemeralVerb)
+        self.check(v)
 
         # Reason for hallucinate_is_perf:
         #
