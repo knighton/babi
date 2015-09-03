@@ -3,8 +3,8 @@ from itertools import chain
 import json
 import sys
 
-from base.combinatorics import each_choose_one_from_each, int_from_int_tuple, \
-    int_tuple_from_int, collapse_int_tuples_to_wildcards
+from base.combinatorics import each_choose_one_from_each, \
+    collapse_int_tuples_to_wildcards
 from ling.verb.conjugation import Conjugator, MAGIC_INTS_LEMMA
 from ling.verb.verb import SurfaceVerb
 
@@ -20,6 +20,30 @@ def deverb(sss):
     return tuple(sss[0]), tuple(sss[1][:-1])
 
 
+def int_from_wildcardy_int_tuple(nn, num_options_per_field):
+    """
+    int tuple, num options per field -> int
+    """
+    r = 0
+    mul = 1
+    for n, z in zip(nn, num_options_per_field):
+        r += n * mul
+        mul *= (z + 1)  # Reserve the top slot for wildcard values.
+    return r
+
+
+def wildcardy_int_tuple_from_int(n, num_options_per_field):
+    """
+    int, num options per field -> int tuple
+    """
+    rr = []
+    for z in num_options_per_field:
+        r = n % (z + 1)
+        rr.append(r)
+        n /= (z + 1)
+    return rr
+
+
 def to_ints(sss2vv, options_per_field, num_options_per_field):
     s2nn = {}
     for sss, vv in sss2vv.iteritems():
@@ -28,13 +52,13 @@ def to_ints(sss2vv, options_per_field, num_options_per_field):
         for v in vv:
             nn = v.to_int_tuple(options_per_field)
             nnn.append(nn)
-        print 'Collapsing', len(nnn),
+        print 'Collapsing', s, 'from', len(nnn),
         sys.stdout.flush()
         nnn = collapse_int_tuples_to_wildcards(nnn, num_options_per_field)
-        print '->', len(nnn)
+        print 'to', len(nnn)
         ints = []
         for nn in nnn:
-            n = int_from_int_tuple(nn, num_options_per_field)
+            n = int_from_wildcardy_int_tuple(nn, num_options_per_field)
             ints.append(n)
         s2nn[s] = ints
     return s2nn
@@ -63,6 +87,7 @@ def load_lookup_tables(f):
     """
     f -> be, pro, deverbed
     """
+    d = json.load(open(f))
 
     """
     d = cPickle.load(open(f))

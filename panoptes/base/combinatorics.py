@@ -28,33 +28,9 @@ def each_choose_one_from_each(sss):
             break
 
 
-def int_from_int_tuple(nn, num_options_per_field):
-    """
-    int tuple, num options per field -> int
-    """
-    r = 0
-    mul = 1
-    for n, z in zip(nn, num_options_per_field):
-        r += n * mul
-        mul *= z
-    return r
-
-
-def int_tuple_from_int(n, num_options_per_field):
-    """
-    int, num options per field -> int tuple
-    """
-    rr = []
-    for z in num_options_per_field:
-        r = n % z
-        rr.append(r)
-        n /= z
-    return rr
-
-
 def collapse_int_tuples_to_wildcards(tuples, num_options_per_field):
     """
-    tuples, num options per field -> tuples with Nones
+    int tuples, num options per field -> tuples with "wildcards"
     """
     # Keep greedily shrinking tuples until we can't anymore.
     while True:
@@ -74,7 +50,7 @@ def collapse_int_tuples_to_wildcards(tuples, num_options_per_field):
 
                 # Create the tuple's lookup key with wildcard.
                 wildcarded = list(aa)
-                wildcarded[field_index] = None
+                wildcarded[field_index] = num_options
                 wildcarded = tuple(wildcarded)
 
                 # Set the present bit for this option.
