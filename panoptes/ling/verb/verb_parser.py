@@ -199,7 +199,7 @@ class VerbParser(object):
             print 'Loading from "%s"' % f
             return VerbParser.load(verb_sayer.conjugator, f)
         else:
-            print '"%s" does not exist, constructing from scratch'
+            print '"%s" does not exist, constructing from scratch' % f
             return VerbParser.regenerate(verb_sayer, f)
 
     def parse_field_index_replacing(self, sss):
