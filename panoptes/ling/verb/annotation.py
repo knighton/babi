@@ -1,5 +1,5 @@
 def annotate_as_pro_verb(s):
-    return 'PRO_VERB:' + s
+    return 'PV:' + s
 
 
 def annotate_as_aux(s):
