@@ -500,33 +500,34 @@ class EphemeralSayer(object):
                 # Actually insert it.
                 rr = rr[:notx] + ['not'] + rr[notx:]
 
-        # Conjugate the front word depending on mood, tense, etc., if it isn't a
-        # modal, 'not', 'to', etc.  Leftovers are automatically converted to
-        # their lemmas, so in a few cases we just do nothing.
-        if is_finite:
-            if v.mood == Mood.NORMAL:
-                conjx = 0  # If there is a not, it's at index 1.
-                if not isinstance(rr[conjx], str):
-                    if v.tense == EphemeralTense.NONPAST:
-                        rr[0] = rr[0].nonpast[CONJ2INDEX[v.conj]]
-                    elif v.tense == EphemeralTense.PAST:
-                        rr[0] = rr[0].past[CONJ2INDEX[v.conj]]
+            # Conjugate the front word depending on mood, tense, etc., if it
+            # isn't a modal, 'not', 'to', etc.  Leftovers are automatically
+            # converted to their lemmas, so in a few cases we just do nothing.
+            if is_finite:
+                if v.mood == Mood.NORMAL:
+                    conjx = 0  # If there is a not, it's at index 1.
+                    if not isinstance(rr[conjx], str):
+                        if v.tense == EphemeralTense.NONPAST:
+                            rr[0] = rr[0].nonpast[CONJ2INDEX[v.conj]]
+                        elif v.tense == EphemeralTense.PAST:
+                            rr[0] = rr[0].past[CONJ2INDEX[v.conj]]
+                        else:
+                            assert False
+                elif v.mood == Mood.SBJ_CF:
+                    if v.tense == EphemeralTense.SBJ_PAST:
+                        said_conj = Conjugation.P2 if v.use_were_sbj else v.conj
+                        rr[0] = rr[0].past[CONJ2INDEX[said_conj]]
                     else:
+                        # SBJ_FUT (the other option) is covered separately
+                        # above.
                         assert False
-            elif v.mood == Mood.SBJ_CF:
-                if v.tense == EphemeralTense.SBJ_PAST:
-                    said_conj = Conjugation.P2 if v.use_were_sbj else v.conj
-                    rr[0] = rr[0].past[CONJ2INDEX[said_conj]]
                 else:
-                    # SBJ_FUT (the other option) is covered separately above.
-                    assert False
+                    # IMP, SBJ_IMP.
+                    pass
             else:
-                # IMP, SBJ_IMP.
-                pass
-        else:
-            if v.verb_form == EphemeralVerbForm.GERUND:
-                conjx = 1 if v.whether == Whether.NO else 0
-                rr[conjx] = rr[conjx].pres_part
+                if v.verb_form == EphemeralVerbForm.GERUND:
+                    conjx = 1 if v.whether == Whether.NO else 0
+                    rr[conjx] = rr[conjx].pres_part
 
         # Index of end of infinitives (exclusive).
         z = len(rr)

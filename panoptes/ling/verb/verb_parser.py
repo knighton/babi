@@ -39,7 +39,7 @@ def construct_one_lookup_table(verb_sayer, lemmas, is_pro_verbs):
                     each_choose_one_from_each(nonfinite_options)):
         v = SurfaceVerb.from_tuple(aa)
         for sss in verb_sayer.get_all_say_options(v):
-            sss = tuple(tuple(sss[0]), tuple(sss[1]))
+            sss = (tuple(sss[0]), tuple(sss[1]))
             sss2vv[sss].append(v)
 
     print len(sss2vv)
