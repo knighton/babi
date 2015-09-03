@@ -275,6 +275,20 @@ class SurfaceVerb(object):
         return SurfaceVerb(intrinsics, voice, conj, is_split, relative_cont,
                            contract_not, split_inf, sbj_handling)
 
+    @staticmethod
+    def from_int_tuple(nn, options_per_field):
+        """
+        Allows Nones, in which n == number options.
+        """
+        aa = []
+        for n, options in zip(nn, options_per_field):
+            if n == len(options):
+                a = None
+            else:
+                a = options[n]
+            aa.append(a)
+        return SurfaceVerb.from_tuple(aa)
+
     def to_tuple(self):
         i = self.intrinsics
         return (i.lemma, i.polarity.tf, i.polarity.is_contrary, i.tense,
@@ -282,3 +296,13 @@ class SurfaceVerb(object):
                 i.modality.is_cond, i.verb_form, i.is_pro_verb, self.voice,
                 self.conj, self.is_split, self.relative_cont, self.contract_not,
                 self.split_inf, self.sbj_handling)
+
+    def to_int_tuple(self, options_per_field):
+        """
+        Does not allow fields to be None.
+        """
+        aa = self.to_tuple()
+        nn = []
+        for a, options in zip(aa, options_per_field):
+            nn.append(options.index(a))
+        return nn

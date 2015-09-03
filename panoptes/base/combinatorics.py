@@ -28,35 +28,31 @@ def each_choose_one_from_each(sss):
             break
 
 
-def int_from_tuple(aa, options_per_field):
+def int_from_int_tuple(nn, num_options_per_field):
     """
-    tuple, options per field -> integer
-
-    Corresponds to tuple_from_int().
+    int tuple, num options per field -> int
     """
-    n = 0
+    r = 0
     mul = 1
-    for a, options in zip(aa, options_per_field):
-        n += options.index(a) * mul
-        mul *= len(options)
-    return n
+    for n, z in zip(nn, num_options_per_field):
+        r += n * mul
+        mul *= z
+    return r
 
 
-def tuple_from_int(n, options_per_field):
+def int_tuple_from_int(n, num_options_per_field):
     """
-    integer, options per field -> tuple
-
-    Corresponds to int_from_tuple().
+    int, num options per field -> int tuple
     """
-    aa = []
-    for options in options_per_field:
-        a = options[n % len(options)]
-        aa.append(a)
-        n /= len(options)
-    return aa
+    rr = []
+    for z in num_options_per_field:
+        r = n % z
+        rr.append(r)
+        n /= z
+    return rr
 
 
-def collapse_to_wildcards(tuples, num_options_per_field):
+def collapse_int_tuples_to_wildcards(tuples, num_options_per_field):
     """
     tuples, num options per field -> tuples with Nones
     """
@@ -101,7 +97,7 @@ def collapse_to_wildcards(tuples, num_options_per_field):
                         tmp_new_tuples.append(aa)
 
             # If we did a better job than the existing, keep it.
-            if len(tmp_new_tuples) < len(best_new_tuples):
+            if tmp_new_tuples and len(tmp_new_tuples) < len(best_new_tuples):
                 best_new_tuples = tmp_new_tuples
                 give_up = False
 

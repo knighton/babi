@@ -1,9 +1,10 @@
 from collections import defaultdict
 from itertools import chain
 import json
+import sys
 
-from base.combinatorics import each_choose_one_from_each, int_from_tuple, \
-    tuple_from_int
+from base.combinatorics import each_choose_one_from_each, int_from_int_tuple, \
+    int_tuple_from_int, collapse_int_tuples_to_wildcards
 from ling.verb.conjugation import Conjugator, MAGIC_INTS_LEMMA
 from ling.verb.verb import SurfaceVerb
 
@@ -19,16 +20,23 @@ def deverb(sss):
     return tuple(sss[0]), tuple(sss[1][:-1])
 
 
-def to_ints(sss2vv, all_options):
+def to_ints(sss2vv, options_per_field, num_options_per_field):
     s2nn = {}
     for sss, vv in sss2vv.iteritems():
         s = ' '.join(list(sss[0]) + ['|'] + list(sss[1]))
-        nn = []
+        nnn = []
         for v in vv:
-            aa = v.to_tuple()
-            n = int_from_tuple(aa, all_options)
-            nn.append(n)
-        s2nn[s] = nn
+            nn = v.to_int_tuple(options_per_field)
+            nnn.append(nn)
+        print 'Collapsing', len(nnn),
+        sys.stdout.flush()
+        nnn = collapse_int_tuples_to_wildcards(nnn, num_options_per_field)
+        print '->', len(nnn)
+        ints = []
+        for nn in nnn:
+            n = int_from_int_tuple(nn, num_options_per_field)
+            ints.append(n)
+        s2nn[s] = ints
     return s2nn
 
 
@@ -36,23 +44,14 @@ def save_lookup_tables(be, pro, deverbed, f):
     """
     be, pro, deverbed, f -> None
     """
-
-    """
-    d = {
-        'be': be,
-        'pro-verb': pro,
-        'deverbed': deverbed,
-    }
-    cPickle.dump(d, open(f, 'wb'))
-    """
-
     verbs_used = ['be', 'see', MAGIC_INTS_LEMMA]
-    all_options = SurfaceVerb.all_options(verbs_used, [False, True])
-    be_s2nn = to_ints(be, all_options)
-    pro_verb_s2nn = to_ints(pro, all_options)
-    deverbed_s2nn = to_ints(deverbed, all_options)
+    options_per_field = SurfaceVerb.all_options(verbs_used, [False, True])
+    zz = map(len, options_per_field)
+    be_s2nn = to_ints(be, options_per_field, zz)
+    pro_verb_s2nn = to_ints(pro, options_per_field, zz)
+    deverbed_s2nn = to_ints(deverbed, options_per_field, zz)
     d = {
-        'options_per_field': all_options,
+        'options_per_field': options_per_field,
         'be': be_s2nn,
         'pro-verb': pro_verb_s2nn,
         'deverbed': deverbed_s2nn,
@@ -90,15 +89,13 @@ def construct_lookup_tables(sayer):
     """
     None -> be, pro, deverbed
     """
-    from time import time
-    t0 = time()
-    print 'be', time() - t0
+    print 'Conjugating forms of "to be"...'
     be = construct_one_lookup_table(sayer, ['be'], [False, True])
-    print 'pro-verb', time() - t0
+    print 'Conjugating pro-verbs...'
     pro = construct_one_lookup_table(sayer, ['see'], [True])
-    print 'deverbed', time() - t0
+    print 'Conjugating all other verbs...'
     deverbed = construct_one_lookup_table(sayer, [MAGIC_INTS_LEMMA], [False])
-    print 'done', time() - t0
+    print 'Done conjugating.'
     return be, pro, deverbed
 
 

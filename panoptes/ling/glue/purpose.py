@@ -6,8 +6,9 @@
 # Used for deciding sentence-ending punctuation, whether to do-split a verb, if
 # there are wh-roles to possibly front, etc.
 
-from base.enum import enum
 from collections import defaultdict
+
+from base.enum import enum
 
 
 Purpose = enum('Purpose = WH_Q TF_Q VERIFY_Q INFO')
