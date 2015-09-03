@@ -35,7 +35,7 @@ class EnumManager(object):
 _MGR = EnumManager()
 
 
-def new(s, base_classes=None):
+def enum(s, base_classes=None):
     """
     '<enum name> = <list of enum values>' -> enum object
 

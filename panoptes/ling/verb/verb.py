@@ -1,4 +1,4 @@
-from base import enum
+from base.enum import enum
 from ling.glue.inflection import Conjugation
 
 
@@ -60,7 +60,7 @@ class Aspect(object):
 # * The two subjunctives:
 #       SBJ_CF ('subjunctive-counterfactual') "if he [were] smart"
 #       SBJ_IMP ('subjunctive-imperative') "he requests you [come]"
-ModalFlavor = enum.new("""ModalFlavor =
+ModalFlavor = enum("""ModalFlavor =
     INDICATIVE
     SBJ_CF
 
@@ -93,11 +93,11 @@ class Modality(object):
 
 
 # Abstract sense of tense that is actually about time only.
-Tense = enum.new('Tense = PAST PRESENT FUTURE')
+Tense = enum('Tense = PAST PRESENT FUTURE')
 
 
 # Deep verb form splits gerund for usage higher up in the codebase.
-VerbForm = enum.new('VerbForm = FINITE BARE_INF TO_INF GERUND SUBJLESS_GERUND')
+VerbForm = enum('VerbForm = FINITE BARE_INF TO_INF GERUND SUBJLESS_GERUND')
 
 
 class DeepVerb(object):
@@ -138,7 +138,7 @@ class DeepVerb(object):
 
 
 # Linguistic voice.
-Voice = enum.new('Voice = ACTIVE PASSIVE')
+Voice = enum('Voice = ACTIVE PASSIVE')
 
 
 # Relative containment.
@@ -166,14 +166,14 @@ Voice = enum.new('Voice = ACTIVE PASSIVE')
 # - Meaning: is not part of a relative clause.
 # - verb_form restriction: any of them is ok.
 # - Surface verb_form handling; normal (NORMAL_FINITE for finite).
-RelativeContainment = enum.new('RelativeContainment = ZERO WORD NOT_REL')
+RelativeContainment = enum('RelativeContainment = ZERO WORD NOT_REL')
 
 
 # Subjunctive handling.
 #
 # WERE_SBJ  "If I [were] an astronaut"
 # WAS_SBJ   "If I [was] an astronaut"
-SubjunctiveHandling = enum.new('SubjunctiveHandling = WERE_SBJ WAS_SBJ')
+SubjunctiveHandling = enum('SubjunctiveHandling = WERE_SBJ WAS_SBJ')
 
 
 class SurfaceVerb(object):

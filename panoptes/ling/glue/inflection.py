@@ -1,11 +1,11 @@
 # "inflection" here means the single concept connecting choices of verb
 # conjugation, personal pronoun, etc.
 
-from base import enum
+from base.enum import enum
 from ling.glue.grammatical_number import N2
 
 
-Declension = enum.new("""Declension =
+Declension = enum("""Declension =
     I WE YOU YALL HE SHE IT THEY1 ONE WHO1 WHO2 THEY2 WHOEVER1 WHOEVER2""")
 
 
@@ -14,17 +14,17 @@ def is_declension_q(d):
                  Declension.WHOEVER2)
 
 
-Person = enum.new('Person = FIRST SECOND THIRD')
+Person = enum('Person = FIRST SECOND THIRD')
 
 
-Conjugation = enum.new('Conjugation = S1 S2 S3 P1 P2 P3')
+Conjugation = enum('Conjugation = S1 S2 S3 P1 P2 P3')
 
 
 CONJ2INDEX = dict(zip(sorted(Conjugation.values),
                       range(len(Conjugation.values))))
 
 
-Gender = enum.new('Gender = MALE FEMALE NEUTER')
+Gender = enum('Gender = MALE FEMALE NEUTER')
 
 
 class PerNumGen(object):
