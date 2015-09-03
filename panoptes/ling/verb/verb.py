@@ -37,12 +37,18 @@ class Aspect(object):
 
     def __init__(self, is_perf, is_prog):
         self.is_perf = is_perf
+
+        # TODO: check where is_prog is wildcarded.
         self.is_prog = is_prog
         self.check()
 
     def check(self, allow_wildcards=True):
-        assert isinstance(self.is_perf, bool)
-        assert isinstance(self.is_prog, bool)
+        if allow_wildcards:
+            assert self.is_perf in (None, False, True)
+            assert self.is_prog in (None, False, True)
+        else:
+            assert isinstance(self.is_perf, bool)
+            assert isinstance(self.is_prog, bool)
 
 
 # Modal "flavor".
@@ -81,12 +87,17 @@ ModalFlavor = enum("""ModalFlavor =
 class Modality(object):
     def __init__(self, flavor, is_cond):
         self.flavor = flavor
+
+        # TODO: check where is_cond is wildcarded.
         self.is_cond = is_cond
         self.check()
 
     def check(self, allow_wildcards=True):
         assert ModalFlavor.is_valid(self.flavor)
-        assert isinstance(self.is_cond, bool)
+        if allow_wildcards:
+            assert self.is_cond in (None, False, True)
+        else:
+            assert isinstance(self.is_cond, bool)
 
     def is_indicative(self):
         return self.flavor == ModalFlavor.INDICATIVE and not self.is_cond

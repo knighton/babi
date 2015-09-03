@@ -14,7 +14,8 @@ def main():
     print conj.identify_word('lose')
 
     verb_sayer = VerbSayer(conj)
-    verb_parser = VerbParser.load_or_construct(verb_sayer, '../data/verbs.json')
+    verb_parser = VerbParser.load_or_regenerate(
+        verb_sayer, '../data/verbs.json')
 
 
 if __name__ == '__main__':
