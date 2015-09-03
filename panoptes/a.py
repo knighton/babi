@@ -1,21 +1,21 @@
-from ling.verb.conjugation import conjugations_from_file, Conjugator
-from ling.verb.verb_parser import VerbParser
-from ling.verb.verb_sayer import VerbSayer
+from agent import Agent
+from datasets import get_problems
+from ling.verb.verb_manager import VerbManager
 
 
 def main():
-    fn = 'config/conjugations.csv'
-    cc = conjugations_from_file(fn)
-    print len(cc)
-    conj = Conjugator(cc)
-    print conj.identify_word('batting')
-    print conj.identify_word('bat')
-    print conj.identify_word('bats')
-    print conj.identify_word('lose')
+    conj_f = 'config/conjugations.csv'
+    verb_f = '../data/verbs.json'
+    verb_mgr = VerbManager.from_files(conj_f, verb_f)
 
-    verb_sayer = VerbSayer(conj)
-    verb_parser = VerbParser.load_or_regenerate(
-        verb_sayer, '../data/verbs.json')
+    d = '../data/tasks_1-20_v1-2/en/'
+    problems = get_problems(d)
+    problem = problems[1]
+    s, want_out = problem[0]
+
+    a = Agent()
+    got_out = a.put(s)
+    assert want_out == got_out
 
 
 if __name__ == '__main__':

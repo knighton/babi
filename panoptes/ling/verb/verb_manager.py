@@ -17,7 +17,7 @@ class VerbManager(object):
         assert isinstance(self.parser, VerbParser)
 
     @staticmethod
-    def load_or_regenerate(conjugation_f, verb_f):
+    def from_files(conjugation_f, verb_f):
         conjugator = Conjugator.from_file(conjugation_f)
         sayer = VerbSayer(conjugator)
         parser = VerbParser.load_or_regenerate(sayer, verb_f)

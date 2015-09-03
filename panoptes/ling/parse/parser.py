@@ -1,7 +1,8 @@
 from collections import defaultdict
 from spacy.en import English
+import sys
 
-from lang.parse.parse import Parse, Token
+from ling.parse.parse import Parse, Token
 
 
 def truecase(tokens):
@@ -16,7 +17,10 @@ def truecase(tokens):
 
 class Parser(object):
     def __init__(self):
+        print 'Initializing spacy...',
+        sys.stdout.flush()
         self.nlp = English()
+        print 'done'
 
     def parse(self, text):
         tokens = self.nlp(text, parse=True)
