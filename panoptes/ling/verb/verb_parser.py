@@ -14,6 +14,27 @@ def deverb(sss):
     return tuple(sss[0]), tuple(sss[1][:-1])
 
 
+def save_lookup_tables(be, pro, main, f):
+    """
+    be, pro, main, f -> None
+    """
+    assert False  # XXX
+
+
+def load_lookup_tables(f):
+    """
+    f -> be, pro, main
+    """
+    assert False  # XXX
+
+
+def construct_lookup_tables():
+    """
+    None -> be, pro, main
+    """
+    assert False  # XXX
+
+
 class VerbParser(object):
     def __init__(self, conjugator, be_sss2vv, pro_verb_sss2vv, main_sss2vv):
         self.conjugator = conjugator
@@ -41,6 +62,24 @@ class VerbParser(object):
         # Used by main_sss2vv parsing.
         self.deverbed_sss_set = \
             set(filter(bool, map(remove_lemma_specific_word, self.main_sss2vv)))
+
+    @staticmethod
+    def load(conjugator, f):
+        be, pro, main = load_lookup_tables(f)
+        return VerbParser(conjugator, be, pro, main)
+
+    @staticmethod
+    def construct(conjugator, f):
+        be, pro, main = construct_lookup_tables()
+        save_lookup_tables(be, pro, main, f)
+        return VerbParser(conjugator, be, pro, main)
+
+    @staticmethod
+    def load_or_construct(conjugator, f):
+        try:
+            return VerbParser.load(conjugator, f)
+        except:
+            return VerbParser.construct(conjugator, f)
 
     def parse_field_index_replacing(self, sss):
         """

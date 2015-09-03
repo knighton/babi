@@ -112,7 +112,6 @@ class DeepVerb(object):
 
     def __init__(self, lemma, polarity, tense, aspect, modality, verb_form,
                  is_pro_verb):
-        # Lemma is blank if it's a pro-verb.
         self.lemma = lemma
         self.polarity = polarity
         self.tense = tense
@@ -120,9 +119,9 @@ class DeepVerb(object):
         self.modality = modality
         self.verb_form = verb_form
         self.is_pro_verb = is_pro_verb
-        self.check()
 
     def check(self, allow_wildcards=True):
+        # Lemma is blank if it's a pro-verb.
         if self.lemma is not None:
             assert self.lemma
             assert isinstance(self.lemma, str)
@@ -197,7 +196,6 @@ class SurfaceVerb(object):
         self.contract_not = contract_not
         self.split_inf = split_inf
         self.sbj_handling = sbj_handling
-        self.check()
 
     def check(self, allow_wildcards=True):
         assert isinstance(self.intrinsics, DeepVerb)
@@ -216,3 +214,63 @@ class SurfaceVerb(object):
             assert isinstance(self.contract_not, bool)
             assert isinstance(self.split_inf, bool)
             assert SubjunctiveHandling.is_valid(self.sbj_handling)
+
+    @staticmethod
+    def all_options(lemmas, is_pro_verb_options):
+        bools = [False, True]
+
+        lemma = lemmas
+
+        tf = bools
+        is_contrary = bools
+
+        tense = sorted(Tense.values)
+
+        is_prog = bools
+        is_perf = bools
+
+        flavor = sorted(ModalFlavor.values)
+        is_cond = bools
+
+        verb_form = sorted(VerbForm.values)
+
+        is_pro_verb = is_pro_verb_options
+
+        voice = sorted(Voice.values)
+        conj = sorted(Conjugation.values)
+        is_split = bools
+        relative_cont = sorted(RelativeContainment.values)
+        contract_not = bools
+        split_inf = bools
+        sbj_handling = sorted(SubjunctiveHandling.values)
+
+        return lemma, tf, is_contrary, tense, is_prog, is_perf, flavor, \
+               is_cond, verb_form, is_pro_verb, voice, conj, is_split, \
+               relative_cont, contract_not, split_inf, sbj_handling
+
+    @staticmethod
+    def finite_options(lemmas, is_pro_verb_options):
+        aaa = SurfaceVerb.all_options(lemmas, is_pro_verb_options)
+        aaa[8] = [VerbForm.FINITE]
+        return aaa
+
+    @staticmethod
+    def nonfinite_options(lemmas, is_pro_verb_options):
+        aaa = SurfaceVerb.all_options(lemmas, is_pro_verb_options)
+        aaa[6] = [ModalFlavor.INDICATIVE]
+        del aaa[8][0] 
+        aaa[12] = [False]
+        return aaa
+
+    @staticmethod
+    def from_tuple(aa):
+        lemma, tf, is_contrary, tense, is_prog, is_perf, flavor, \
+            is_cond, verb_form, is_pro_verb, voice, conj, is_split, \
+            relative_cont, contract_not, split_inf, sbj_handling = aa
+        polarity = Polarity(tf, is_contrary)
+        aspect = Aspect(is_prog, is_perf)
+        modality = Modality(flavor, is_cond)
+        intrinsics = DeepVerb(
+            lemma, polarity, tense, aspect, modality, verb_form, is_pro_verb)
+        return SurfaceVerb(intrinsics, voice, conj, is_split, relative_cont,
+                           contract_not, split_inf, sbj_handling)
