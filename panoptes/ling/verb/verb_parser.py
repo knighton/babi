@@ -1,8 +1,9 @@
 from collections import defaultdict
-import cPickle
 from itertools import chain
+import json
 
-from base.combinatorics import each_choose_one_from_each
+from base.combinatorics import each_choose_one_from_each, int_from_tuple, \
+    tuple_from_int
 from ling.verb.conjugation import Conjugator, MAGIC_INTS_LEMMA
 from ling.verb.verb import SurfaceVerb
 
@@ -18,9 +19,24 @@ def deverb(sss):
     return tuple(sss[0]), tuple(sss[1][:-1])
 
 
+def to_ints(sss2vv, all_options):
+    s2nn = {}
+    for sss, vv in sss2vv.iteritems():
+        s = ' '.join(list(sss[0]) + ['|'] + list(sss[1]))
+        nn = []
+        for v in vv:
+            aa = v.to_tuple()
+            n = int_from_tuple(aa, all_options)
+            nn.append(n)
+        s2nn[s] = nn
+    return s2nn
+
+
 def save_lookup_tables(be, pro, deverbed, f):
     """
     be, pro, deverbed, f -> None
+    """
+
     """
     d = {
         'be': be,
@@ -28,14 +44,33 @@ def save_lookup_tables(be, pro, deverbed, f):
         'deverbed': deverbed,
     }
     cPickle.dump(d, open(f, 'wb'))
+    """
+
+    verbs_used = ['be', 'see', MAGIC_INTS_LEMMA]
+    all_options = SurfaceVerb.all_options(verbs_used, [False, True])
+    be_s2nn = to_ints(be, all_options)
+    pro_verb_s2nn = to_ints(pro, all_options)
+    deverbed_s2nn = to_ints(deverbed, all_options)
+    d = {
+        'options_per_field': all_options,
+        'be': be_s2nn,
+        'pro-verb': pro_verb_s2nn,
+        'deverbed': deverbed_s2nn,
+    }
+    json.dump(d, open(f, 'wb'))
 
 
 def load_lookup_tables(f):
     """
     f -> be, pro, deverbed
     """
+
+    """
     d = cPickle.load(open(f))
     return d['be'], d['pro-verb'], d['deverbed']
+    """
+
+    assert False  # XXX
 
 
 def construct_one_lookup_table(verb_sayer, lemmas, is_pro_verbs):

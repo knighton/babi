@@ -24,3 +24,30 @@ def each_choose_one_from_each(sss):
         if not ok:
             break
 
+
+def int_from_tuple(aa, options_per_field):
+    """
+    tuple, options per field -> integer
+
+    Corresponds to tuple_from_int().
+    """
+    n = 0
+    mul = 1
+    for a, options in zip(aa, options_per_field):
+        n += options.index(a) * mul
+        mul *= len(options)
+    return n
+
+
+def tuple_from_int(n, options_per_field):
+    """
+    integer, options per field -> tuple
+
+    Corresponds to int_from_tuple().
+    """
+    aa = []
+    for options in options_per_field:
+        a = options[n % len(options)]
+        aa.append(a)
+        n /= len(options)
+    return aa

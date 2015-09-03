@@ -274,3 +274,11 @@ class SurfaceVerb(object):
             lemma, polarity, tense, aspect, modality, verb_form, is_pro_verb)
         return SurfaceVerb(intrinsics, voice, conj, is_split, relative_cont,
                            contract_not, split_inf, sbj_handling)
+
+    def to_tuple(self):
+        i = self.intrinsics
+        return (i.lemma, i.polarity.tf, i.polarity.is_contrary, i.tense,
+                i.aspect.is_prog, i.aspect.is_perf, i.modality.flavor,
+                i.modality.is_cond, i.verb_form, i.is_pro_verb, self.voice,
+                self.conj, self.is_split, self.relative_cont, self.contract_not,
+                self.split_inf, self.sbj_handling)
