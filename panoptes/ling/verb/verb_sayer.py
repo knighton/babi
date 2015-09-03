@@ -1,9 +1,10 @@
 from collections import defaultdict
 
+from base.enum import enum
 from ling.glue.inflection import CONJ2INDEX, Conjugation
 from ling.verb.annotation import annotate_as_pro_verb
 from ling.verb.conjugation import Conjugator
-from ling.verb.verb import ModalFlavor, Modality, SurfaceVerb, VerbForm, Voice
+from ling.verb.verb import *
 
 
 # Whether.
@@ -13,7 +14,7 @@ from ling.verb.verb import ModalFlavor, Modality, SurfaceVerb, VerbForm, Voice
 # NO    no
 # YES   yes
 # EMPH  emphatic yes (yes + you were expecting no)
-Whether = enums.new('Whether = NO YES EMPH')
+Whether = enum('Whether = NO YES EMPH')
 
 
 # Ephemeral tense.
@@ -25,7 +26,7 @@ Whether = enums.new('Whether = NO YES EMPH')
 # SBJ_PAST  past subjunctive
 # SBJ_PRES  present subjunctive
 # SBJ_FUT   future subjunctive
-EphemeralTense = enums.new(
+EphemeralTense = enum(
     'EphemeralTense = PAST NONPAST SBJ_PAST SBJ_PRES SBJ_FUT')
 
 
@@ -33,7 +34,7 @@ EphemeralTense = enums.new(
 #
 # Distinguishes finites that are in zero-relative pronoun relative clauses
 # (this matters for saying/parsing).
-EphemeralVerbForm = enums.new("""EphemeralVerbForm =
+EphemeralVerbForm = enum("""EphemeralVerbForm =
     NORMAL_FINITE ZERO_REL_CLAUSE_FINITE BARE_INF TO_INF GERUND""")
 
 
@@ -53,7 +54,7 @@ EPHEMERAL_VERB_FORM2IS_FINITE = {
 # NORMAL   normal
 # SBJ_IMP  subjunctive-imperative
 # SBJ_CF   subjunctive-counterfactual
-Mood = enums.new('Mood = NORMAL IMP SBJ_IMP SBJ_CF')
+Mood = enum('Mood = NORMAL IMP SBJ_IMP SBJ_CF')
 
 
 # Mood -> list of possible EphemeralTenses.
@@ -85,6 +86,7 @@ class EphemeralVerb(object):
         self.whether = whether
         assert Whether.is_valid(self.whether)
 
+        self.modal = modal
         if self.modal is not None:
             assert self.modal
             assert isinstance(self.modal, str)
@@ -119,12 +121,10 @@ def make_flavor_cond2modals_moods(known_modals):
         MODALITY        NORMAL  CONDITIONAL
         INDICATIVE      NORMAL  would
         SUBJUNCTIVE_CF  SBJ_CF  -
-
         DEDUCTIVE       must    -
         ALMOST_CERTAIN  must    -
         PROBABLE        should  -
         POSSIBLE        can,may could,might
-
         IMPERATIVE      IMP     -
         SUBJUNCTIVE_IMP SBJ_IMP -
         ABILITY         can     could
@@ -134,7 +134,7 @@ def make_flavor_cond2modals_moods(known_modals):
     """
 
     flavor_cond2modals_moods = defaultdict(list)
-    for line in text.strip().split('\n')
+    for line in text.strip().split('\n')[1:]:
         flavor, normal, cond = line.split()
         flavor = ModalFlavor.from_str[flavor]
         for options, is_cond in ((normal, False), (cond, True)):
@@ -153,10 +153,10 @@ def make_flavor_cond2modals_moods(known_modals):
                 key = (flavor, is_cond)
                 flavor_cond2modals_moods[key].append((modal, mood))
 
-    r_flavors = set(map(lambda (m, _): m, r.iterkeys()))
+    r_flavors = set(map(lambda (m, _): m, flavor_cond2modals_moods.iterkeys()))
     assert r_flavors == ModalFlavor.values
 
-    return r
+    return flavor_cond2modals_moods
 
 
 def make_mood2tense2etense():
@@ -167,7 +167,7 @@ def make_mood2tense2etense():
             EphemeralTense.NONPAST,
         ],
         Mood.IMP:
-            [EmphemeralTense.NONPAST] * 3,
+            [EphemeralTense.NONPAST] * 3,
         Mood.SBJ_IMP:
             [EphemeralTense.SBJ_PRES] * 3,
         Mood.SBJ_CF: [
@@ -179,7 +179,7 @@ def make_mood2tense2etense():
 
     mood2tense2etense = {}
     for mood, etenses in mood2etenses.iteritems():
-        mood2tense2etenses[mood] = dict(zip(
+        mood2tense2etense[mood] = dict(zip(
             [Tense.PAST, Tense.PRESENT, Tense.FUTURE],
             etenses))
 
@@ -204,7 +204,7 @@ class VerbEphemeralizer(object):
     Converts SurfaceVerb to EphemeralVerb for saying.
     """
 
-    def __init__(self):
+    def __init__(self, known_modals):
         # VerbForm -> EphemeralVerbForm.
         #
         # Only for when not in a relative clause.
@@ -225,17 +225,17 @@ class VerbEphemeralizer(object):
         # Mood -> Tense -> EphemeralTense.
         self.mood2tense2etense = make_mood2tense2etense()
 
-    def everbform_from_verbform_relcont(self, verb_form, rel_cont):
-        in_relative_clause = rel_cont != RelativeContainment.NOT_REL
+    def everbform_from_verbform_relcont(self, verb_form, relative_cont):
+        in_relative_clause = relative_cont != RelativeContainment.NOT_REL
         is_finite = verb_form == VerbForm.FINITE
         if in_relative_clause and not is_finite:
             raise VerbConfigError('Relative clause verbs must be finite')
 
-        if rel_cont == RelativeContainment.ZERO:
+        if relative_cont == RelativeContainment.ZERO:
             r = EphemeralVerbForm.ZERO_REL_CLAUSE_FINITE
-        elif rel_cont == RelativeContainment.WORD:
+        elif relative_cont == RelativeContainment.WORD:
             r = EphemeralVerbForm.NORMAL_FINITE
-        elif rel_cont == RelativeContainment.NOT_REL:
+        elif relative_cont == RelativeContainment.NOT_REL:
             r = self.nonrel_verbform2everbform[verb_form]
         else:
             assert False
@@ -251,7 +251,7 @@ class VerbEphemeralizer(object):
         # conditionality is not very common, so use "if <ind> then <non-cond>"
         # instead of "if <sbj-cf> then <cond>".
         key = (modal_flavor, is_cond)
-        modal_moods = self.normal_flavor_cond2modals_moods.get(key)
+        modals_moods = self.normal_flavor_cond2modals_moods.get(key)
         if not modals_moods:
             raise VerbConfigError(
                 'There is no conditional form of the modality you have chosen')
@@ -303,7 +303,7 @@ class VerbEphemeralizer(object):
         # VerbForm, RelativeContainment -> EphemeralVerbForm.
         ephemeral_verb_form = \
             self.everbform_from_verbform_relcont(
-                v.instrincs.verb_form, v.rel_cont)
+                v.intrinsics.verb_form, v.relative_cont)
 
         for mood, modal, ephemeral_tense in \
             self.moods_modals_etenses_from_flavor_cond_tense(
@@ -312,8 +312,8 @@ class VerbEphemeralizer(object):
             use_were_sbj = v.sbj_handling == SubjunctiveHandling.WERE_SBJ
             yield EphemeralVerb(
                 v.intrinsics.lemma, whether, modal, v.voice, ephemeral_tense,
-                aspect, mood, v.conj, ephemeral_verb_form, v.split_inf,
-                use_were_sbj)
+                v.intrinsics.aspect, mood, v.conj, ephemeral_verb_form,
+                v.split_inf, use_were_sbj)
 
 
 def make_modal2indtense2mstr_perf():
@@ -330,7 +330,7 @@ def make_modal2indtense2mstr_perf():
     """
 
     modal2indtense2mstr_perf = {}
-    for line in text.strip().split('\n'):
+    for line in text.strip().split('\n')[1:]:
         modal, past, nonpast_modal = line.split()
 
         assert modal.islower()
@@ -362,9 +362,12 @@ class EphemeralSayer(object):
         self.modal2indtense2mstr_perf = make_modal2indtense2mstr_perf()
 
         # Keep auxiliaries around for quick access.
-        self.to_be = self.create_verb('be')
-        self.to_have_aux = self.create_verb('have').annotated_as_aux()
-        self.to_do = self.create_verb('do')
+        # Auxiliary "to have" and regular "to have" contract differently in
+        # American English, so annotate it here.
+        self.to_be = self.conjugator.create_verb('be')
+        self.to_have_aux = \
+            self.conjugator.create_verb('have').annotated_as_aux()
+        self.to_do = self.conjugator.create_verb('do')
 
     def check(self, v):
         # Modality is handled as either a mood or a modal verb, the other being
@@ -400,6 +403,9 @@ class EphemeralSayer(object):
             raise VerbConfigError(
                 'Relative clauses with the zero relative pronoun must be '
                 'passive')
+
+    def get_known_modals(self):
+        return self.modal2indtense2mstr_perf.keys()
 
     def say(self, v):
         assert isinstance(v, EphemeralVerb)
@@ -606,11 +612,12 @@ def slice_verb_words(v, ss):
 
 
 class VerbSayer(object):
-    def __init__(self):
-        self.verb_ephemeralizer = VerbEphemeralizer()
-
-        self.conjugator = Conjugator()
+    def __init__(self, conjugator):
+        self.conjugator = conjugator
         self.ephemeral_sayer = EphemeralSayer(conjugator)
+
+        known_modals = self.ephemeral_sayer.get_known_modals()
+        self.ephemeralizer = VerbEphemeralizer(known_modals)
 
     def say(self, v):
         assert isinstance(v, SurfaceVerb)

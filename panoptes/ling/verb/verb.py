@@ -58,11 +58,11 @@ class Aspect(object):
 #   is because of relations like 'can + would = could'.
 #
 # * The two subjunctives:
-#       SBJ_CF ('subjunctive-counterfactual') "if he [were] smart"
-#       SBJ_IMP ('subjunctive-imperative') "he requests you [come]"
+#       SUBJUNCTIVE_CF ('subjunctive-counterfactual') "if he [were] smart"
+#       SUBJUNCTIVE_IMP ('subjunctive-imperative') "he requests you [come]"
 ModalFlavor = enum("""ModalFlavor =
     INDICATIVE
-    SBJ_CF
+    SUBJUNCTIVE_CF
 
     DEDUCTIVE
     ALMOST_CERTAIN
@@ -70,9 +70,9 @@ ModalFlavor = enum("""ModalFlavor =
     POSSIBLE
 
     IMPERATIVE
-    SBJ_IMP
+    SUBJUNCTIVE_IMP
     ABILITY
-    PERMISSION
+    PERMISSIVE
     NORMATIVE
     NECESSITY
 """)
@@ -250,13 +250,13 @@ class SurfaceVerb(object):
 
     @staticmethod
     def finite_options(lemmas, is_pro_verb_options):
-        aaa = SurfaceVerb.all_options(lemmas, is_pro_verb_options)
+        aaa = list(SurfaceVerb.all_options(lemmas, is_pro_verb_options))
         aaa[8] = [VerbForm.FINITE]
         return aaa
 
     @staticmethod
     def nonfinite_options(lemmas, is_pro_verb_options):
-        aaa = SurfaceVerb.all_options(lemmas, is_pro_verb_options)
+        aaa = list(SurfaceVerb.all_options(lemmas, is_pro_verb_options))
         aaa[6] = [ModalFlavor.INDICATIVE]
         del aaa[8][0] 
         aaa[12] = [False]

@@ -200,6 +200,11 @@ class Conjugator(object):
         self.deriv_index_picker = \
             SuffixGeneralizingMap(self.lemma2deriv_index, min)
 
+    @staticmethod
+    def from_file(f):
+        vv = conjugations_from_file(f)
+        return Conjugator(vv)
+
     def create_verb(self, lemma):
         """
         lemma -> Verb
