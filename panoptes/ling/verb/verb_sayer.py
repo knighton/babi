@@ -240,8 +240,10 @@ class VerbEphemeralizer(object):
         else:
             assert False
 
+        return r
+
     def moods_modals_etenses_from_flavor_cond_tense(
-            self, modal_flavor, is_cond, tense):
+            self, modal_flavor, is_cond, tense, ignore_invalid_configs):
         """
         ModalFlavor, is_cond, Tense -> yields (Mood, modal, EphemeralTense).
         """
@@ -253,8 +255,12 @@ class VerbEphemeralizer(object):
         key = (modal_flavor, is_cond)
         modals_moods = self.normal_flavor_cond2modals_moods.get(key)
         if not modals_moods:
-            raise VerbConfigError(
-                'There is no conditional form of the modality you have chosen')
+            if ignore_invalid_configs:
+                return
+            else:
+                raise VerbConfigError(
+                    'There is no conditional form of the modality you have '
+                    'chosen')
 
         # We prefer the first one.
         for modal, mood in modals_moods:
@@ -274,46 +280,52 @@ class VerbEphemeralizer(object):
         assert isinstance(v, SurfaceVerb)
         v.check(allow_wildcards=False)
 
-        if v.is_split and v.intrinsics.verb_form != VerbForm.FINITE and \
-                not ignore_invalid_configs:
-            raise VerbConfigError('Can only split words of finite verbs')
+        try:
+            if v.is_split and v.intrinsics.verb_form != VerbForm.FINITE:
+                raise VerbConfigError('Can only split words of finite verbs')
 
-        # Polarity, etc. -> Whether.
-        if v.intrinsics.polarity.tf:
-            # "No, she *does* write."
-            if v.intrinsics.polarity.is_contrary:
-                w = Whether.EMPH
+            # Polarity, etc. -> Whether.
+            if v.intrinsics.polarity.tf:
+                # "No, she *does* write."
+                if v.intrinsics.polarity.is_contrary:
+                    w = Whether.EMPH
 
-            # "Does she write?"
-            elif v.is_split:
-                w = Whether.EMPH
+                # "Does she write?"
+                elif v.is_split:
+                    w = Whether.EMPH
 
-            # "Yes, she does."
-            elif v.intrinsics.is_pro_verb:
-                w = Whether.EMPH
+                # "Yes, she does."
+                elif v.intrinsics.is_pro_verb:
+                    w = Whether.EMPH
 
-            # "She writes."
+                # "She writes."
+                else:
+                    w = Whether.YES
             else:
-                w = Whether.YES
-        else:
-            # "She doesn't write."
-            w = Whether.NO
-        whether = w
+                # "She doesn't write."
+                w = Whether.NO
+            whether = w
 
-        # VerbForm, RelativeContainment -> EphemeralVerbForm.
-        ephemeral_verb_form = \
-            self.everbform_from_verbform_relcont(
-                v.intrinsics.verb_form, v.relative_cont)
+            # VerbForm, RelativeContainment -> EphemeralVerbForm.
+            ephemeral_verb_form = \
+                self.everbform_from_verbform_relcont(
+                    v.intrinsics.verb_form, v.relative_cont)
+
+        except VerbConfigError, e:
+            if ignore_invalid_configs:
+                return
+            else:
+                raise e
 
         for mood, modal, ephemeral_tense in \
             self.moods_modals_etenses_from_flavor_cond_tense(
                 v.intrinsics.modality.flavor, v.intrinsics.modality.is_cond,
-                v.intrinsics.tense):
+                v.intrinsics.tense, ignore_invalid_configs):
             use_were_sbj = v.sbj_handling == SubjunctiveHandling.WERE_SBJ
             yield EphemeralVerb(
-                v.intrinsics.lemma, whether, modal, v.voice, ephemeral_tense,
-                v.intrinsics.aspect, mood, v.conj, ephemeral_verb_form,
-                v.split_inf, use_were_sbj)
+                v.intrinsics.lemma, whether, modal, v.voice,
+                ephemeral_tense, v.intrinsics.aspect, mood, v.conj,
+                ephemeral_verb_form, v.split_inf, use_were_sbj)
 
 
 def make_modal2indtense2mstr_perf():
@@ -440,7 +452,7 @@ class EphemeralSayer(object):
         if v.aspect.is_prog:
             rr.append(self.to_be)
         if v.voice == Voice.PASSIVE:
-            rr.apepnd(self.to_be)
+            rr.append(self.to_be)
         rr.append(to_verb)
 
         if v.mood == Mood.SBJ_CF and v.tense == EphemeralTense.SBJ_FUT:
@@ -463,7 +475,7 @@ class EphemeralSayer(object):
                     already_has_an_aux = \
                         actual_modal or use_perf or v.aspect.is_prog
                     can_use_do = \
-                        to_verb.has_do_support and voice == Voice.ACTIVE
+                        to_verb.has_do_support and v.voice == Voice.ACTIVE
                     if mood_ok and not already_has_an_aux and can_use_do:
                         rr = [self.to_do] + rr
 
@@ -522,7 +534,7 @@ class EphemeralSayer(object):
         # If passive voice, use past participle of the last verb.
         if v.voice == Voice.PASSIVE:
             z -= 1
-            zz[z] = rr[z].past_part
+            rr[z] = rr[z].past_part
 
         # Conjugate for aspect on the preceding words, if applicable.
         if v.aspect.is_prog:
@@ -632,5 +644,5 @@ class VerbSayer(object):
             try:
                 ss = self.ephemeral_sayer.say(ev)
             except VerbConfigError:
-                pass
+                continue
             yield slice_verb_words(v, ss)
