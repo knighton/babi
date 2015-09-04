@@ -1,0 +1,2 @@
+class SurfaceArgument(object):
+    pass

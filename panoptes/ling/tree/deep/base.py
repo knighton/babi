@@ -1,0 +1,2 @@
+class DeepArgument(object):
+    pass
