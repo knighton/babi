@@ -99,11 +99,6 @@ class VerbArgExtractor(object):
     """
 
     def extract(self, root_token, verb_span_pair):
-        """
-        root token, verb span pair -> subj arg index, options per arg
-
-        ... where an option is a (prep, verb arg).
-        """
         #for rel, t in root_token.downs:
         #    if rel in ('nsubj', 'dobj'):
         assert False  # XXX
@@ -113,9 +108,34 @@ class SurfaceRecognizer(object):
     def __init__(self, verb_mgr):
         self.end_punct_clf = EndPunctClassifier()
         self.verb_extractor = VerbExtractor(verb_mgr)
-        self.verb_arg_extractor = VerbArgExtractor()
 
-    def conjs_from_verb_args(self, nn, subj_argx):
+    def extract_verb_args(self, root_token, verb_span_pair):
+        """
+        root token, verb span pair -> subj arg index, options per arg
+        ... where an option is a (prep, verb arg).
+        """
+        XXX
+
+    def conjs_from_verb(self, v):
+        """
+        recognized verb with wildcards -> possible conjugations
+        """
+        # If the verb's field is a wildcard, it could be any of them.
+        if v.conj == None:
+            v_conjs = Conjugation.values
+        else:
+            v_conjs = set([v.conj])
+
+        # If imperative, it just be conjugated second person.
+        if v.intrinsics.modality.flavor == ModalFlavor.IMPERATIVE:
+            v_conjs &= (Conjugation.S2, Conjugation.P2)
+
+        return v_conjs
+
+    def conjs_from_verb_args(self, pp_nn, subj_argx):
+        """
+        verb arguments -> possible conjugations
+        """
         # It's possible to have no subject, in the case of imperatives.  In that
         # case, choose second person.
         if subj_argx is None:
@@ -133,24 +153,15 @@ class SurfaceRecognizer(object):
 
         return set([conj])
 
-    def possible_conjs(self, v, pp_nn, subj_argx):
+    def possible_conjugations(self, v, pp_nn, subj_argx):
         """
         verb and arguments -> possible conjugations
+
+        Verb agreement.
         """
-        if v.conj == None:
-            v_conjs = Conjugation.values
-        else:
-            v_conjs = set([v.conj])
-
+        v_conjs = self.conjs_from_verb(v)
         n_conjs = self.conjs_from_verb_args(pp_nn, subj_argx)
-
-        conjs = v_conjs & n_conjs
-
-        if v.intrinsics.modality.flavor == ModalFlavor.IMPERATIVE:
-            conjs = filter(lambda c: c in (Conjugation.S2, Conjugation.P2),
-                           conjs)
-
-        return conjs
+        return v_conjs & n_conjs
 
     def recog_clause(self, root_token, is_root_clause):
         """
@@ -158,11 +169,11 @@ class SurfaceRecognizer(object):
         """
         for verb_span_pair, vv in \
                 self.verb_extractor.extract(root_token, is_root_clause):
-            subj_argx, ppp_nnn = self.verb_arg_extractor.extract(
+            subj_argx, ppp_nnn = self.extract_verb_args(
                 root_token, verb_span_pair)
             for v in vv:
                 for pp_nn in each_choose_one_from_each(ppp_nnn):
-                    for conj in self.possible_conjs(v, pp_nn, subj_argx):
+                    for conj in self.possible_conjugations(v, pp_nn, subj_argx):
                         ctzr = Complementizer.ZERO
                         new_v = deepcopy(v)
                         new_v.conj = conj
