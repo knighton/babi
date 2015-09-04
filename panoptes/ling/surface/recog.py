@@ -5,6 +5,7 @@ from ling.glue.inflection import Conjugation
 from ling.glue.purpose import EndPunctClassifier
 from ling.parse.parse import Parse
 from ling.surface.clause import Clause
+from ling.surface.proper_noun import ProperNoun
 from ling.surface.sentence import Sentence
 
 
@@ -98,8 +99,15 @@ class SurfaceRecognizer(object):
         self.end_punct_clf = EndPunctClassifier()
         self.verb_extractor = VerbExtractor(verb_mgr)
 
-    def extract_verb_arg(self, root_token):
-        assert False  # XXX
+        self.tag2recognize = {
+            'NNP': self.recognize_nnp,
+        }
+
+    def recognize_nnp(self, root_token):
+        return [ProperNoun(root_token.text)]
+
+    def recognize_verb_arg(self, root_token):
+        return self.tag2recognize[root_token.tag](root_token)
 
     def find_subject(self, verb_span_pair, token_indexes):
         a, b = verb_span_pair
@@ -141,7 +149,7 @@ class SurfaceRecognizer(object):
                 continue
             token_indexes.append(t.index)
             pp = [()]
-            nn = self.extract_verb_arg(t)
+            nn = self.recognize_verb_arg(t)
             pp_nn = []
             for p, n in each_choose_one_from_each([pp, nn]):
                 pp_nn.append((p, n))
@@ -196,10 +204,11 @@ class SurfaceRecognizer(object):
         n_conjs = self.conjs_from_verb_args(pp_nn, subj_argx)
         return v_conjs & n_conjs
 
-    def recog_clause(self, root_token, is_root_clause):
+    def recognize_clause(self, root_token, is_root_clause):
         """
         root token -> yields Clause
         """
+        cc = []
         for verb_span_pair, vv in \
                 self.verb_extractor.extract(root_token, is_root_clause):
             subj_argx, ppp_nnn = self.extract_verb_args(
@@ -211,8 +220,10 @@ class SurfaceRecognizer(object):
                         new_v = deepcopy(v)
                         new_v.conj = conj
                         is_pos = False
-                        yield Clause(ctzr, new_v, deepcopy(pp_nn), subj_argx,
-                                     is_pos)
+                        c = Clause(ctzr, new_v, deepcopy(pp_nn), subj_argx,
+                                   is_pos)
+                        cc.append(c)
+        return cc
 
     def recog(self, parse):
         """
@@ -223,5 +234,5 @@ class SurfaceRecognizer(object):
         assert parse.tokens
         end_punct = self.end_punct_clf.classify(parse.tokens[-1])
 
-        for clause in self.recog_clause(parse.root, is_root_clause):
+        for clause in self.recognize_clause(parse.root, is_root_clause):
             yield Sentence(clause, end_punct)
