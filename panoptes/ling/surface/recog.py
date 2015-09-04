@@ -62,13 +62,13 @@ class VerbExtractor(object):
             sss = tuple(word_tuples[0]), ()
             vv = self.verb_mgr.parse(sss)
             if vv:
-                yield (spans[0], ()), vv
+                yield (spans[0], None), vv
 
             # Try the verb words as "main" words.  Eg, "She did."
             sss = (), tuple(word_tuples[0])
             vv = self.verb_mgr.parse(sss)
             if vv:
-                yield ((), spans[0]), vv
+                yield (None, spans[0]), vv
         elif len(spans) == 2:
             # Both spans present.  Eg, "Did she know?"
             sss = tuple(word_tuples)
@@ -93,28 +93,37 @@ class VerbExtractor(object):
                 yield verb_span_pair, vv
 
 
-class VerbArgExtractor(object):
-    """
-    Finds and parses verb arguments.
-    """
-
-    def extract(self, root_token, verb_span_pair):
-        #for rel, t in root_token.downs:
-        #    if rel in ('nsubj', 'dobj'):
-        assert False  # XXX
-
-
 class SurfaceRecognizer(object):
     def __init__(self, verb_mgr):
         self.end_punct_clf = EndPunctClassifier()
         self.verb_extractor = VerbExtractor(verb_mgr)
 
+    def extract_verb_arg(self, root_token):
+        assert False  # XXX
+
+    def find_subject(self, verb_span_pair, token_indexes):
+        assert False  # XXX
+
     def extract_verb_args(self, root_token, verb_span_pair):
         """
         root token, verb span pair -> subj arg index, options per arg
+
         ... where an option is a (prep, verb arg).
         """
-        XXX
+        token_indexes = []
+        ppp_nnn = []
+        for rel, t in root_token.downs:
+            if rel not in ('nsubj', 'dobj'):
+                continue
+            token_indexes.append(t.index)
+            pp = [()]
+            nn = self.extract_verb_arg(t)
+            pp_nn = []
+            for p, n in each_choose_one_from_each([pp, nn]):
+                pp_nn.append((p, n))
+            ppp_nnn.append(pp_nn)
+        subj_argx = self.find_subject(verb_span_pair, token_indexes)
+        return subj_argx, ppp_nnn
 
     def conjs_from_verb(self, v):
         """
