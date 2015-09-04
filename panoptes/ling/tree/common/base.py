@@ -10,7 +10,7 @@ class SayContext(object):
     Input to saying.
     """
 
-    def __init__(self, idiolect, has_left, has_right, prep):
+    def __init__(self, idiolect, has_left, has_right, prep, is_possessive):
         # Various knobs on how things are said.
         self.idiolect = idiolect
 
@@ -23,12 +23,16 @@ class SayContext(object):
         # when it is said (eg, (because of, what reason) -> "why").
         self.prep = prep
 
+        # Whether it needs to be said in its possessive form.
+        self.is_possessive = is_possessive
+
     def check(self):
         assert isinstance(self.idiolect, Idiolect)
         assert isinstance(self.has_left, bool)
         assert isinstance(self.has_right, bool)
         if self.prep:
             assert isinstance(self.prep, tuple)
+        assert isinstance(self.is_possessive, bool)
 
 
 class SayResult(object):
