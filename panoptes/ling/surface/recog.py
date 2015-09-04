@@ -102,7 +102,31 @@ class SurfaceRecognizer(object):
         assert False  # XXX
 
     def find_subject(self, verb_span_pair, token_indexes):
-        assert False  # XXX
+        a, b = verb_span_pair
+        if a and b:
+            # Both spans ("would you see?"): find the argument that goes between
+            # the spans.
+            for i, x in enumerate(token_indexes):
+                if a[1] < x < b[0]:
+                    return i
+        elif a:
+            # Just the pre span ("would you?"): find the argument directly
+            # after the verb words.
+            for i, x in enumerate(token_indexes):
+                if a[1] < x:
+                    return i
+        elif b:
+            # Just the main span ("you would", "go!"): find the argument
+            # preceding the one directly after the verb words, or return None if
+            # there isn't one (in the case of imperatives).
+            for i, x in enumerate(token_indexes):
+                if b[1] < x:
+                    if 0 <= i - 1:
+                        return i - 1
+                    else:
+                        return None
+        else:
+            assert False
 
     def extract_verb_args(self, root_token, verb_span_pair):
         """
