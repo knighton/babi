@@ -1,4 +1,4 @@
-from ling.common.base import Argument, ArgPositionRestriction, SayResult
+from ling.common.base import *
 
 
 class ExistentialThere(Argument):
@@ -12,6 +12,8 @@ class ExistentialThere(Argument):
         return ArgPositionRestriction.SUBJECT
 
     def decide_conjugation(self):
+        # Returning None instead of a Conjugation means that it will take the
+        # conjugation of the verb's object instead.
         return None
 
     def say(self, context):
