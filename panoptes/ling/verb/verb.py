@@ -317,3 +317,21 @@ class SurfaceVerb(object):
         for a, options in zip(aa, options_per_field):
             nn.append(options.index(a))
         return nn
+
+    def can_be_in_root_clause(self):
+        # Most non-indicative moods are banned.
+        #
+        # "I wish I were here", "she requests you come", etc.
+        if self.intrinsics.modality.flavor in \
+                (ModalFlavor.SBJ_CF, ModalFlavor.SBJ_IMP):
+            return False
+
+        # The verb has to be finite (conjugated).
+        if self.intrinsics.verb_form != VerbForm.FINITE:
+            return False
+
+        # We can't be inside a relative clause at root.
+        if self.relative_cont != RelativeContainment.NOT_REL:
+            return False
+
+        return True
