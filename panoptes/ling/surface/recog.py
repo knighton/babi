@@ -1,3 +1,7 @@
+from copy import deepcopy
+
+from base.combinatorics import each_choose_one_from_each
+from ling.glue.inflection import Conjugation
 from ling.glue.purpose import EndPunctClassifier
 from ling.parse.parse import Parse
 from ling.surface.clause import Clause
@@ -89,10 +93,64 @@ class VerbExtractor(object):
                 yield verb_span_pair, vv
 
 
+class VerbArgExtractor(object):
+    """
+    Finds and parses verb arguments.
+    """
+
+    def extract(self, root_token, verb_span_pair):
+        """
+        root token, verb span pair -> subj arg index, options per arg
+
+        ... where an option is a (prep, verb arg).
+        """
+        #for rel, t in root_token.downs:
+        #    if rel in ('nsubj', 'dobj'):
+        assert False  # XXX
+
+
 class SurfaceRecognizer(object):
     def __init__(self, verb_mgr):
         self.end_punct_clf = EndPunctClassifier()
         self.verb_extractor = VerbExtractor(verb_mgr)
+        self.verb_arg_extractor = VerbArgExtractor()
+
+    def conjs_from_verb_args(self, nn, subj_argx):
+        # It's possible to have no subject, in the case of imperatives.  In that
+        # case, choose second person.
+        if subj_argx is None:
+            return set([Conjugation.S2, Conjugation.P2])
+
+        # Get the required conjugation from the subject.
+        conj = pp_nn[subj_x][1].conjugation()
+
+        # In case of existential there, get conjugation from the object instead.
+        if not conj:
+            x = subj_argx + 1
+            if not (0 <= x < len(pp_nn)):
+                return []  # Ex-there but no object = can't parse it.
+            conj = pp_nn[x][1].conjugation()
+
+        return set([conj])
+
+    def possible_conjs(self, v, pp_nn, subj_argx):
+        """
+        verb and arguments -> possible conjugations
+        """
+        if v.conj == None:
+            v_conjs = Conjugation.values
+        else:
+            v_conjs = set([v.conj])
+
+        n_conjs = self.conjs_from_verb_args(pp_nn, subj_argx)
+
+        conjs = v_conjs & n_conjs
+
+        if v.intrinsics.modality.flavor == ModalFlavor.IMPERATIVE:
+            conjs = filter(lambda c: c in (Conjugation.S2, Conjugation.P2),
+                           conjs)
+
+        return conjs
 
     def recog_clause(self, root_token, is_root_clause):
         """
@@ -100,7 +158,17 @@ class SurfaceRecognizer(object):
         """
         for verb_span_pair, vv in \
                 self.verb_extractor.extract(root_token, is_root_clause):
-            XXX
+            subj_argx, ppp_nnn = self.verb_arg_extractor.extract(
+                root_token, verb_span_pair)
+            for v in vv:
+                for pp_nn in each_choose_one_from_each(ppp_nnn):
+                    for conj in self.possible_conjs(v, pp_nn, subj_argx):
+                        ctzr = Complementizer.ZERO
+                        new_v = deepcopy(v)
+                        new_v.conj = conj
+                        is_pos = False
+                        yield Clause(ctzr, new_v, deepcopy(pp_nn), subj_argx,
+                                     is_pos)
 
     def recog(self, parse):
         """
