@@ -1,4 +1,4 @@
-from base.dicts import v2kk_from_k2v
+from base.dicts import v2kk_from_k2v, v2k_from_k2v
 from base.enum import enum
 from ling.glue.inflection import Conjugation, Declension
 from ling.glue.magic_token import POSSESSIVE_MARK
@@ -124,7 +124,7 @@ class PersonalTable(object):
         return self.ss2decs_pcs[tuple(ss)]
 
 
-class PersonalManager(object):
+class PersonalKnowledge(object):
     def __init__(self):
         self.who = PersonalTable(make_table(False))
         self.whom = PersonalTable(make_table(True))
@@ -137,3 +137,81 @@ class PersonalManager(object):
 
     def parse(self, ss):
         return sorted(set(self.who.parse(ss) + self.whom.parse(ss)))
+
+
+class PersonalManager(object):
+    def __init__(self, inflect_mgr):
+        self.inflect_mgr = inflect_mgr
+
+        self.ppcase2pc = {
+            PersonalPronounCase.SUBJECT: PersonalColumn.SUBJ,
+            PersonalPronounCase.OBJECT: PersonalColumn.OBJ,
+            PersonalPronounCase.REFLEXIVE: PersonalColumn.REFL,
+        }
+
+        self.pc2ppcase = v2k_from_k2v(self.ppcase2pc)
+
+        self.tables = PersonalKnowledge()
+
+    def perspro_parse(self, ss):
+        """
+        tokens -> possible PersonalPronouns
+        """
+        pp = []
+        for dec, pc in self.tables.parse(ss):
+            ppc = self.pc2ppcase.get(pc)
+            if not ppc:
+                continue
+            p = PersonalPronoun(dec, ppc)
+            pp.append(p)
+        return pp
+
+    def perspro_decide_conjugation(self, p):
+        """
+        PersonalPronoun -> Conjugation
+        """
+        dec = self.inflect_mgr.get_declension(p.declension)
+        return dec.decide_conjugation(True)
+
+    def perspro_say(self, p, use_whom):
+        """
+        PersonalPronoun, who/whom -> tokens
+        """
+        pc = self.ppcase2pc[p.ppcase]
+        ss = self.tables.say(p.declension, pc, use_whom)
+        conj = self.personal_pronoun_decide_conjugation(p)
+        return SayResult(tokens=ss, conjugation=conj, eat_prep=False)
+
+    def pospro_parse(self, ss):
+        """
+        tokens -> possible Declensions if possessive pronoun
+        """
+        decs = []
+        for dec, pc in self.tables.parse(ss):
+            if pc != PersonalColumn.POS_PRO:
+                continue
+            decs.append(dec)
+        return decs
+
+    def pospro_say(self, dec, use_whom):
+        """
+        Declension, who/whom -> tokens
+        """
+        return self.tables.say(dec, PersonalColumn.POS_PRO, use_whom)
+
+    def posdet_parse(self, ss):
+        """
+        tokens -> possible Declensions if possessive determiner
+        """
+        decs = []
+        for dec, pc in self.tables.parse(ss):
+            if pc != PersonalColumn.POS_DET:
+                continue
+            decs.append(dec)
+        return decs
+
+    def posdet_say(self, dec, use_whom):
+        """
+        Declension, who/whom -> tokens
+        """
+        return self.tables.say(dec, PersonalColumn.POS_DET, use_whom)
