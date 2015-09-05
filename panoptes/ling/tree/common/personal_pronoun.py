@@ -17,11 +17,13 @@ PPCASE2ARG_POS_RES = {
 
 
 class PersonalPronoun(Argument):
+    """
+    (Non-possessive) personal pronouns.
+    """
+
     def __init__(self, ppcase, declension):
-        # This field is none for personal determiners.
         self.ppcase = ppcase
-        if self.ppcase is not None:
-            assert PersonalPronounCase.is_valid(self.ppcase)
+        assert PersonalPronounCase.is_valid(self.ppcase)
 
         self.declension = declension
         assert Declension.is_valid(self.declension)
@@ -140,6 +142,13 @@ class PersonalKnowledge(object):
 
 
 class PersonalManager(object):
+    """
+    Personal pronouns are represented as the PersonalPronoun verb arg.
+
+    The other two types, possessive determiners and possessive pronouns, are
+    stored in the 'cor_dec_pos' field in CommonNoun in surface structure.
+    """
+
     def __init__(self, inflect_mgr):
         self.inflect_mgr = inflect_mgr
 
