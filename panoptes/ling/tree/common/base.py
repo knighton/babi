@@ -2,7 +2,7 @@ from base.enum import enum
 from ling.glue.inflection import Conjugation
 
 
-ArgPosRestriction = enum('ArgPosRestriction = SUBJECT OBJECT ANYWHERE')
+ArgPosRestriction = enum('ArgPosRestriction = SUBJECT NOT_SUBJECT ANYWHERE')
 
 
 class SayContext(object):

@@ -1,4 +1,4 @@
-from ling.common.base import *
+from ling.tree.common.base import *
 
 
 class ExistentialThere(Argument):

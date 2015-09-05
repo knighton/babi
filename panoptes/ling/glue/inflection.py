@@ -185,6 +185,5 @@ class InflectionManager(object):
                 r = Declension.THEY2
         return r
 
-    def decide_conjugation(self, declension, is_bare_pers_pro):
-        info = self.declension2info[declension]
-        return info.get_conjugation(is_bare_pers_pro)
+    def get_declension(self, declension):
+        return self.declension2info[declension]
