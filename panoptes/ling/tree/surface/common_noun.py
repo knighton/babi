@@ -120,3 +120,102 @@ class CommonNoun(Argument):
     def say(self, context):
         # Call the manager class that contains the necessary state.
         assert False
+
+
+SurfaceCorrelative = enum("""SurfaceCorrelative =
+    INDEF DEF INTR PROX DIST EXIST ELECT_ANY ELECT_EVER UNIV_ALL UNIV_EVERY NEG
+    ALT""")
+
+
+ShortcutColumn = enum("""ShortcutColumn =
+    ONE BODY THING PLACE SOURCE SOURCE_FROM GOAL TIME WAY REASON REASON_FORE
+    REASON_LATIN""")
+
+
+def make_impersonals_table():
+    text_part_one = """
+           ONE          BODY        THING      PLACE      SOURCE
+INDEF      -            -           -          -          -
+DEF        -            -           -          -          -
+INTR       X            X           X          where      (whence)
+PROX       -            -           -          here       (hence)
+DIST       -            -           -          there      (thence)
+EXIST      someone      somebody    something  somewhere  -
+ELECT_ANY  anyone       anybody     anything   anywhere   -
+ELECT_EVER X            X           X          wherever   (whenceever)
+UNIV_ALL   -            -           -          -          -
+UNIV_EVERY everyone     everybody   everything everywhere -
+NEG        no_one       nobody      nothing    nowhere    (nowhence)
+ALT        -            -           -          elsewhere  -
+    """
+
+    text_part_two = """
+           SOURCE_FROM  GOAL            TIME        WAY        WAY_BY
+INDEF      -            -               -           -          -
+DEF        -            -               -           -          -
+INTR       (whencefrom) (whither)       when        how        -
+PROX       -            (hither)        now         thus       hereby
+DIST       (thencefrom) (thither)       then        -          thereby
+EXIST      -            (somewhither)   sometime    somehow    -
+ELECT_ANY  -            (anywhither)    anytime     -          -
+ELECT_EVER -            (whithersoever) whenver     however
+UNIV_ALL   -            -               always      -
+UNIV_EVERY -            -               (everywhen) (everyway)
+NEG        -            (nowhither)     never       (noway)
+ALT        -            -               -           otherwise
+    """
+
+    text_part_three = """
+           REASON    REASON_FORE REASON_LATIN
+INDEF      -         -           -
+DEF        -         -           -
+INTR       why       (wherefore) -
+PROX       thus      -           -
+DIST       -         therefore   ergo
+EXIST      -         -           -
+ELECT_ANY  -         -           -
+ELECT_EVER -         -           -
+UNIV_ALL   -         -           -
+UNIV_EVERY -         -           -
+NEG        -         -           -
+ALT        -         -           -
+    """
+
+    aa = text_part_one.strip().split('\n')
+    bb = text_part_one.strip().split('\n')
+    cc = text_part_one.strip().split('\n')
+    lines = map(lambda (a, b, c): a + b + c, zip(aa, bb, cc))
+    sss = map(lambda line: line.split(), lines)
+
+    n = len(sss[0])
+    for ss in sss[1:]:
+        assert len(ss) == n + 1
+
+    rows = []
+    for s in map(lambda ss: ss[0], sss[1:]):
+        row = SurfaceCorrelative.from_str[s]
+        rows.append(row)
+    assert set(rows) == SurfaceCorrelative.values
+
+    cols = []
+    for s in sss[0][1:]:
+        col = ShortcutColumn.from_str[s]
+        cols.append(col)
+    assert set(cols) == ShortcutColumn.values
+
+    cor_sh2ss_archaic = {}
+    for row_index in xrange(len(sss) - 1):
+        for col_index in xrange(n):
+            s = sss[row_index + 1][col_index + 1]
+            if s == '-' or s == 'X':
+                continue
+            if s.startswith('(') and s.endswith(')'):
+                s = s[1:-1]
+                is_archaic = True
+            else:
+                is_archaic = False
+            ss = tuple(ss.split('_'))
+            row = rows[row_index]
+            col = cols[col_index]
+            cor_sh2ss_archaic[(row, col)] = ss, is_archaic
+    return cor_sh2ss_archaic
