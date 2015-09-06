@@ -3,6 +3,7 @@ from collections import defaultdict
 from base.dicts import v2k_from_k2vv
 from base.enum import enum
 from ling.glue.correlative import SurfaceCorrelative
+from ling.tree.common.base import SayResult
 
 
 ShortcutColumn = enum("""ShortcutColumn =
@@ -150,17 +151,23 @@ class ShortcutManager(object):
 
     def say(self, prep, n, of_n, cor, thing, allow_archaic):
         """
-        args -> tokens or None
+        args -> SayResult or None
 
         See if the preposition and noun and can expressed using a 'shortcut'.
         """
         # TODO: require and swallow prepositions correctly.
 
-        restriction = self.cor2counts[cor][0]
+        restriction, override_gram_num = self.cor2counts[cor][0]
         if not restriction:
             return None
         if not self.count_restriction_checker.is_possible(restriction, n, of_n):
             return None
+
+        if override_gram_num:
+            gram_num = override_gram_num
+        else:
+            gram_num = nx_to_nx(n, N2)
+        conj = N2_TO_CONJ[gram_num]
 
         if allow_archaic:
             use_archaics = [False, True]
@@ -172,7 +179,8 @@ class ShortcutManager(object):
                 ss, is_archaic = self.cor_sh2ss_archaic[(cor, shortcut_col)]
                 if is_archaic and not use_archaic:
                     continue
-                return ss
+                eat_prep = False  # TODO: swallow preposition correctly.
+                return SayResult(tokens=ss, conjugation=conj, eat_prep=eat_prep)
 
         return None
 
