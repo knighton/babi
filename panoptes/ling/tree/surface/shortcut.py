@@ -100,6 +100,11 @@ ALT        -         -           -
 
 
 class ShortcutManager(object):
+    """
+    Saying and parsing of shortcuts.  Does not check that counts match.
+    That is the caller's respnosibility.
+    """
+
     def __init__(self):
         # SurfaceCorrelative, ShortcutColumn -> tokens, is_archaic.
         self.cor_sh2ss_archaic = make_shortcut_table()
@@ -134,8 +139,8 @@ class ShortcutManager(object):
         else:
             use_archaics = [False]
 
-        for use_archaic in use_archaics:
-            for shortcut_col in self.thing2shortcut_cols[thing]:
+        for shortcut_col in self.thing2shortcut_cols[thing]:
+            for use_archaic in use_archaics:
                 ss, is_archaic = self.cor_sh2ss_archaic[(cor, shortcut_col)]
                 if is_archaic and not use_archaic:
                     continue
