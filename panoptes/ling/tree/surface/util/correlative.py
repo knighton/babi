@@ -150,7 +150,7 @@ class CorrelativeManager(object):
 
     def parse(self, s):
         """
-        word -> list of (Correlative, n, of_n, Conjugation)
+        word -> list of (Correlative, n, of_n)
 
         Get the possible meanings of a word.
         """
@@ -158,8 +158,6 @@ class CorrelativeManager(object):
         for cor, is_pro, is_plur, of_n in self.s2cors_pros_plurs_ofs[s]:
             n2 = N2.PLUR if is_plur else N2.SING
             for n in nx_to_nxs(n2, N3):
-                gram_num = self.get_grammatical_number(cor, n, of_n)
-                conj = N2_TO_CONJ[gram_num]
-                r = (cor, n, of_n, conj)
+                r = (cor, n, of_n)
                 rr.append(r)
         return rr
