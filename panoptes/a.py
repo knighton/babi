@@ -11,11 +11,26 @@ def main():
     d = '../data/tasks_1-20_v1-2/en/'
     problems = get_problems(d)
     problem = problems[1]
-    s, want_out = problem[0]
+    in_s, want_out = problem[0]
+
+    print 'INPUT:', in_s
+
+    ss = [
+        u'I was seen by you.',
+        u'I slept because I was tired.',
+        u'Sandra got the football there.',
+        u'I have been being been.',
+        u"Don't you see?",
+        u'I went to my home town.',
+        u'I threw the ball to you.',
+    ]
 
     a = Agent()
-    got_out = a.put(s)
-    assert want_out == got_out
+    for s in ss:
+        a.put(s)
+
+    #got_out = a.put(in_s)
+    #assert want_out == got_out
 
 
 if __name__ == '__main__':

@@ -7,4 +7,6 @@ class Agent(object):
 
     def put(self, text):
         parses = self.parser.parse(text)
+        for p in parses:
+            p.dump()
         return None
