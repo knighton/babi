@@ -3,10 +3,12 @@ from collections import defaultdict
 from base.enum import enum
 from ling.glue.correlative import SurfaceCorrelative
 from ling.glue.grammatical_number import N2, N5
+from ling.glue.inflection import Conjugation
 from ling.glue.magic_token import A_OR_AN
+from ling.tree.common.base import SayResult
 
 
-def parse_det_pro_entry(s):
+def parse_correlative_entry(s):
     x = s.find('/')
     if x == -1:
         det, pro = s, s
@@ -35,7 +37,7 @@ def parse_det_pro_entry(s):
         yield is_pro, is_plur, s
 
 
-def make_det_pro_table():
+def make_correlative_table():
     text = """
                    SING  DUAL      FEW             MANY
         INDEF      -     a/one     a:some/one:some a:some/one:some
@@ -71,7 +73,7 @@ def make_det_pro_table():
         ofs.append(of)
     assert set(ofs) == N5.values - N5.ZERO
 
-    cor_pro_plur_of2ss = defaultdict(list)
+    cor_pro_plur_of2s = {}
     for row_index in xrange(len(sss) - 1):
         for col_index in xrange(n):
             s = sss[row_index + 1][col_index + 1]
@@ -79,66 +81,85 @@ def make_det_pro_table():
             cor = SurfaceCorrelative.from_str[cor]
             of = sss[0][col_index]
             of = N5.from_str[of]
-            for is_pro, is_plur, s in parse_det_pro_entry(s):
-                cor_pro_plur_of2ss[(cor, is_pro, is_plur, of)].append(s)
-    return cor_pro_plur_of2ss
+            for is_pro, is_plur, s in parse_correlative_entry(s):
+                cor_pro_plur_of2s[(cor, is_pro, is_plur, of)] = s
+    return cor_pro_plur_of2s
 
 
-CountRequirement = enum("""CountRequirement =
-    UNK NONE ONE_OF_N SOME ALL_ONE ALL""")
+class CorrelativeManager(object):
+    def __init__(self, count_restriction_checker):
+        # CountRestrictionChecker.
+        self.count_restriction_checker = count_restriction_checker
 
+        # Correlative -> count restriction, grammatical number override.
+        C = SurfaceCorrelativj
+        R = CountRestriction
+        self.cor2counts = {
+            C.INDEF: (R.SOME, None),
+            C.DEF: (R.ALL, None),
+            C.INTR: (R.UNK, None),
+            C.PROX: (R.ALL, None),
+            C.DIST: (R.ALL, None),
+            C.EXIST: (R.ONE_OF_N, None),
+            C.ELECT_ANY: (R.SOME, None),
+            C.ELECT_EVER: (R.UNK, None),
+            c.UNIV_EVERY: (R.ALL, N2.SING),
+            C.UNIV_ALL: (R.ALL, N2.PLUR),
+            C.NEG: (R.NONE, None),
+            C.ALT: (R.ONE_OF_N, None),
+        }
 
-def parse_count_req_entry(s):
-    if s == '-':
-        return
+        self.cor_pro_plur_of2s = make_correlative_table()
 
-    x = s.find('/')
-    if x != -1:
-        s, override_n2 = s, None
-    else:
-        s, override_n2 = s[:x], s[x + 1:]
-        override_n2 = N2.from_str[override_n2.upper()]
-    req = CountRequirement.from_str[s.upper()]
-    yield req, override_n2
+        self.s2cors_pros_plurs_ofs = v2kk_from_k2v(self.cor_pro_plur_of2s)
 
+    def get_grammatical_number(self, cor, n, of_n):
+        """
+        Correlative, n, of_n -> N2 or None if invalid
+        """
+        # Verify counts against its correlative field.
+        restriction, override_gram_num = seslf.cor2counts[cor]
+        if not self.count_restriction_checker.is_possible(restriction, n, of_n):
+            return None
 
-def make_count_req_table():
-    text = """
-                   DET_PRO  SHORTCUT
-        INDEF      some     -
-        DEF        all      -
-        INTR       unk      all_one
-        PROX       all      all_one
-        DIST       all      all_one
-        EXIST      one_of_n one_of_n
-        ELECT_ANY  some     one_of_n
-        ELECT_EVER unk      all_one
-        UNIV_EVERY all/sing all/sing
-        UNIV_ALL   all/plur all/sing
-        NEG        none     none/sing
-        ALT        one_of_n one_of_n
-    """
+        if override_gram_num:
+            gram_num = override_gram_num
+        else:
+            gram_num = nx_to_nx(n, N2)
+        return gram_num
 
-    sss = map(lambda line: line.split(), text.strip().split('\n'))
+    def say(self, cor, n, of_n, is_pro):
+        """
+        args -> SayResult or None
 
-    n = len(sss[0])
-    for ss in sss[1:]:
-        assert len(ss) == n + 1
+        See if the args can be expressed using a 'correlative'.
+        """
+        # Can't be selected out of zero.
+        if of_n == N5.ZERO:
+            return None
 
-    cors = []
-    for ss in sss[1:]:
-        s = ss[0]
-        cor = SurfaceCorrelative.from_str[s]
-        cors.append(cor)
-    assert set(cors) == SurfaceCorrelative.values
+        gram_num = self.get_grammatical_number(cor, n, of_n)
+        if not gram_num:
+            return None
 
-    col_cor2req = {}
-    for row_index in xrange(len(sss) - 1):
-        for col_index in xrange(n):
-            s = sss[row_index + 1][col_index + 1]
-            for req in parse_count_req_entry(s):
-                col = sss[0][col_index]
-                cor = sss[row_index + 1][0]
-                cor = SurfaceCorrelative.from_str[cor]
-                col_cor2req[(col, cor)] = req
-    return col_cor2req
+        conj = N2_TO_CONJ[gram_num]
+        is_plur = gram_num == N2.PLUR
+
+        s = self.cor_pro_plur_of2s[(cor, is_pro, is_plur, of_n)]
+        return SayResult(tokens=[s], conjugation=conj, eat_prep=False)
+
+    def parse(self, s):
+        """
+        word -> list of (Correlative, n, of_n, Conjugation)
+
+        Get the possible meanings of a word.
+        """
+        rr = []
+        for cor, is_pro, is_plur, of_n in self.s2cors_pros_plurs_ofs[s]:
+            n2 = N2.PLUR if is_plur else N2.SING
+            for n in nx_to_nxs(n2, N3):
+                gram_num = self.get_grammatical_number(cor, n, of_n)
+                conj = N2_TO_CONJ[gram_num]
+                r = (cor, n, of_n, conj)
+                rr.append(r)
+        return rr

@@ -153,11 +153,11 @@ class ShortcutManager(object):
         """
         args -> SayResult or None
 
-        See if the preposition and noun and can expressed using a 'shortcut'.
+        See if the args can expressed using a 'shortcut'.
         """
         # TODO: require and swallow prepositions correctly.
 
-        restriction, override_gram_num = self.cor2counts[cor][0]
+        restriction, override_gram_num = self.cor2counts[cor]
         if not restriction:
             return None
         if not self.count_restriction_checker.is_possible(restriction, n, of_n):
@@ -186,7 +186,7 @@ class ShortcutManager(object):
 
     def parse(self, ss):
         """
-        tokens -> list of (preposition, correlative, thing, gram num override)
+        tokens -> list of (preposition, Correlative, thing, gram num override)
         """
         rr = []
         for is_archaic in [False, True]:

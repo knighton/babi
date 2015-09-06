@@ -24,6 +24,12 @@ CONJ2INDEX = dict(zip(sorted(Conjugation.values),
                       range(len(Conjugation.values))))
 
 
+N2_TO_CONJ = {
+    N2.SING: Conjugation.S3,
+    N2.PLUR: Conjugation.P3,
+}
+
+
 Gender = enum('Gender = MALE FEMALE NEUTER')
 
 
