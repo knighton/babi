@@ -13,3 +13,11 @@ def v2k_from_k2v(k2v):
     for k, v in k2v.iteritems():
         v2k[v] = k
     return v2k
+
+
+def v2k_from_k2vv(k2vv):
+    v2k = {}
+    for k, vv in k2vv.iteritems():
+        for v in vv:
+            v2k[v] = k
+    return v2k

@@ -1,3 +1,6 @@
+from collections import defaultdict
+
+from base.dicts import v2k_from_k2vv
 from base.enum import enum
 from ling.glue.correlative import Correlative, CORRELATIVE2IS_INTERROGATIVE
 from ling.glue.grammatical_number import N3, N5, nx_le_nx
@@ -132,7 +135,7 @@ ShortcutColumn = enum("""ShortcutColumn =
     REASON_LATIN""")
 
 
-def make_impersonals_table():
+def make_shortcut_table():
     text_part_one = """
            ONE          BODY        THING      PLACE      SOURCE
 INDEF      -            -           -          -          -
@@ -219,3 +222,60 @@ ALT        -         -           -
             col = cols[col_index]
             cor_sh2ss_archaic[(row, col)] = ss, is_archaic
     return cor_sh2ss_archaic
+
+
+class ShortcutKnowledge(object):
+    def __init__(self):
+        # SurfaceCorrelative, ShortcutColumn -> tokens, is_archaic.
+        self.cor_sh2ss_archaic = make_shortcut_table()
+
+        # Tokens, is_archaic -> SurfaceCorrelative, ShortcutColumn.
+        self.ss_archaic2cors_shs = v2kk_from_k2v(self.cor_sh2ss_archaic)
+
+        self.thing2shortcut_cols = defaultdict(list, {
+            'person': [ShortcutColumn.ONE, ShortColumn.BODY],
+            'thing': [ShortcutColumn.THING],
+            'place': [ShortcutColumn.PLACE],
+            'source': [ShortcutColumn.SOURCE, ShortcutColumn.SOURCE_FROM],
+            'goal': [ShortcutColumn.GOAL],
+            'time': [ShortcutColumn.TIME],
+            'way': [ShortcutColumn.WAY, ShortcutColumn.WAY_BY],
+            'reason': [ShortcutColumn.REASON, ShortcutColumn.REASON_FORE,
+                       ShortcutColumn.REASON_LATIN],
+        })
+
+        self.shortcut_col2thing = v2k_from_k2vv(self.thing2shortcut_cols)
+
+    def say(self, prep, cor, thing, allow_archaic):
+        """
+        preposition, correlative, thing, allow archaic -> tokens or None
+
+        See if the preposition and noun and can expressed using a 'shortcut'.
+        """
+        # TODO: require and swallow prepositions correctly.
+
+        if allow_archaic:
+            use_archaics = [False, True]
+        else:
+            use_archaics = [False]
+
+        for use_archaic in use_archaics:
+            for shortcut_col in self.thing2shortcut_cols[thing]:
+                ss, is_archaic = self.cor_sh2ss_archaic[(cor, shortcut_col)]
+                if is_archaic and not use_archaic:
+                    continue
+                return ss
+
+        return None
+
+    def parse(self, ss):
+        """
+        tokens -> list of (preposition, correlative, thing)
+        """
+        rr = []
+        for is_archaic in [False, True]:
+            for cor, shortcut_col in self.ss_archaic2cors_shs[(ss, is_archaic)]:
+                thing = self.shortcut_col2thing[shortcut_col]
+                r = (None, cor, thing)
+                rr.append(r)
+        return rr
