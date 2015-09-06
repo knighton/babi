@@ -2,11 +2,7 @@ from collections import defaultdict
 
 from base.dicts import v2k_from_k2vv
 from base.enum import enum
-
-
-SurfaceCorrelative = enum("""SurfaceCorrelative =
-    INDEF DEF INTR PROX DIST EXIST ELECT_ANY ELECT_EVER UNIV_ALL UNIV_EVERY NEG
-    ALT""")
+from ling.glue.correlative import SurfaceCorrelative
 
 
 ShortcutColumn = enum("""ShortcutColumn =
@@ -24,7 +20,7 @@ PROX       -            -           -          here       (hence)
 DIST       -            -           -          there      (thence)
 EXIST      someone      somebody    something  somewhere  -
 ELECT_ANY  anyone       anybody     anything   anywhere   -
-ELECT_EVER X            X           X          wherever   (whenceever)
+ELECT_EVER -            -           -          wherever   (whenceever)
 UNIV_ALL   -            -           -          -          -
 UNIV_EVERY everyone     everybody   everything everywhere -
 NEG        no_one       nobody      nothing    nowhere    (nowhence)
@@ -40,7 +36,7 @@ PROX       -            (hither)        now         thus       hereby
 DIST       (thencefrom) (thither)       then        -          thereby
 EXIST      -            (somewhither)   sometime    somehow    -
 ELECT_ANY  -            (anywhither)    anytime     -          -
-ELECT_EVER -            (whithersoever) whenver     however
+ELECT_EVER -            (whithersoever) whenever    however
 UNIV_ALL   -            -               always      -
 UNIV_EVERY -            -               (everywhen) (everyway)
 NEG        -            (nowhither)     never       (noway)
@@ -103,7 +99,7 @@ ALT        -         -           -
     return cor_sh2ss_archaic
 
 
-class ShortcutKnowledge(object):
+class ShortcutManager(object):
     def __init__(self):
         # SurfaceCorrelative, ShortcutColumn -> tokens, is_archaic.
         self.cor_sh2ss_archaic = make_shortcut_table()
