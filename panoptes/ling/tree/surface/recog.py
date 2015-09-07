@@ -27,7 +27,7 @@ class VerbExtractor(object):
         # Find all words that make up the verb.
         tt = [root_token]
         for rel, t in root_token.downs:
-            if rel == 'aux':
+            if rel in ('aux', 'auxpass', 'neg'):
                 tt.append(t)
 
         # Put them in order.
@@ -35,10 +35,10 @@ class VerbExtractor(object):
 
         # Group consecutive tokens into contiguous spans of verb words.
         spans = []
-        begin = 0
+        begin = tt[0].index
         end = begin
         word_tuples = []
-        word_tuple = []
+        word_tuple = [tt[0].text]
         for token in tt[1:]:
             x = token.index
 
