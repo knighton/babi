@@ -376,7 +376,7 @@ class SurfaceVerb(object):
         #
         # "I wish I were here", "she requests you come", etc.
         if self.intrinsics.modality.flavor in \
-                (ModalFlavor.SBJ_CF, ModalFlavor.SBJ_IMP):
+                (ModalFlavor.SUBJUNCTIVE_CF, ModalFlavor.SUBJUNCTIVE_IMP):
             return False
 
         # The verb has to be finite (conjugated).
