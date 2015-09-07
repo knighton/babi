@@ -4,9 +4,9 @@ from etc.combinatorics import each_choose_one_from_each
 from ling.glue.inflection import Conjugation
 from ling.glue.purpose import EndPunctClassifier
 from ling.parse.parse import Parse
-from ling.surface.clause import Clause
-from ling.surface.proper_noun import ProperNoun
-from ling.surface.sentence import Sentence
+from ling.tree.common.proper_noun import ProperNoun
+from ling.tree.surface.content_clause import ContentClause
+from ling.tree.surface.sentence import Sentence
 
 
 class VerbExtractor(object):
@@ -94,7 +94,11 @@ class VerbExtractor(object):
                 yield verb_span_pair, vv
 
 
-class SurfaceRecognizer(object):
+class ParseToSurface(object):
+    """
+    Objects that converts parses to surface structure.
+    """
+
     def __init__(self, verb_mgr):
         self.end_punct_clf = EndPunctClassifier()
         self.verb_extractor = VerbExtractor(verb_mgr)

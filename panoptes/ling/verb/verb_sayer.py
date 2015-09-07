@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from base.enum import enum
+from etc.enum import enum
 from ling.glue.inflection import CONJ2INDEX, Conjugation
 from ling.verb.annotation import annotate_as_pro_verb
 from ling.verb.conjugation import Conjugator

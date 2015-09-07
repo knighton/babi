@@ -1,4 +1,4 @@
-from base.enum import enum
+from etc.enum import enum
 from ling.glue.inflection import Conjugation
 
 
