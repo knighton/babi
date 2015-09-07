@@ -236,7 +236,7 @@ class ParseToSurface(object):
         assert isinstance(parse, Parse)
 
         assert parse.tokens
-        end_punct = self.end_punct_clf.classify(parse.tokens[-1])
+        end_punct = self.end_punct_clf.classify(parse.tokens[-1].text)
 
         for clause in self.recognize_clause(parse.root, is_root_clause):
             yield Sentence(clause, end_punct)
