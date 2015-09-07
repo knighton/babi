@@ -226,7 +226,8 @@ class VerbParser(object):
         rr = []
         for lemma, field_index in self.conjugator.identify_word(last):
             # Look up the field index-replaced form in the table.
-            key = (deverbed_sss[0], tuple(deverbed_sss[1] + [str(field_index)]))
+            key = (deverbed_sss[0],
+                   tuple(list(deverbed_sss[1]) + [str(field_index)]))
             sub_rr = self.deverbed_sss2vv[key]
 
             # Put our lemma into the results found.
