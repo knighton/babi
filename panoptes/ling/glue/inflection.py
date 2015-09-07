@@ -9,9 +9,11 @@ Declension = enum("""Declension =
     I WE YOU YALL HE SHE IT THEY1 ONE WHO1 WHO2 THEY2 WHOEVER1 WHOEVER2""")
 
 
-def is_declension_q(d):
-    return d in (Declension.WHO1, Declension.WHO2, Declension.WHOEVER1,
-                 Declension.WHOEVER2)
+DECLENSION2IS_INTERROGATIVE = dict(zip(
+    sorted(Declension.values),
+    map(lambda d: d in (Declension.WHO1, Declension.WHO2, Declension.WHOEVER1,
+                        Declension.WHOEVER2),
+        sorted(Declension.values))))
 
 
 Person = enum('Person = FIRST SECOND THIRD')
