@@ -27,6 +27,12 @@ class Polarity(object):
         else:
             assert isinstance(self.is_contrary, bool)
 
+    def to_d(self):
+        return {
+            'tf': self.tf,
+            'is_contrary': self.is_contrary,
+        }
+
 
 class Aspect(object):
     """
@@ -49,6 +55,12 @@ class Aspect(object):
         else:
             assert isinstance(self.is_perf, bool)
             assert isinstance(self.is_prog, bool)
+
+    def to_d(self):
+        return {
+            'is_perf': self.is_perf,
+            'is_prog': self.is_prog,
+        }
 
 
 # Modal "flavor".
@@ -99,6 +111,12 @@ class Modality(object):
         else:
             assert isinstance(self.is_cond, bool)
 
+    def to_d(self):
+        return {
+            'flavor': ModalFlavor.to_str[self.flavor],
+            'is_cond': self.is_cond,
+        }
+
     def is_indicative(self):
         return self.flavor == ModalFlavor.INDICATIVE and not self.is_cond
 
@@ -146,6 +164,21 @@ class DeepVerb(object):
         self.modality.check(allow_wildcards)
         assert VerbForm.is_valid(self.verb_form)
         assert isinstance(self.is_pro_verb, bool)
+
+    def to_d(self):
+        if self.tense:
+            tense = Tense.to_str[self.tense]
+        else:
+            tense = self.tense
+        return {
+            'lemma': self.lemma,
+            'polarity': self.polarity.to_d(),
+            'tense': tense,
+            'aspect': self.aspect.to_d(),
+            'modality': self.modality.to_d(),
+            'verb_form': VerbForm.to_str[self.verb_form],
+            'is_pro_verb': self.is_pro_verb,
+        }
 
 
 # Linguistic voice.
@@ -299,6 +332,26 @@ class SurfaceVerb(object):
                 a = options[n]
             aa.append(a)
         return SurfaceVerb.from_tuple(aa)
+
+    def to_d(self):
+        if self.conj:
+            conj = Conjugation.to_str[self.conj]
+        else:
+            conj = self.conj
+        if self.sbj_handling:
+            sbj = SubjunctiveHandling.to_str[self.sbj_handling]
+        else:
+            sbj = self.sbj_handling
+        return {
+            'intrinsics': self.intrinsics.to_d(),
+            'voice': Voice.to_str[self.voice],
+            'conj': conj,
+            'is_split': self.is_split,
+            'relative_cont': RelativeContainment.to_str[self.relative_cont],
+            'contract_not': self.contract_not,
+            'split_inf': self.split_inf,
+            'sbj_handling': sbj,
+        }
 
     def to_tuple(self):
         i = self.intrinsics
