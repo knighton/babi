@@ -1,7 +1,7 @@
 from collections import defaultdict
 
-from base.suffix_transform import SuffixTransform
-from base.suffix_generalizing_map import SuffixGeneralizingMap
+from etc.suffix_transform import SuffixTransform
+from etc.suffix_generalizing_map import SuffixGeneralizingMap
 from ling.verb.annotation import annotate_as_aux
 
 

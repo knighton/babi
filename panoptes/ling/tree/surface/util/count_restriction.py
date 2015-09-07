@@ -1,4 +1,4 @@
-from base.enum import enum
+from etc.enum import enum
 from ling.glue.grammatical_number import N2, nx_to_nx, NX2COMP_INTS
 
 

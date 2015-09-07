@@ -3,7 +3,7 @@
 # Grammatical number shows up in different ways in English with varying levels
 # of ambiguity, such as singular/plural, which/what, verb conjugation, etc.
 
-from base.enum import enum
+from etc.enum import enum
 
 
 N2 = enum('N2 = SING PLUR')

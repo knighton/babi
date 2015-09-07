@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from base.combinatorics import each_choose_one_from_each
+from etc.combinatorics import each_choose_one_from_each
 from ling.glue.inflection import Conjugation
 from ling.glue.purpose import EndPunctClassifier
 from ling.parse.parse import Parse

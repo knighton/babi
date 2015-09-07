@@ -1,5 +1,5 @@
-from base.dicts import v2kk_from_k2v, v2k_from_k2v
-from base.enum import enum
+from etc.dicts import v2kk_from_k2v, v2k_from_k2v
+from etc.enum import enum
 from ling.glue.inflection import Conjugation, Declension
 from ling.glue.magic_token import POSSESSIVE_MARK
 from ling.tree.common.base import *

@@ -4,7 +4,7 @@ import json
 import os
 import sys
 
-from base.combinatorics import each_choose_one_from_each, \
+from etc.combinatorics import each_choose_one_from_each, \
     collapse_int_tuples_to_wildcards
 from ling.verb.conjugation import Conjugator, MAGIC_INTS_LEMMA
 from ling.verb.verb import SurfaceVerb

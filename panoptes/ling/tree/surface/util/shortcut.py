@@ -1,7 +1,7 @@
 from collections import defaultdict
 
-from base.dicts import v2k_from_k2vv
-from base.enum import enum
+from etc.dicts import v2k_from_k2vv
+from etc.enum import enum
 from ling.glue.correlative import SurfaceCorrelative
 from ling.tree.common.base import SayResult
 
@@ -174,8 +174,8 @@ class ShortcutManager(object):
         else:
             use_archaics = [False]
 
-        for shortcut_col in self.thing2shortcut_cols[thing]:
-            for use_archaic in use_archaics:
+        for use_archaic in use_archaics:
+            for shortcut_col in self.thing2shortcut_cols[thing]:
                 ss, is_archaic = self.cor_sh2ss_archaic[(cor, shortcut_col)]
                 if is_archaic and not use_archaic:
                     continue

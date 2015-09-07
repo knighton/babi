@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from base.enum import enum
+from etc.enum import enum
 from ling.glue.correlative import SurfaceCorrelative
 from ling.glue.grammatical_number import N2, N5
 from ling.glue.inflection import Conjugation

@@ -8,7 +8,7 @@
 
 from collections import defaultdict
 
-from base.enum import enum
+from etc.enum import enum
 
 
 Purpose = enum('Purpose = WH_Q TF_Q VERIFY_Q INFO')

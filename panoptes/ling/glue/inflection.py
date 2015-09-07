@@ -1,7 +1,7 @@
 # "inflection" here means the single concept connecting choices of verb
 # conjugation, personal pronoun, etc.
 
-from base.enum import enum
+from etc.enum import enum
 from ling.glue.grammatical_number import N2
 
 
