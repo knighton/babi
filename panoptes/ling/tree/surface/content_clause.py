@@ -1,4 +1,16 @@
+from etc.enum import enum
 from ling.tree.surface.base import Argument
+
+
+Complementizer = enum('Complementizer = ZERO THAT WHETHER IF')
+
+
+COMPLEMENTIZER2WORD = {
+    Complementizer.ZERO: None,
+    Complementizer.THAT: 'that',
+    Complementizer.WHETHER: 'whether',
+    Complementizer.IF: 'if',
+}
 
 
 class ContentClause(Argument):
