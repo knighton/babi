@@ -10,6 +10,13 @@ class Token(object):
         self.up = up        # (dep, Token or None)
         self.downs = downs  # list of (dep, Token)
 
+    def to_d(self):
+        return {
+            'index': self.index,
+            'text': self.text,
+            'tag': self.tag,
+        }
+
 
 class Parse(object):
     """

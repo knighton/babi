@@ -13,7 +13,7 @@ def main():
     problem = problems[1]
     in_s, want_out = problem[0]
 
-    print 'INPUT:', in_s
+    print 'EVENTUAL INPUT:', in_s
 
     ss = [
         u'I was seen by you.',
@@ -23,6 +23,10 @@ def main():
         u"Don't you see?",
         u'I went to my home town.',
         u'I threw the ball to you.',
+    ]
+
+    ss = [
+        u'Tim saw Tom.'
     ]
 
     a = Agent()

@@ -36,6 +36,8 @@ class English(object):
             print '>', parse.dump()
             for surf in self.parse_to_surface.recog(parse):
                 print '>>', surf
+        if False:
+            yield 7  # TODO: hack to yield nothing until this is implemented.
 
     def text_from_dsen(self, dsen):
         assert False  # XXX

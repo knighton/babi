@@ -5,8 +5,9 @@ from ling.glue.inflection import Conjugation
 from ling.glue.purpose import EndPunctClassifier
 from ling.parse.parse import Parse
 from ling.tree.common.proper_noun import ProperNoun
-from ling.tree.surface.content_clause import ContentClause
+from ling.tree.surface.content_clause import Complementizer, ContentClause
 from ling.tree.surface.sentence import Sentence
+from ling.verb.verb import ModalFlavor
 
 
 class VerbExtractor(object):
@@ -108,7 +109,8 @@ class ParseToSurface(object):
         }
 
     def recognize_nnp(self, root_token):
-        return [ProperNoun(root_token.text)]
+        name = root_token.text,
+        return [ProperNoun(name=name, is_plur=False)]
 
     def recognize_verb_arg(self, root_token):
         return self.tag2recognize[root_token.tag](root_token)
@@ -173,7 +175,7 @@ class ParseToSurface(object):
 
         # If imperative, it just be conjugated second person.
         if v.intrinsics.modality.flavor == ModalFlavor.IMPERATIVE:
-            v_conjs &= (Conjugation.S2, Conjugation.P2)
+            v_conjs &= set([Conjugation.S2, Conjugation.P2])
 
         return v_conjs
 
@@ -187,14 +189,14 @@ class ParseToSurface(object):
             return set([Conjugation.S2, Conjugation.P2])
 
         # Get the required conjugation from the subject.
-        conj = pp_nn[subj_x][1].conjugation()
+        conj = pp_nn[subj_argx][1].decide_conjugation()
 
         # In case of existential there, get conjugation from the object instead.
         if not conj:
             x = subj_argx + 1
             if not (0 <= x < len(pp_nn)):
                 return []  # Ex-there but no object = can't parse it.
-            conj = pp_nn[x][1].conjugation()
+            conj = pp_nn[x][1].decide_conjugation()
 
         return set([conj])
 
@@ -210,7 +212,7 @@ class ParseToSurface(object):
 
     def recognize_clause(self, root_token, is_root_clause):
         """
-        root token -> yields Clause
+        root token -> yields ContentClause
         """
         cc = []
         for verb_span_pair, vv in \
@@ -223,9 +225,8 @@ class ParseToSurface(object):
                         ctzr = Complementizer.ZERO
                         new_v = deepcopy(v)
                         new_v.conj = conj
-                        is_pos = False
-                        c = Clause(ctzr, new_v, deepcopy(pp_nn), subj_argx,
-                                   is_pos)
+                        c = ContentClause(
+                            ctzr, new_v, deepcopy(pp_nn), subj_argx)
                         cc.append(c)
         return cc
 

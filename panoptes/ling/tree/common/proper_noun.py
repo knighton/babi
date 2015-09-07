@@ -12,10 +12,10 @@ class ProperNoun(Argument):
         self.name = name
         assert isinstance(self.name, tuple)
         for s in self.name:
-            assert isinstance(s, str)
+            assert isinstance(s, basestring)
 
         self.is_plur = is_plur
-        assert isinstance(self.plur, bool)
+        assert isinstance(self.is_plur, bool)
 
     def decide_conjugation(self):
         if self.is_plur:
