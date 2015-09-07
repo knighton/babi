@@ -238,5 +238,5 @@ class ParseToSurface(object):
         assert parse.tokens
         end_punct = self.end_punct_clf.classify(parse.tokens[-1].text)
 
-        for clause in self.recognize_clause(parse.root, is_root_clause):
+        for clause in self.recognize_clause(parse.root, is_root_clause=True):
             yield Sentence(clause, end_punct)
