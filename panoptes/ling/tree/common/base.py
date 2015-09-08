@@ -75,6 +75,8 @@ class Argument(object):
 
     def is_interrogative(self):
         """
+        -> bool
+
         Whether we raise a question.  If we do, we should be fronted during
         surface-to-deep structure transformation if we are the only
         'interrogative' or focused-on argument.
@@ -91,6 +93,8 @@ class Argument(object):
 
     def is_relative(self):
         """
+        -> bool
+
         Whether this arg either is a relative pronoun, or contains one in a
         direct child prepositional phrase or possessive.
 
