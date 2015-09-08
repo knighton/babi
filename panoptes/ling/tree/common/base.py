@@ -20,7 +20,8 @@ class SayContext(object):
     Input to saying.
     """
 
-    def __init__(self, idiolect, has_left, has_right, prep, is_possessive):
+    def __init__(self, idiolect, has_left, has_right, prep, is_possessive,
+                 is_arg):
         # Various knobs on how things are said.
         self.idiolect = idiolect
 
@@ -35,6 +36,16 @@ class SayContext(object):
 
         # Whether it needs to be said in its possessive form.
         self.is_possessive = is_possessive
+
+        # Some arguments can be interior fields of certain other arguments.  But
+        # they aren't said the same way in that case.  Track that here.
+        #
+        # Whether it is an entire standalone argument.  This is almost always
+        # true.  False when saying interior pieces of a common noun.
+        #
+        # Eg, false for saying the attribute in "an [8 foot tall] giant", but
+        # true for saying "the giant is [8 feet tall]".
+        self.is_arg = is_arg
 
     def check(self):
         assert isinstance(self.idiolect, Idiolect)

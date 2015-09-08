@@ -57,12 +57,15 @@ class CommonNoun(Argument):
         assert SurfaceCorrealtive.is_valid(self.correlative)
         assert N3.is_valid(self.gram_number)
         assert N5.is_valid(self.gram_of_number)
+        assert nx_le_nx(self.gram_number, self.gram_of_number)
+        # TODO: crosscheck correlative against grammatical numbers.
 
         # Explicit count or amount that converts to N3.  If present, must match
         # grammatical clues about number above.
         self.explicit_number = explicit_number
         if self.explicit_number:
             assert isinstance(self.explicit_number, Number)
+            # TODO: crosscheck explicit nubmer against grammatical numbers.
 
         # List of restrictive or descriptive attributes.
         self.attrs = attrs
@@ -186,7 +189,54 @@ class CommonNoun(Argument):
         return SayResult(ss, conj, eat_prep)
 
     def say_head_as_number(self, state, context):
-        XXX
+        """
+        Eg, three
+        """
+        if self.attrs:
+            return None
+
+        if self.possessor:
+            # Eg, "your three".
+            left = context.has_left
+            right = True
+            is_pos = True
+            is_arg = True
+            sub_context = SayContext(
+                context.idiolect, left, right, context.prep, is_pos, is_arg)
+            r = self.possessor.say(state, sub_context)
+            num_has_left = True
+        elif self.correlative == SurfaceCorrelative.INDEF:
+            # Eg, "three".
+            tokens = []
+            n2 = nx_to_nx(self.gram_number, N2)
+            conj = N2_TO_CONJ[n2]
+            eat_prep = False
+            r = SayResult(tokens, conj, eat_prep)
+            num_has_left = False
+        else:
+            # Eg, "those three"
+            r = state.correlative_mgr.say(
+                self.correlative, self.gram_number, self.gram_of_number, False)
+            num_has_left = True
+
+        # If saying the possessor or the correlative failed (some kind of
+        # invalid configuration), bail.
+        if not r:
+            return None
+
+        # Add the actual number's tokens.
+        if num_has_left:
+            left = True
+        else:
+            left = context.has_left
+
+        is_arg = False
+        sub_context = SayContext(
+            context.idiolect, left, context.has_right, context.prep,
+            context.is_possessive, is_arg)
+        r2 += self.number.say(sub_context)
+        r.tokens += r2.tokens
+        return r
 
     def say_head_as_full(self, state, context, override_noun):
         XXX
@@ -220,7 +270,8 @@ class CommonNoun(Argument):
         left = context.has_left
         right = context.has_right or self.preps_nargs
         sub_context = SayContext(
-            context.idiolect, left, right, context.prep, context.is_possessive)
+            context.idiolect, left, right, context.prep, context.is_possessive,
+            context.is_arg)
         r = self.say_head(state, context)
 
         XXX
