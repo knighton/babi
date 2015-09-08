@@ -148,15 +148,25 @@ class CommonNoun(Argument):
         return self.say(state, ARBITRARY_SAY_CONTEXT).conjugation
 
     def say_head_as_shortcut(self, state, context):
+        if self.possessor or self.explicit_number or self.attrs:
+            return None
+
+        return state.shortcut_mgr.say(
+            context.prep, self.gram_number, self.gram_of_number,
+            self.correlative, self.noun,
+            context.idiolect.allow_archaic_shortcuts)
+
+    def say_head_as_correlative(self, state, context):
+        if self.possessor or self.explicit_number or self.attrs:
+            return None
+
+        return state.correlative_mgr.say(
+            self.correlative, self.gram_number, self.gram_of_number, True)
+
+    def say_head_as_number(self, state, context):
         XXX
 
     def say_head_as_full(self, state, context, override_noun):
-        XXX
-
-    def say_head_as_pronoun(self, state, context):
-        XXX
-
-    def say_head_as_number(self, state, context):
         XXX
 
     def say_head(self, state, context):
@@ -166,7 +176,7 @@ class CommonNoun(Argument):
             if not r:
                 r = self.say_head_as_full(state, context, self.noun)
         else:
-            r = self.say_head_as_pronoun(state, context)
+            r = self.say_head_as_correlative(state, context)
             if not r:
                 self.say_head_as_number(state, context)
 
