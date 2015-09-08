@@ -1,9 +1,11 @@
 from copy import deepcopy
 
 from etc.combinatorics import each_choose_one_from_each
-from ling.glue.inflection import Conjugation
+from ling.glue.inflection import Conjugation, InflectionManager
 from ling.glue.purpose import EndPunctClassifier
 from ling.parse.parse import Parse
+from ling.tree.common.base import SayState
+from ling.tree.common.personal_pronoun import PersonalManager
 from ling.tree.common.proper_noun import ProperNoun
 from ling.tree.surface.content_clause import Complementizer, ContentClause
 from ling.tree.surface.sentence import Sentence
@@ -108,6 +110,10 @@ class ParseToSurface(object):
             'NNP': self.recognize_nnp,
         }
 
+        inflection_mgr = InflectionManager()
+        personal_mgr = PersonalManager(inflection_mgr)
+        self.say_state = SayState(inflection_mgr, personal_mgr)
+
     def recognize_nnp(self, root_token):
         name = root_token.text,
         return [ProperNoun(name=name, is_plur=False)]
@@ -189,14 +195,14 @@ class ParseToSurface(object):
             return set([Conjugation.S2, Conjugation.P2])
 
         # Get the required conjugation from the subject.
-        conj = pp_nn[subj_argx][1].decide_conjugation()
+        conj = pp_nn[subj_argx][1].decide_conjugation(self.say_state)
 
         # In case of existential there, get conjugation from the object instead.
         if not conj:
             x = subj_argx + 1
             if not (0 <= x < len(pp_nn)):
                 return []  # Ex-there but no object = can't parse it.
-            conj = pp_nn[x][1].decide_conjugation()
+            conj = pp_nn[x][1].decide_conjugation(self.say_state)
 
         return set([conj])
 

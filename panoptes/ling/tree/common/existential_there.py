@@ -11,10 +11,10 @@ class ExistentialThere(Argument):
     def arg_position_restriction(self):
         return ArgPositionRestriction.SUBJECT
 
-    def decide_conjugation(self):
+    def decide_conjugation(self, state):
         # Returning None instead of a Conjugation means that it will take the
         # conjugation of the verb's object instead.
         return None
 
-    def say(self, context):
+    def say(self, state, context):
         return SayResult(tokens=['there'], conjugation=None, eat_prep=False)

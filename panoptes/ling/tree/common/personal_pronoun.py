@@ -12,7 +12,7 @@ PersonalPronounCase = enum('PersonalPronounCase = SUBJECT OBJECT REFLEXIVE')
 PPCASE2ARG_POS_RES = {
     PersonalPronounCase.SUBJECT: ArgPosRestriction.SUBJECT,
     PersonalPronounCase.OBJECT: ArgPosRestriction.NOT_SUBJECT,
-    PersonalPronounCase.REFLEXIVE: ArgPositionRestriction.NOT_SUBJECT,
+    PersonalPronounCase.REFLEXIVE: ArgPosRestriction.NOT_SUBJECT,
 }
 
 
@@ -33,13 +33,11 @@ class PersonalPronoun(Argument):
         # found in the cor_or_pos field of common nouns, so we're fine.
         return PPCASE2ARG_POS_RES[self.ppcase]
 
-    def decide_conjugation(self):
-        # Call manager class.
-        assert False
+    def decide_conjugation(self, state):
+        return state.personal_mgr.perspro_decide_conjugation(self)
 
-    def say(self, context):
-        # Call manager class.
-        assert False
+    def say(self, state, context):
+        return state.personal_mgr.perspro_say(self, context.use_whom)
 
 
 def table_from_str(s, row_enum, col_enum, invalid_entry):
@@ -56,13 +54,16 @@ def table_from_str(s, row_enum, col_enum, invalid_entry):
     r = {}
     for row_index in xrange(len(sss) - 1):
         for col_index in xrange(n):
-            row = sss[row_index + 1][0]
-            row = row_enum.from_str[row]
-            col = sss[0][col_index + 1]
-            col = col_enum.from_str[col]
             s = sss[row_index + 1][col_index + 1]
             if s == invalid_entry:
                 continue
+
+            row = sss[0][col_index]
+            row = row_enum.from_str[row]
+
+            col = sss[row_index + 1][0]
+            col = col_enum.from_str[col]
+
             if s.endswith("'s"):
                 entry = (s[:-2], POSSESSIVE_MARK)
             else:
@@ -91,7 +92,7 @@ def make_table(use_whom):
         WHO2     who     whom     X          whose     whose
         WHOEVER1 whoever whomever X          whoever's whoever's
         WHOEVER2 whoever whomever X          whoever's whoever's
-    """)
+    """
 
     r = table_from_str(
         text, row_enum=PersonalColumn, col_enum=Declension, invalid_entry='X')
@@ -149,8 +150,8 @@ class PersonalManager(object):
     stored in the 'cor_dec_pos' field in CommonNoun in surface structure.
     """
 
-    def __init__(self, inflect_mgr):
-        self.inflect_mgr = inflect_mgr
+    def __init__(self, inflection_mgr):
+        self.inflection_mgr = inflection_mgr
 
         self.ppcase2pc = {
             PersonalPronounCase.SUBJECT: PersonalColumn.SUBJ,
@@ -179,7 +180,7 @@ class PersonalManager(object):
         """
         PersonalPronoun -> Conjugation
         """
-        dec = self.inflect_mgr.get_declension(p.declension)
+        dec = self.inflection_mgr.get_declension(p.declension)
         return dec.decide_conjugation(True)
 
     def perspro_say(self, p, use_whom):

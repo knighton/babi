@@ -17,13 +17,13 @@ class ProperNoun(Argument):
         self.is_plur = is_plur
         assert isinstance(self.is_plur, bool)
 
-    def decide_conjugation(self):
+    def decide_conjugation(self, state):
         if self.is_plur:
             return Conjugation.P2
         else:
             return Conjugation.S2
 
-    def say(self, context):
+    def say(self, state, context):
         ss = list(name)
         if context.is_possessive:
             ss.append(POSSESSIVE_MARK)

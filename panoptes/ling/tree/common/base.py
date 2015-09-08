@@ -5,6 +5,16 @@ from ling.glue.inflection import Conjugation
 ArgPosRestriction = enum('ArgPosRestriction = SUBJECT NOT_SUBJECT ANYWHERE')
 
 
+class SayState(object):
+    """
+    Input to saying.
+    """
+
+    def __init__(self, inflection_mgr, personal_mgr):
+        self.inflection_mgr = inflection_mgr  # InflectionManager
+        self.personal_mgr = personal_mgr  # PersonalManager
+
+
 class SayContext(object):
     """
     Input to saying.
@@ -104,9 +114,9 @@ class Argument(object):
         """
         return ArgPosRestriction.ANYWHERE
 
-    def decide_conjugation(self):
+    def decide_conjugation(self, state):
         """
-        -> Conjugation or None
+        SayState -> Conjugation or None
 
         Decide the conjugation of the verb if we are the subject.  Dies if we
         cannot be the subject (arg_position_restriction()).  For existential
@@ -115,17 +125,18 @@ class Argument(object):
 
         This is cheaper than saying the whole thing for large noun phrases and
         the like.
+
+        May rely on external state.
         """
         raise NotImplementedError
 
-    def say(self, context):
+    def say(self, state, context):
         """
-        SayContext -> SayResult
+        SayState, SayContext -> SayResult
 
         Render this object (to words, a conjugation, whether to drop the
         referring preposition, etc).
 
-        Some more complicated objects depend on external state to be said, so
-        this call may raise an exception.
+        Nontrivial objects depend on external state to be said.
         """
         raise NotImplementedError
