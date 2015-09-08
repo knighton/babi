@@ -1,0 +1,325 @@
+- name: uninflected
+  words:
+  - bison
+  - bream
+  - breeches
+  - britches
+  - carp
+  - chassis
+  - clippers
+  - cod
+  - contretemps
+  - corps
+  - debris
+  - diabetes
+  - djinn
+  - eland
+  - elk
+  - flounder
+  - gallows
+  - headquarters
+  - herpes
+  - high-jinks
+  - homework
+  - jackanapes
+  - mackerel
+  - measles
+  - mews
+  - mumps
+  - pincers
+  - pliers
+  - proceedings
+  - rabies
+  - salmon
+  - scissors
+  - series
+  - shears
+  - species
+  - swine
+  - trout
+  - tuna
+  - whiting
+  - wildebeest
+
+- name: uncountable
+  words:
+  - advice
+  - bread
+  - butter
+  - cheese
+  - electricity
+  - equipment
+  - fruit
+  - furniture
+  - garbage
+  - graffiti
+  - gravel
+  - happiness
+  - information
+  - ketchup
+  - knowledge
+  - love
+  - luggage
+  - mathematics
+  - mayonnaise
+  - meat
+  - mustard
+  - news
+  - progress
+  - research
+  - rice
+  - sand
+  - software
+  - understanding
+  - water
+
+- name: ose
+  words:
+  - cellulose
+  - fructose
+  - galactose
+  - glucose
+  - ketose
+  - lactose
+  - maltose
+  - ribose
+  - saccharose
+
+- name: s-singular
+  words:
+  - acropolis
+  - aegis
+  - alias
+  - asbestos
+  - bathos
+  - bias
+  - caddis
+  - cannabis
+  - canvas
+  - chaos
+  - cosmos
+  - dais
+  - digitalis
+  - epidermis
+  - ethos
+  - gas
+  - glottis
+  - ibis
+  - lens
+  - mantis
+  - marquis
+  - metropolis
+  - pathos
+  - pelvis
+  - polis
+  - rhinoceros
+  - sassafras
+  - trellis
+
+- name: ex-ices
+  words:
+  - codex
+  - murex
+  - silex
+
+- name: ex-ices-classical
+  words:
+  - apex
+  - cortex
+  - index
+  - latex
+  - pontifex
+  - simplex
+  - vertex
+  - vortex
+
+- name: um-a
+  words:
+  - agendum
+  - bacterium
+  - candelabrum
+  - datum
+  - desideratum
+  - erratum
+  - extremum
+  - ovum
+  - stratum
+
+- name: um-a-classical
+  words:
+  - aquarium
+  - compendium
+  - consortium
+  - cranium
+  - curriculum
+  - dictum
+  - emporium
+  - enconium
+  - gymnasium
+  - honorarium
+  - interregnum
+  - lustrum
+  - maximum
+  - medium
+  - memorandum
+  - millenium
+  - minimum
+  - momentum
+  - optimum
+  - phylum
+  - quantum
+  - rostrum
+  - spectrum
+  - speculum
+  - stadium
+  - trapezium
+  - ultimatum
+  - vacuum
+  - velum
+
+- name: on-a
+  words:
+  - aphelion
+  - asyndeton
+  - criterion
+  - hyperbaton
+  - noumenon
+  - organon
+  - perihelion
+  - phenomenon
+  - prolegomenon
+
+- name: a-ae
+  words:
+  - alga
+  - alumna
+  - vertebra
+
+- name: a-ae-classical
+  words:
+  - abscissa
+  - amoeba
+  - antenna
+  - aurora
+  - formula
+  - hydra
+  - hyperbola
+
+  - lacuna
+  - medusa
+  - nebula
+  - nova
+  - parabola
+
+- name: en-ina-classical
+  words:
+  - foramen
+  - lumen
+  - stamen
+
+- name: a-ata-classical
+  words:
+  - anathema
+  - bema
+  - carcinoma
+  - charisma
+  - diploma
+  - dogma
+  - drama
+  - edema
+  - enema
+  - enigma
+  - gumma
+  - lemma
+  - lymphoma
+  - magma
+  - melisma
+  - miasma
+  - oedema
+  - sarcoma
+  - schema
+  - soma
+  - stigma
+  - stoma
+  - trauma
+
+- name: is-ides-classical
+  words:
+  - clitoris
+  - iris
+
+- name: us-i-classical
+  words:
+  - focus
+  - fungus
+  - incubus
+  - nimbus
+  - nucleolus
+  - radius
+  - stylus
+  - succubus
+  - torus
+  - umbilicus
+  - uterus
+
+- name: us-us-classical
+  words:
+  - apparatus
+  - cantus
+  - coitus
+  - hiatus
+  - impetus
+  - nexus
+  - plexus
+  - prospectus
+  - sinus
+  - status
+
+- name: o-i-classical
+  words:
+  - alto
+  - basso
+  - canto
+  - contralto
+  - crescendo
+  - solo
+  - soprano
+  - tempo
+
+- name: i-classical
+  words:
+  - afreet
+  - afrit
+  - efreet
+
+- name: im-classical
+  words:
+  - cherub
+  - goy
+  - seraph
+
+- name: o-os
+  words:
+  - albino
+  - archipelago
+  - armadillo
+  - commando
+  - ditto
+  - dynamo
+  - embryo
+  - fiasco
+  - generalissimo
+  - ghetto
+  - guano
+  - inferno
+  - jumbo
+  - lingo
+  - lumbago
+  - magneto
+  - manifesto
+  - medico
+  - octavo
+  - photo
+  - quarto
+  - rhino
+  - stylo

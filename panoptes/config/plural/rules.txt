@@ -1,0 +1,128 @@
+# Columns: sing_suffix, plur_suffix, is_pedantic, category_only
+
+# 4. Words that do not inflect.
+-         -           - uninflected
+-         -           - uncountable
+s         s           - s-singular
+fish      fish        - -
+bass      bass        - -
+ois       ois         - -
+sheep     sheep       - -
+deer      deer        - -
+pox       pox         - -
+itis      itis        - -
+-         -           - ose
+
+# 5. Irregular plurals (eg mongoose, oxen).
+ephemeris ephemerides x -
+corpus    corpora     - -
+opus      opera       - -
+genus     genera      - -
+mythos    mythoi      - -
+penis     penes       x -
+testis    testes      - -
+child     children    - -
+brother   brethren    x -
+loaf      loaves      - -
+hoof      hooves      - -
+beef      beeves      - -
+money     monies      x -
+mongoose  mongooses   - -
+#ox       oxen        - -
+soliloquy soliloquies - -
+#graffito graffiti    - -
+octopus   octopodes   x -
+genie     genii       x -
+ganglion  ganglia     x -
+turf      turfs       - -
+numen     numena      - -
+occiput   occipita    x -
+princeps  principes   - -
+
+# 6. Irregular inflections for common suffixes (eg synopses, mice, men).
+man       men         - -
+person    people      - -
+louse     lice        - -
+mouse     mice        - -
+tooth     teeth       - -
+goose     geese       - -
+foot      feet        - -
+zoon      zoa         - -
+cis       ces         - -
+sis       ses         - -
+xis       xes         - -
+
+# 7. Fully assimilated classical inflections (eg vertebrae, codices).
+ex        ices        - ex-ices
+ex        ices        x ex-ices-classical
+um        a           - um-a
+um        a           x um-a-classical
+on        a           - on-a
+a         ae          - a-ae
+a         ae          x a-ae-classical
+
+# 8. Classical variants of modern inflections (eg stigmata, soprani).
+trix      trices      x -
+eau       eaux        x -
+ieu       ieu         x -
+inx       inges       x -
+anx       anges       x -
+ynx       ynges       x -
+en        ina         x en-ina-classical
+a         ata         x a-ata-classical
+is        ides        x is-ides-classical
+us        i           x us-i-classical
+us        us          x us-us-classical
+o         i           x o-i-classical
+-         i           x i-classical
+-         im          x im-classical
+
+# 9. -ch, -sh, -ss take -es in the plural (eg churches, classes).
+ch        ches        - -
+sh        shes        - -
+ss        sses        - -
+x         xes         - -
+
+# 10. Certain words ending in -f or -fe take -ves in the plural (eg wolves).
+alf       alves       - -
+elf       elves       - -
+olf       olves       - -
+deaf      deafs       - -
+eaf       eaves       - -
+arf       arves       - -
+nife      nives       - -
+life      lives       - -
+wife      wives       - -
+
+# 11. -y takes -ys if preceded by a vowel or when a proper noun, but -ies if
+# preceded by a consonant (eg storeys, Marys, stories).
+ay        ays         - -
+ey        eys         - -
+iy        iys         - -
+oy        oys         - -
+uy        uys         - -
+y         ies         - -
+
+# 12. Some words ending in -o take -os, while the rest take -oes.  words in
+# which the -o is preceded by a vowel always take -os (eg lassos, potatoes,
+# bamboos).
+o         os          - o-os
+ao        aos         - -
+eo        eos         - -
+io        ios         - -
+oo        oos         - -
+uo        uos         - -
+o         oes         - -
+
+# 13.7 "Casual" plurals: "penises", "corpuses", etc.
+us        uses        - -
+is        ises        - -
+
+# 13.8 "Biceps" -> "biceps"
+ceps      ceps        - -
+
+# 13.9 How would this not be right?
+s         ses         - -
+
+# 14. Otherwise, assume that the plural just adds -s (eg cats, programmes).
+-         s           - -
