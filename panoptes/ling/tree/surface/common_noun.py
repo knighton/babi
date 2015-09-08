@@ -215,8 +215,9 @@ class CommonNoun(Argument):
             num_has_left = False
         else:
             # Eg, "those three"
+            is_pro = False
             r = state.correlative_mgr.say(
-                self.correlative, self.gram_number, self.gram_of_number, False)
+                self.correlative, self.gram_number, self.gram_of_number, is_pro)
             num_has_left = True
 
         # If saying the possessor or the correlative failed (some kind of
@@ -239,7 +240,71 @@ class CommonNoun(Argument):
         return r
 
     def say_head_as_full(self, state, context, override_noun):
-        XXX
+        """
+        Eg, cats, whichever three wise men
+        """
+        # Say the front part (correlative or possessive).
+        if self.possessor:
+            # Say the potentially recursive possessor tree.
+            has_right = True
+            is_pos = True
+            is_arg = True
+            sub_context = SayContext(
+                context.idiolect, context.has_left, has_right, context.prep,
+                is_pos, is_arg)
+            r = self.possessor.say(state, sub_context)
+
+            # If that failed, bail.
+            if not r:
+                return None
+
+            # Get pluralness from grammatical number.
+            n2 = nx_to_nx(self.gram_number, N2)
+            is_plur = N2 == N2.PLUR
+        else:
+            # Get the determiner words.
+            is_pro = False
+            r = state.correlative_mgr.say(
+                self.correlative, self.gram_number, self.gram_of_number, is_pro)
+
+            # If saying failed, bail.
+            if not r:
+                return None
+
+            # If explicit number and indef, don't say the correlative.
+            #
+            # Eg, "I saw 3 cats"
+            if self.explicit_number and \
+                    self.correlative == SurfaceCorrelative.INDEF:
+                r.tokens = []
+
+            # Get pluralness from its conjugation.
+            is_plur = r.conjugation == Conjugation.P3
+
+        # Say the explicit number.
+        if self.explicit_number:
+            left = True
+            right = True
+            prep = None
+            is_pos = False
+            is_arg = False
+            sub_context = SayContext(
+                context.idiolect, left, right, prep, is_pos, is_arg)
+            r2 = self.explicit_number.say(state, context)
+            r.tokens += r2.tokens
+
+        # Say the attributes.
+        if self.attrs:
+            assert False  # TODO: not in MVP.
+
+        # Say the noun.
+        if is_plur:
+            s = state.plural_mgr.to_plural(override_noun)
+        else:
+            s = override_noun
+        r.tokens.append(s)
+
+        return r
 
     def say_head(self, state, context):
         # Try various options for rendering it.
