@@ -148,6 +148,9 @@ class CommonNoun(Argument):
         return self.say(state, ARBITRARY_SAY_CONTEXT).conjugation
 
     def say_head_as_shortcut(self, state, context):
+        """
+        Eg, therefore
+        """
         if self.possessor or self.explicit_number or self.attrs:
             return None
 
@@ -157,11 +160,30 @@ class CommonNoun(Argument):
             context.idiolect.allow_archaic_shortcuts)
 
     def say_head_as_correlative(self, state, context):
+        """
+        Eg, what
+        """
         if self.possessor or self.explicit_number or self.attrs:
             return None
 
         return state.correlative_mgr.say(
             self.correlative, self.gram_number, self.gram_of_number, True)
+
+    def say_head_as_possessive_pronoun(self, state, context):
+        """
+        Eg, yours
+        """
+        if self.explicit_number or self.attrs:
+            return None
+
+        if not isinstance(self.possessor, PersonalPronoun):
+            return None
+
+        ss = state.personal_mgr.pospro_say(
+            self.possessor.declension, context.idiolect.use_whom)
+        conj = nx_to_nx(self.gram_number, N2)
+        eat_prep = False
+        return SayResult(ss, conj, eat_prep)
 
     def say_head_as_number(self, state, context):
         XXX
@@ -177,6 +199,8 @@ class CommonNoun(Argument):
                 r = self.say_head_as_full(state, context, self.noun)
         else:
             r = self.say_head_as_correlative(state, context)
+            if not r:
+                r = self.say_head_as_possessive_pronoun(state, context)
             if not r:
                 self.say_head_as_number(state, context)
 
