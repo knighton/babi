@@ -144,20 +144,20 @@ class InflectionManager(object):
         # their common noun equivalents during encode/decode (who -> what
         # person, etc).  They are outside 'person groups' characterizations.
         data = """
-            I         S1  ANY     1
-            WE        P1  ANY     1+
-            YOU1      S2  ANY     2
-            YOU2      P2  ANY     2+
-            HE        S3  MALE    3
-            SHE       S3  FEMALE  3
-            IT        S3  NEUTER  3
-            THEY1     S3  ANY     3
-            ONE       S3  ANY     3
-            WHO1      S3  ANY     ?
-            WHO2      S3  ANY     ?
-            THEY2     P3  ANY     3
-            WHOEVER1  P3  ANY     ?
-            WHOEVER2  P3  ANY     ?
+            I        S1 -      1
+            WE       P1 -      1+
+            YOU      S2 -      2
+            YALL     P2 -      2+
+            HE       S3 MALE   3
+            SHE      S3 FEMALE 3
+            IT       S3 NEUTER 3
+            THEY1    S3 -      3
+            ONE      S3 -      3
+            WHO1     S3 -      ?
+            WHO2     S3 -      ?
+            THEY2    P3 -      3
+            WHOEVER1 P3 -      ?
+            WHOEVER2 P3 -      ?
         """
 
         self.declension2info = {}
@@ -166,7 +166,10 @@ class InflectionManager(object):
             dec = Declension.from_str[dec]
             usual_conj = Conjugation.from_str[conj]
             number = N2.SING if 'S' in gender else N2.PLUR
-            gender = Gender.from_str[gender]
+            if gender == '-':
+                gender = None
+            else:
+                gender = Gender.from_str[gender]
             person_groups = s2pgroups[pgroups]
             info = InflectionInfo(
                 dec, usual_conj, number, gender, person_groups)
