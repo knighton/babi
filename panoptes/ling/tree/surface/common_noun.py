@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from ling.glue.correlative import Correlative, CORRELATIVE2IS_INTERROGATIVE
 from ling.glue.grammatical_number import N3, N5, nx_le_nx
+from ling.glue.magic_token import POSSESSIVE_MARK
 from ling.surface.number import Number
 from ling.surface.arg import Argument, ArgPositionRequirement, SayContext
 
@@ -331,12 +332,30 @@ class CommonNoun(Argument):
 
         return r
 
+    def say_tail(self, state, context):
+        if self.preps_nargs:
+            assert False  # TOOD: not in MVP.
+
+        return []
+
     def say(self, state, context):
         left = context.has_left
         right = context.has_right or self.preps_nargs
         sub_context = SayContext(
             context.idiolect, left, right, context.prep, context.is_possessive,
             context.is_arg)
-        r = self.say_head(state, context)
+        r = self.say_head(state, sub_context)
 
-        XXX
+        left = True
+        right = context.has_right
+        prep = None
+        is_pos = False
+        is_arg = False
+        sub_context = SayContext(
+            context.idiolect, left, right, prep, is_pos, is_arg)
+        r.tokens += self.say_tail(state, sub_context)
+
+        if context.is_possessive:
+            r.tokens.append(POSSESSIVE_MARK)
+
+        return r
