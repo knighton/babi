@@ -93,14 +93,6 @@ class CommonNoun(Argument):
         self.preps_nargs = preps_nargs
         assert isinstance(self.preps_nargs, list)
 
-        # At most one argument can be fronted (therefore missing from its
-        # original position).
-        count = 0
-        for p, n in self.preps_nargs:
-            if not n:
-                count += 1
-        assert count in (0, 1)
-
         # We can have at most one relative child (eg, "the castle whose king",
         # "the castle the kind of which").
         count = 0
