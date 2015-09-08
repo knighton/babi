@@ -6,8 +6,8 @@ from ling.surface.number import Number
 from ling.surface.arg import Argument, ArgPositionRequirement, SayContext
 
 
-def is_thing_sentient(thing):
-    return thing == 'person'
+def is_noun_sentient(noun):
+    return noun == 'person'
 
 
 ARBITRARY_SAY_CONTEXT = SayContext(
@@ -30,7 +30,7 @@ class CommonNoun(Argument):
     """
 
     def __init__(self, possessor, correlative, gram_number, gram_of_number,
-                 explicit_number, attrs, thing, say_thing, preps_nargs):
+                 explicit_number, attrs, noun, say_noun, preps_nargs):
         # Possessor.
         #
         # If it has a possessor, correlative must be DEFINITE (eg, "[Tim's] cat"
@@ -74,20 +74,38 @@ class CommonNoun(Argument):
         #
         # May not be present (eg, "[that kite] flew" vs "[that] flew").
         #
-        # Say its type when it is non-obvious from context, otherwise it's more
+        # Say the noun when it is non-obvious from context, otherwise it's more
         # parsimonious not to.
         #
-        # If 'say_thing', 'thing' must exist.
-        self.thing = thing
-        self.say_thing = say_thing
-        if self.say_thing or self.thing:
-            assert isinstance(self.thing, str)
-            assert self.thing
+        # If 'say_noun', 'noun' must exist.
+        self.noun = noun
+        self.say_noun = say_noun
+        if self.say_noun or self.noun:
+            assert isinstance(self.noun, str)
+            assert self.noun
 
         # Descriptive or restrictive child structures coming after the head.
         # TODO: not used in this demo.
         self.preps_nargs = preps_nargs
         assert isinstance(self.preps_nargs, list)
+
+        # At most one argument can be fronted (therefore missing from its
+        # original position).
+        count = 0
+        for p, n in self.preps_nargs:
+            if not n:
+                count += 1
+        assert count in (0, 1)
+
+        # We can have at most one relative child (eg, "the castle whose king",
+        # "the castle the kind of which").
+        count = 0
+        if self.possessor and self.possessor.is_relative():
+            count += 1
+        for p, n in self.preps_nargs:
+            if n and n.is_relative():
+                count += 1
+        assert count in (0, 1)
 
     def is_interrogative(self):
         if CORRELATIVE2IS_INTERROGATIVE[self.correlative]:
@@ -121,13 +139,54 @@ class CommonNoun(Argument):
 
         Eg, "the dog [that] saw you" but "the boy [who] saw you"
         """
-        if self.thing:
-            return is_thing_sentient(self.thing)
+        if self.noun:
+            return is_noun_sentient(self.noun)
         else:
             return None
 
     def decide_conjugation(self, state):
         return self.say(state, ARBITRARY_SAY_CONTEXT).conjugation
 
+    def say_head_as_shortcut(self, state, context):
+        XXX
+
+    def say_head_as_full(self, state, context, override_noun):
+        XXX
+
+    def say_head_as_pronoun(self, state, context):
+        XXX
+
+    def say_head_as_number(self, state, context):
+        XXX
+
+    def say_head(self, state, context):
+        # Try various options for rendering it.
+        if self.say_noun:
+            r = self.say_head_as_shortcut(state, context)
+            if not r:
+                r = self.say_head_as_full(state, context, self.noun)
+        else:
+            r = self.say_head_as_pronoun(state, context)
+            if not r:
+                self.say_head_as_number(state, context)
+
+        # Fall back to tying full as "one" (can still fail if invalid
+        # configuration).
+        if not r:
+            r = self.say_head_as_full(state, context, 'one')
+
+        # Crash if the wrong correlative was chosen for its grammatical counts,
+        # etc.  Could not happen during parsing.  If this crashes, structure
+        # generation code is wrong.
+        assert r
+
+        return r
+
     def say(self, state, context):
+        left = context.has_left
+        right = context.has_right or self.preps_nargs
+        sub_context = SayContext(
+            context.idiolect, left, right, context.prep, context.is_possessive)
+        r = self.say_head(state, context)
+
         XXX
