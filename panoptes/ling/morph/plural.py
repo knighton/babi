@@ -1,4 +1,7 @@
+from collections import defaultdict
 import yaml
+
+from etc.suffix_fanout_map import SuffixFanoutMap
 
 
 def remove_then_append(s, remove, append):
@@ -81,37 +84,174 @@ def load_rules(f):
     return rules
 
 
-def load_normal_rules(f):
-    rules = []
+def load_sing2plur(f):
+    sing2plur = {}
     with open(f) as f:
         for line in f:
-            sing_suffix, plur_suffix = line.split()
-            rule = Rule(sing_suffix, plur_suffix, None, False)
-            rules.append(rule)
-    return rules
+            sing, plur = line.split()
+            assert sing not in sing2plur
+            sing2plur[sing] = plur
+    return sing2plur
 
 
-def load_nonsuffixable_rules(f):
-    return load_normal_rules(f)
+def singular_suffixes_from_rule(rule, cat2sings):
+    if rule.category_only:
+        return cat2sings[rule.category_only]
+    else:
+        return [rule.sing_suffix]
 
 
-def load_capitalized_rules(f):
-    return load_normal_rules(f)
+def plural_suffixes_from_rule(rule, cat2sings):
+    if rule.category_only:
+        return map(rule.plur_from_sing, cat2sings[rule.category_only])
+    else:
+        return [rule.plur_suffix]
+
+
+def each_suffix_shortest_first(s):
+    for i in xrange(len(s) + 1):
+        yield s[len(s) - i:]
 
 
 class PluralManager(object):
     @staticmethod
-    def from_files(capitalized_f, categories_f, nonsuffixable_f, rules_f):
-        cat2sings = load_categories(categories_f)
-        normal_rules = load_normal_rules(rules_f)
-        nonsuffixable_rules = load_nonsuffixable_rules(nonsuffixable_f)
-        capitalized_rules = load_capitalized_rules(capitalized_f)
-        return PluralManager(cat2sings, normal_rules, nonsuffixable_rules,
-                             capitalized_rules)
+    def from_files(category_f, rule_f, nonsuffixable_f, capitalized_f):
+        cat2sings = load_categories(category_f)
+        rules = load_rules(rule_f)
+        nonsuffixable_sing2plur = load_sing2plur(nonsuffixable_f)
+        capitalized_sing2plur = load_sing2plur(capitalized_f)
+        return PluralManager(cat2sings, rules, nonsuffixable_sing2plur,
+                             capitalized_sing2plur)
 
-    def __init__(self, cat2sings, normal_rules, nonsuffixable_rules,
-                 capitalized_rules):
-        for r in normal_rules + nonsuffixable_rules + capitalized_rules:
+    def __init__(self, cat2sings, rules, nonsuffixable_sing2plur,
+                 capitalized_sing2plur):
+        sings_set = set()
+        for r in rules:
             if r.category_only:
                 for sing in cat2sings[r.category_only]:
                     assert sing.endswith(r.sing_suffix)
+                    assert sing not in sings_set
+                    sings_set.add(sing)
+
+        sing2x = {}
+        sing2x_pedantic_ok = {}
+        plur2xx = defaultdict(list)
+        plur2xx_pedantic_ok = defaultdict(list)
+        for i, rule in enumerate(rules):
+            for s in singular_suffixes_from_rule(rule, cat2sings):
+                assert s not in sing2x_pedantic_ok
+                sing2x_pedantic_ok[s] = i
+                if not rule.is_pedantic:
+                    sing2x[s] = i
+            for s in plural_suffixes_from_rule(rule, cat2sings):
+                plur2xx_pedantic_ok[s].append(i)
+                if not rule.is_pedantic:
+                    plur2xx[s].append(i)
+
+        self.sing2x = SuffixFanoutMap(sing2x, None, min)
+        self.sing2x_pedantic_ok = SuffixFanoutMap(sing2x_pedantic_ok, None, min)
+        self.plur2xx = SuffixFanoutMap(plur2xx, [], min)
+        self.plur2xx_pedantic_ok = SuffixFanoutMap(plur2xx_pedantic_ok, [], min)
+
+        self.rules = rules
+        self.nonsuffixable_sing2plur = nonsuffixable_sing2plur
+        self.capitalized_sing2plur = capitalized_sing2plur
+
+    def name_to_plural(self, s):
+        for sing_suffix in each_suffix_shortest_first(s):
+            plur_suffix = self.sing2plur_capitalized.get(sing_suffix)
+            if not plur_suffix:
+                continue
+            return remove_then_append(s, sing_suffix, plur_suffix)
+        return None
+
+    def to_plural(self, s, is_pedantic_ok=False):
+        """
+        singular, pedantic ok -> plural
+        """
+        assert isinstance(s, basestring)
+        assert s
+        assert isinstance(is_pedantic_ok, bool)
+
+        # Names.
+        if s[0].isupper():
+            return self.name_to_plural(s)
+
+        # Special non-suffixable words.
+        #
+        # If we hit this, it is all you need (eg, ox -> oxen).
+        r = self.nonsuffixable_sing2plur.get(s)
+        if r:
+            return r
+
+        # Everything else.
+        if is_pedantic_ok:
+            a = self.sing2x_pedantic_ok
+        else:
+            a = self.sing2x
+        x = a.get(s)
+        return self.rules[x].plur_from_sing(s)
+
+    def name_to_singular(self, s):
+        for plur_suffix in each_suffix_shortest_first(s):
+            sing_suffix = self.plur2sing_capitalized.get(plur_suffix)
+            if not sing_suffix:
+                continue
+            return remove_then_append(s, plur_suffix, sing_suffix)
+        return None
+
+    def to_singular(self, s, is_pedantic_ok=False):
+        """
+        plural, pedantic ok -> list of possible singulars
+        """
+        assert isinstance(s, basestring)
+        assert s
+        assert isinstance(is_pedantic_ok, bool)
+
+        # Names.
+        if s[0].isupper():
+            return [self.name_to_singular(s)]
+
+        # Special non-suffixable words.
+        r = self.nonsuffixable_plur2sing.get(s)
+        if r:
+            return [r]
+
+        # Everything else.
+        if is_pedantic_ok:
+            a = self.plur2xx_pedantic_ok
+        else:
+            a = self.plur2xx
+        rr = []
+        for x in a.get(s):
+            r = self.rules[x].sing_from_plur(s)
+            rr.append(r)
+        return rr
+
+    def identify(self, word):
+        """
+        word -> list of (singular form, is plural)
+        """
+        ss = self.to_singular(word, is_pedantic_ok=True)
+
+        # If we cannot make it singular, it must already be singular.
+        if not ss:
+            return [(word, False)]
+
+        # Else if singular and plural forms are the same, return both.
+        if ss == [word]:
+            return [(word, False), (word, True)]
+
+        # It has a singular form(s), so it certainly is a plural (and may or
+        # may not be its own singular form as well).
+        rr = map(lambda s: (s, True), ss)
+
+        same = False
+        for s in ss:
+            if s == word:
+                same = True
+                break
+        if same:
+            rr.append((s, False))
+
+        return rr
