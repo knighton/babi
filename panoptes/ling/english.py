@@ -4,6 +4,8 @@ from ling.parse.parser import Parser as TextToParse
 from ling.tree.common.base import SayState
 from ling.tree.common.personal_pronoun import PersonalManager
 from ling.tree.surface.recog import ParseToSurface
+from ling.tree.surface.util.correlative import CorrelativeManager
+from ling.tree.surface.util.count_restriction import CountRestrictionChecker
 from ling.verb.verb_manager import VerbManager
 
 
@@ -25,6 +27,9 @@ class English(object):
         verb_f = '../data/verbs.json'
         verb_mgr = VerbManager.from_files(conj_f, verb_f)
 
+        count_restriction_checker = CountRestrictionChecker()
+        correlative_mgr = CorrelativeManager(count_restriction_checker)
+
         inflection_mgr = InflectionManager()
         personal_mgr = PersonalManager(inflection_mgr)
 
@@ -35,7 +40,8 @@ class English(object):
         plural_mgr = PluralManager.from_files(
             cat_f, rule_f, nonsuffixable_f, cap_f)
 
-        say_state = SayState(inflection_mgr, personal_mgr, plural_mgr)
+        say_state = SayState(
+            correlative_mgr, inflection_mgr, personal_mgr, plural_mgr)
 
         # Text -> deep structure.
         self.text_to_parse = TextToParse()
