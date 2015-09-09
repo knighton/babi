@@ -1,4 +1,8 @@
+from ling.glue.inflection import InflectionManager
+from ling.morph.plural import PluralManager
 from ling.parse.parser import Parser as TextToParse
+from ling.tree.common.base import SayState
+from ling.tree.common.personal_pronoun import PersonalManager
 from ling.tree.surface.recog import ParseToSurface
 from ling.verb.verb_manager import VerbManager
 
@@ -21,9 +25,21 @@ class English(object):
         verb_f = '../data/verbs.json'
         verb_mgr = VerbManager.from_files(conj_f, verb_f)
 
+        inflection_mgr = InflectionManager()
+        personal_mgr = PersonalManager(inflection_mgr)
+
+        cat_f = 'config/plural/categories.yaml'
+        rule_f = 'config/plural/rules.txt'
+        nonsuffixable_f = 'config/plural/nonsuffixable.txt'
+        cap_f = 'config/plural/capitalized.txt'
+        plural_mgr = PluralManager.from_files(
+            cat_f, rule_f, nonsuffixable_f, cap_f)
+
+        say_state = SayState(inflection_mgr, personal_mgr, plural_mgr)
+
         # Text -> deep structure.
         self.text_to_parse = TextToParse()
-        self.parse_to_surface = ParseToSurface(verb_mgr)
+        self.parse_to_surface = ParseToSurface(say_state, verb_mgr)
         self.surface_to_deep = SurfaceToDeep()
 
         # Deep structure -> text.

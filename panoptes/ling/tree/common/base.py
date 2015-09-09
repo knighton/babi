@@ -10,9 +10,10 @@ class SayState(object):
     Input to saying.
     """
 
-    def __init__(self, inflection_mgr, personal_mgr):
+    def __init__(self, inflection_mgr, personal_mgr, plural_mgr):
         self.inflection_mgr = inflection_mgr  # InflectionManager
         self.personal_mgr = personal_mgr  # PersonalManager
+        self.plural_mgr = plural_mgr  # PluralManager
 
 
 class SayContext(object):

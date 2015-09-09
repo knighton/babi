@@ -26,7 +26,9 @@ def main():
     ]
 
     ss = [
-        u'Tim saw Tom.'
+        u'Tim saw Tom.',
+        u'I watched them.',
+        u'I saw you.',
     ]
 
     a = Agent()

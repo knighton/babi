@@ -1,11 +1,10 @@
 from copy import deepcopy
 
 from etc.combinatorics import each_choose_one_from_each
-from ling.glue.inflection import Conjugation, InflectionManager
+from ling.glue.inflection import Conjugation
 from ling.glue.purpose import EndPunctClassifier
 from ling.parse.parse import Parse
 from ling.tree.common.base import SayState
-from ling.tree.common.personal_pronoun import PersonalManager
 from ling.tree.common.proper_noun import ProperNoun
 from ling.tree.surface.content_clause import Complementizer, ContentClause
 from ling.tree.surface.sentence import Sentence
@@ -102,7 +101,7 @@ class ParseToSurface(object):
     Objects that converts parses to surface structure.
     """
 
-    def __init__(self, verb_mgr):
+    def __init__(self, say_state, verb_mgr):
         self.end_punct_clf = EndPunctClassifier()
         self.verb_extractor = VerbExtractor(verb_mgr)
 
@@ -110,9 +109,7 @@ class ParseToSurface(object):
             'NNP': self.recognize_nnp,
         }
 
-        inflection_mgr = InflectionManager()
-        personal_mgr = PersonalManager(inflection_mgr)
-        self.say_state = SayState(inflection_mgr, personal_mgr)
+        self.say_state = say_state
 
     def recognize_nnp(self, root_token):
         name = root_token.text,
