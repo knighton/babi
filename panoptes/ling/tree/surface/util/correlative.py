@@ -1,11 +1,13 @@
 from collections import defaultdict
 
+from etc.dicts import v2kk_from_k2v
 from etc.enum import enum
 from ling.glue.correlative import SurfaceCorrelative
 from ling.glue.grammatical_number import N2, N5
 from ling.glue.inflection import Conjugation
 from ling.glue.magic_token import A_OR_AN
 from ling.tree.common.base import SayResult
+from ling.tree.surface.util.count_restriction import CountRestriction
 
 
 def parse_correlative_entry(s):
@@ -71,7 +73,7 @@ def make_correlative_table():
     for s in sss[0]:
         of = N5.from_str[s]
         ofs.append(of)
-    assert set(ofs) == N5.values - N5.ZERO
+    assert set(ofs) == N5.values - set([N5.ZERO])
 
     cor_pro_plur_of2s = {}
     for row_index in xrange(len(sss) - 1):
@@ -92,21 +94,21 @@ class CorrelativeManager(object):
         self.count_restriction_checker = count_restriction_checker
 
         # Correlative -> count restriction, grammatical number override.
-        C = SurfaceCorrelativj
+        C = SurfaceCorrelative
         R = CountRestriction
         self.cor2counts = {
             C.INDEF: (R.SOME, None),
             C.DEF: (R.ALL, None),
-            C.INTR: (R.UNK, None),
+            C.INTR: (R.ANY, None),
             C.PROX: (R.ALL, None),
             C.DIST: (R.ALL, None),
-            C.EXIST: (R.ONE_OF_N, None),
+            C.EXIST: (R.ONE_OF_PLURAL, None),
             C.ELECT_ANY: (R.SOME, None),
-            C.ELECT_EVER: (R.UNK, None),
-            c.UNIV_EVERY: (R.ALL, N2.SING),
+            C.ELECT_EVER: (R.ANY, None),
+            C.UNIV_EVERY: (R.ALL, N2.SING),
             C.UNIV_ALL: (R.ALL, N2.PLUR),
             C.NEG: (R.NONE, None),
-            C.ALT: (R.ONE_OF_N, None),
+            C.ALT: (R.ONE_OF_PLURAL, None),
         }
 
         self.cor_pro_plur_of2s = make_correlative_table()

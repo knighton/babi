@@ -10,18 +10,18 @@ class CountRestrictionChecker(object):
     def __init__(self):
         self.enum2f = {
             # Zero.
-            CountRestriction.NONE: 0 == a <= b,
+            CountRestriction.NONE: lambda a, b: 0 == a <= b,
 
             # Unknown (any).
-            CountRestriction.ANY: 0 <= a <= b,
+            CountRestriction.ANY: lambda a, b: 0 <= a <= b,
 
             # Indefinite: less than all of them.
-            CountRestriction.ONE_OF_PLURAL: 1 == a < b,
-            CountRestirction.SOME: 1 <= a < b,
+            CountRestriction.ONE_OF_PLURAL: lambda a, b: 1 == a < b,
+            CountRestriction.SOME: lambda a, b: 1 <= a < b,
 
             # Definite: all of them.
-            CountRestriction.ALL_ONE: 1 == a == b,
-            CountRestriction.ALL: 1 <= a == b,
+            CountRestriction.ALL_ONE: lambda a, b: 1 == a == b,
+            CountRestriction.ALL: lambda a, b: 1 <= a == b,
         }
 
     def is_possible(self, count_restriction, n, of_n):
