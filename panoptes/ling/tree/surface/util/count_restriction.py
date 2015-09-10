@@ -1,5 +1,5 @@
 from etc.enum import enum
-from ling.glue.grammatical_number import N2, nx_to_nx, NX2COMP_INTS
+from ling.glue.grammatical_number import N2, compints_from_nx, nx_to_nx
 
 
 CountRestriction = enum("""CountRestriction =
@@ -25,8 +25,8 @@ class CountRestrictionChecker(object):
         }
 
     def is_possible(self, count_restriction, n, of_n):
-        aa = NX2COMP_INTS[n]
-        bb = NX2COMP_INTS[of_n]
+        aa = compints_from_nx(n)
+        bb = compints_from_nx(of_n)
         for a in aa:
             for b in bb:
                 if self.enum2f[count_restriction](a, b):

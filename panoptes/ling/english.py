@@ -6,7 +6,7 @@ from ling.tree.common.personal_pronoun import PersonalManager
 from ling.tree.surface.recog import ParseToSurface
 from ling.tree.surface.util.correlative import CorrelativeManager
 from ling.tree.surface.util.count_restriction import CountRestrictionChecker
-from ling.tree.surface.tuil.shortcut import ShortcutManager
+from ling.tree.surface.util.shortcut import ShortcutManager
 from ling.verb.verb_manager import VerbManager
 
 

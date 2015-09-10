@@ -307,3 +307,18 @@ class GrammaticalNumberManager(object):
         aa = self.nx2compints[nx]
         bb = self.compints_from_int(i)
         return bb[-1] < aa[0]
+
+
+_MGR = GrammaticalNumberManager()
+
+
+def compints_from_nx(nx):
+    return _MGR.compints_from_nx(nx)
+
+
+def nx_to_nx(nx, klass):
+    return _MGR.nx_to_nx(nx, klass)
+
+
+def nx_to_nxs(nx, klass):
+    return _MGR.nx_to_nxs(nx, klass)
