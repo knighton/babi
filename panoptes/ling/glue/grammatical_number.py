@@ -221,10 +221,10 @@ class GrammaticalNumberManager(object):
     def nx_eq_nx_is_possible(self, a, b):
         aa = self.nx2compints[a]
         bb = self.nx2compints[b]
-        for a in aa:  # Max possible length: 3
-            for b in bb:  # Max possible length: 3
-                if a == b:
-                    return True
+        aa = set(aa)
+        for b in bb:
+            if b in aa:
+                return True
         return False
 
     def nx_eq_nx_is_guaranteed(self, a, b):
