@@ -112,13 +112,13 @@ class GrammaticalNumberManager(object):
         self.compint_groups = [(0,), (1,), (2,), (3, 4, 5), (6, 7, 8)]
 
         # Any nx -> indexes in spans list.
-        nx2xx = collections.defaultdict(list)
+        nx2xx = defaultdict(list)
         for cols in self.class2col2nx.itervalues():
             for x, col in enumerate(cols):
                 nx2xx[col].append(x)
 
         # Any nx -> NX to convert to -> nxs of that class.
-        self.nx2class2nxs = collections.defaultdict(dict)
+        self.nx2class2nxs = defaultdict(dict)
         for nx in NX.values:
             for to_class in [N5, N3, N2]:
                 to_ee = []
@@ -277,13 +277,9 @@ class GrammaticalNumberManager(object):
     def nx_eq_nx_is_possible(self, nx, i):
         aa = self.nx2compints[nx]
         bb = self.compints_from_int(i)
-        n2count = defaultdict(int)
-        for a in aa:
-            n2count[a] += 1
+        aa = set(aa)
         for b in bb:
-            n2count[b] += 1
-        for count in n2count.itervalues():
-            if 1 < count:
+            if b in a:
                 return True
         return False
 
