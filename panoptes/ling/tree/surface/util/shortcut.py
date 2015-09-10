@@ -1,14 +1,53 @@
 from collections import defaultdict
 
-from etc.dicts import v2k_from_k2vv
+from etc.dicts import v2k_from_k2vv, v2kk_from_k2v
 from etc.enum import enum
 from ling.glue.correlative import SurfaceCorrelative
+from ling.glue.grammatical_number import N2
 from ling.tree.common.base import SayResult
+from ling.tree.surface.util.count_restriction import CountRestriction
 
 
 ShortcutColumn = enum("""ShortcutColumn =
-    ONE BODY THING PLACE SOURCE SOURCE_FROM GOAL TIME WAY REASON REASON_FORE
-    REASON_LATIN""")
+    ONE BODY THING PLACE SOURCE SOURCE_FROM GOAL TIME WAY WAY_BY REASON
+    REASON_FORE REASON_LATIN""")
+
+
+def parse_partial(text):
+    lines = text.strip().split('\n')
+    sss = map(lambda line: line.split(), lines)
+
+    n = len(sss[0])
+    for ss in sss[1:]:
+        assert len(ss) == n + 1
+
+    rows = []
+    for s in map(lambda ss: ss[0], sss[1:]):
+        row = SurfaceCorrelative.from_str[s]
+        rows.append(row)
+    assert set(rows) == SurfaceCorrelative.values
+
+    cols = []
+    for s in sss[0]:
+        col = ShortcutColumn.from_str[s]
+        cols.append(col)
+
+    cor_sh2ss_archaic = {}
+    for row_index in xrange(len(sss) - 1):
+        for col_index in xrange(n):
+            s = sss[row_index + 1][col_index + 1]
+            if s == '-' or s == 'X':
+                continue
+            if s.startswith('(') and s.endswith(')'):
+                s = s[1:-1]
+                is_archaic = True
+            else:
+                is_archaic = False
+            ss = tuple(s.split('_'))
+            row = rows[row_index]
+            col = cols[col_index]
+            cor_sh2ss_archaic[(row, col)] = ss, is_archaic
+    return cor_sh2ss_archaic
 
 
 def make_shortcut_table():
@@ -37,11 +76,11 @@ PROX       -            (hither)        now         thus       hereby
 DIST       (thencefrom) (thither)       then        -          thereby
 EXIST      -            (somewhither)   sometime    somehow    -
 ELECT_ANY  -            (anywhither)    anytime     -          -
-ELECT_EVER -            (whithersoever) whenever    however
-UNIV_ALL   -            -               always      -
-UNIV_EVERY -            -               (everywhen) (everyway)
-NEG        -            (nowhither)     never       (noway)
-ALT        -            -               -           otherwise
+ELECT_EVER -            (whithersoever) whenever    however    -
+UNIV_ALL   -            -               always      -          -
+UNIV_EVERY -            -               (everywhen) (everyway) -
+NEG        -            (nowhither)     never       (noway)    -
+ALT        -            -               -           otherwise  -
     """
 
     text_part_three = """
@@ -60,44 +99,24 @@ NEG        -         -           -
 ALT        -         -           -
     """
 
-    aa = text_part_one.strip().split('\n')
-    bb = text_part_one.strip().split('\n')
-    cc = text_part_one.strip().split('\n')
-    lines = map(lambda (a, b, c): a + b + c, zip(aa, bb, cc))
-    sss = map(lambda line: line.split(), lines)
+    a = parse_partial(text_part_one)
+    b = parse_partial(text_part_two)
+    c = parse_partial(text_part_three)
 
-    n = len(sss[0])
-    for ss in sss[1:]:
-        assert len(ss) == n + 1
+    r = {}
+    for k, v in a.iteritems():
+        r[k] = v
+    for k, v in b.iteritems():
+        r[k] = v
+    for k, v in c.iteritems():
+        r[k] = v
 
-    rows = []
-    for s in map(lambda ss: ss[0], sss[1:]):
-        row = SurfaceCorrelative.from_str[s]
-        rows.append(row)
-    assert set(rows) == SurfaceCorrelative.values
+    shs = set()
+    for (cor, sh), (ss, is_archaic) in r.iteritems():
+        shs.add(sh)
+    assert shs == ShortcutColumn.values
 
-    cols = []
-    for s in sss[0][1:]:
-        col = ShortcutColumn.from_str[s]
-        cols.append(col)
-    assert set(cols) == ShortcutColumn.values
-
-    cor_sh2ss_archaic = {}
-    for row_index in xrange(len(sss) - 1):
-        for col_index in xrange(n):
-            s = sss[row_index + 1][col_index + 1]
-            if s == '-' or s == 'X':
-                continue
-            if s.startswith('(') and s.endswith(')'):
-                s = s[1:-1]
-                is_archaic = True
-            else:
-                is_archaic = False
-            ss = tuple(ss.split('_'))
-            row = rows[row_index]
-            col = cols[col_index]
-            cor_sh2ss_archaic[(row, col)] = ss, is_archaic
-    return cor_sh2ss_archaic
+    return r
 
 
 class ShortcutManager(object):
@@ -140,13 +159,13 @@ class ShortcutManager(object):
             C.INTR: (R.ALL_ONE, None),
             C.PROX: (R.ALL_ONE, None),
             C.DIST: (R.ALL_ONE, None),
-            C.EXIST: (R.ONE_OF_N, None),
-            C.ELECT_ANY: (R.ONE_OF_N, None),
+            C.EXIST: (R.ONE_OF_PLURAL, None),
+            C.ELECT_ANY: (R.ONE_OF_PLURAL, None),
             C.ELECT_EVER: (R.ALL_ONE, None),
             C.UNIV_EVERY: (R.ALL, N2.SING),
             C.UNIV_ALL: (R.ALL, N2.SING),
             C.NEG: (R.NONE, N2.SING),
-            C.ALT: (R.ONE_OF_N, None),
+            C.ALT: (R.ONE_OF_PLURAL, None),
         }
 
     def say(self, prep, n, of_n, cor, thing, allow_archaic):
