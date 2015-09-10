@@ -48,7 +48,8 @@ class English(object):
 
         # Text -> deep structure.
         self.text_to_parse = TextToParse()
-        self.parse_to_surface = ParseToSurface(say_state, verb_mgr)
+        self.parse_to_surface = ParseToSurface(
+            personal_mgr, say_state, verb_mgr)
         self.surface_to_deep = SurfaceToDeep()
 
         # Deep structure -> text.

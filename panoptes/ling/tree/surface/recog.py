@@ -101,19 +101,25 @@ class ParseToSurface(object):
     Objects that converts parses to surface structure.
     """
 
-    def __init__(self, say_state, verb_mgr):
+    def __init__(self, perspro_mgr, say_state, verb_mgr):
         self.end_punct_clf = EndPunctClassifier()
         self.verb_extractor = VerbExtractor(verb_mgr)
 
         self.tag2recognize = {
-            'NNP': self.recognize_nnp,
+            'NNP': self.recog_nnp,
+            'PRP': self.recog_prp,
         }
 
+        self.perspro_mgr = perspro_mgr
         self.say_state = say_state
 
-    def recognize_nnp(self, root_token):
+    def recog_nnp(self, root_token):
         name = root_token.text,
         return [ProperNoun(name=name, is_plur=False)]
+
+    def recog_prp(self, root_token):
+        ss = root_token.text,
+        return self.perspro_mgr.perspro_parse(ss)
 
     def recognize_verb_arg(self, root_token):
         return self.tag2recognize[root_token.tag](root_token)
