@@ -21,12 +21,12 @@ class PersonalPronoun(Argument):
     (Non-possessive) personal pronouns.
     """
 
-    def __init__(self, ppcase, declension):
-        self.ppcase = ppcase
-        assert PersonalPronounCase.is_valid(self.ppcase)
-
+    def __init__(self, declension, ppcase):
         self.declension = declension
         assert Declension.is_valid(self.declension)
+
+        self.ppcase = ppcase
+        assert PersonalPronounCase.is_valid(self.ppcase)
 
     def arg_position_restriction(self):
         # This is not called for personal determiners, which exclusively are
@@ -58,10 +58,10 @@ def table_from_str(s, row_enum, col_enum, invalid_entry):
             if s == invalid_entry:
                 continue
 
-            row = sss[0][col_index]
+            row = sss[row_index + 1][0]
             row = row_enum.from_str[row]
 
-            col = sss[row_index + 1][0]
+            col = sss[0][col_index]
             col = col_enum.from_str[col]
 
             if s.endswith("'s"):
@@ -78,7 +78,7 @@ PersonalColumn = enum('PersonalColumn = SUBJ OBJ REFL POS_PRO POS_DET')
 def make_table(use_whom):
     text = """
                  SUBJ    OBJ      REFL       POS_PRO   POS_DET
-        I        I       me       myself     mine      my
+        I        i       me       myself     mine      my
         YOU      you     you      yourself   yours     your
         HE       he      him      himself    his       his
         SHE      she     her      herself    hers      her
@@ -95,7 +95,7 @@ def make_table(use_whom):
     """
 
     r = table_from_str(
-        text, row_enum=PersonalColumn, col_enum=Declension, invalid_entry='X')
+        text, row_enum=Declension, col_enum=PersonalColumn, invalid_entry='X')
 
     if not use_whom:
         r[(Declension.WHO1, PersonalColumn.OBJ)] = 'who',
