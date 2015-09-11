@@ -1,4 +1,4 @@
-from ling.tree.common.base import *
+from panoptes.ling.tree.common.base import *
 
 
 class ExistentialThere(Argument):

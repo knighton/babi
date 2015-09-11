@@ -1,4 +1,4 @@
-from ling.tree.surface.content_clause import ContentClause
+from panoptes.ling.tree.surface.content_clause import ContentClause
 
 
 class Sentence(object):

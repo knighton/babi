@@ -1,6 +1,6 @@
-from etc.enum import enum
-from ling.glue.inflection import Conjugation
-from ling.tree.surface.base import Argument
+from panoptes.etc.enum import enum
+from panoptes.ling.glue.inflection import Conjugation
+from panoptes.ling.tree.surface.base import Argument
 
 
 Complementizer = enum('Complementizer = ZERO THAT WHETHER IF')

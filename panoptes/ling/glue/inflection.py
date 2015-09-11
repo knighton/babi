@@ -1,8 +1,8 @@
 # "inflection" here means the single concept connecting choices of verb
 # conjugation, personal pronoun, etc.
 
-from etc.enum import enum
-from ling.glue.grammatical_number import N2
+from panoptes.etc.enum import enum
+from panoptes.ling.glue.grammatical_number import N2
 
 
 Declension = enum("""Declension =

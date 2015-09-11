@@ -1,10 +1,10 @@
 from collections import defaultdict
 
-from etc.enum import enum
-from ling.glue.inflection import CONJ2INDEX, Conjugation
-from ling.verb.annotation import annotate_as_pro_verb
-from ling.verb.conjugation import Conjugator
-from ling.verb.verb import *
+from panoptes.etc.enum import enum
+from panoptes.ling.glue.inflection import CONJ2INDEX, Conjugation
+from panoptes.ling.verb.annotation import annotate_as_pro_verb
+from panoptes.ling.verb.conjugation import Conjugator
+from panoptes.ling.verb.verb import *
 
 
 # Whether.

@@ -1,7 +1,7 @@
 from collections import defaultdict
 import yaml
 
-from etc.suffix_fanout_map import SuffixFanoutMap
+from panoptes.etc.suffix_fanout_map import SuffixFanoutMap
 
 
 def remove_then_append(s, remove, append):

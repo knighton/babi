@@ -5,7 +5,7 @@
 
 from collections import defaultdict
 
-from etc.enum import enum
+from panoptes.etc.enum import enum
 
 
 N2 = enum('N2 = SING PLUR')

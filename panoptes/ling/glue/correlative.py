@@ -3,7 +3,7 @@
 # All common nouns have a correlative, including special shortcuts words that
 # map to common nouns.
 
-from etc.enum import enum
+from panoptes.etc.enum import enum
 
 
 # Used by deep common nouns.

@@ -8,7 +8,7 @@
 
 from collections import defaultdict
 
-from etc.enum import enum
+from panoptes.etc.enum import enum
 
 
 Purpose = enum('Purpose = WH_Q TF_Q VERIFY_Q INFO')

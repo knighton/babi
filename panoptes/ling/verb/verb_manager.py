@@ -1,7 +1,7 @@
-from ling.verb.conjugation import Conjugator
-from ling.verb.verb_parser import VerbParser
-from ling.verb.verb_sayer import VerbSayer
-from ling.verb.verb import SurfaceVerb
+from panoptes.ling.verb.conjugation import Conjugator
+from panoptes.ling.verb.verb_parser import VerbParser
+from panoptes.ling.verb.verb_sayer import VerbSayer
+from panoptes.ling.verb.verb import SurfaceVerb
 
 
 class VerbManager(object):

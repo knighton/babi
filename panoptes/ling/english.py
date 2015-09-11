@@ -1,13 +1,14 @@
-from ling.glue.inflection import InflectionManager
-from ling.morph.plural import PluralManager
-from ling.parse.parser import Parser as TextToParse
-from ling.tree.common.base import SayState
-from ling.tree.common.personal_pronoun import PersonalManager
-from ling.tree.surface.recog import ParseToSurface
-from ling.tree.surface.util.correlative import CorrelativeManager
-from ling.tree.surface.util.count_restriction import CountRestrictionChecker
-from ling.tree.surface.util.shortcut import ShortcutManager
-from ling.verb.verb_manager import VerbManager
+from panoptes.ling.glue.inflection import InflectionManager
+from panoptes.ling.morph.plural import PluralManager
+from panoptes.ling.parse.parser import Parser as TextToParse
+from panoptes.ling.tree.common.base import SayState
+from panoptes.ling.tree.common.personal_pronoun import PersonalManager
+from panoptes.ling.tree.surface.recog import ParseToSurface
+from panoptes.ling.tree.surface.util.correlative import CorrelativeManager
+from panoptes.ling.tree.surface.util.count_restriction import \
+    CountRestrictionChecker
+from panoptes.ling.tree.surface.util.shortcut import ShortcutManager
+from panoptes.ling.verb.verb_manager import VerbManager
 
 
 class SurfaceToDeep(object):

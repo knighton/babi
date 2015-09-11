@@ -1,8 +1,8 @@
 from collections import defaultdict
 
-from etc.suffix_transform import SuffixTransform
-from etc.suffix_generalizing_map import SuffixGeneralizingMap
-from ling.verb.annotation import annotate_as_aux
+from panoptes.etc.suffix_transform import SuffixTransform
+from panoptes.etc.suffix_generalizing_map import SuffixGeneralizingMap
+from panoptes.ling.verb.annotation import annotate_as_aux
 
 
 MAGIC_INTS_LEMMA = '<ints>'

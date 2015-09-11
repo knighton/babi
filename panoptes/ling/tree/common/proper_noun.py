@@ -1,6 +1,6 @@
-from ling.glue.inflection import Conjugation
-from ling.glue.magic_token import POSSESSIVE_MARK
-from ling.tree.common.base import *
+from panoptes.ling.glue.inflection import Conjugation
+from panoptes.ling.glue.magic_token import POSSESSIVE_MARK
+from panoptes.ling.tree.common.base import *
 
 
 class ProperNoun(Argument):

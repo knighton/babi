@@ -1,4 +1,4 @@
-from ling.english import English
+from panoptes.ling.english import English
 
 
 class Agent(object):

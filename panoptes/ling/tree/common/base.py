@@ -1,5 +1,5 @@
-from etc.enum import enum
-from ling.glue.inflection import Conjugation
+from panoptes.etc.enum import enum
+from panoptes.ling.glue.inflection import Conjugation
 
 
 ArgPosRestriction = enum('ArgPosRestriction = SUBJECT NOT_SUBJECT ANYWHERE')

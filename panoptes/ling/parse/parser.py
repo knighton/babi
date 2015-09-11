@@ -2,7 +2,7 @@ from collections import defaultdict
 from spacy.en import English
 import sys
 
-from ling.parse.parse import Parse, Token
+from panoptes.ling.parse.parse import Parse, Token
 
 
 def truecase(tokens):

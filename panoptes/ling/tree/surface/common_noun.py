@@ -1,10 +1,12 @@
 from collections import defaultdict
 
-from ling.glue.correlative import Correlative, CORRELATIVE2IS_INTERROGATIVE
-from ling.glue.grammatical_number import N3, N5, nx_le_nx
-from ling.glue.magic_token import POSSESSIVE_MARK
-from ling.surface.number import Number
-from ling.surface.arg import Argument, ArgPositionRequirement, SayContext
+from panoptes.ling.glue.correlative import Correlative, \
+    CORRELATIVE2IS_INTERROGATIVE
+from panoptes.ling.glue.grammatical_number import N3, N5, nx_le_nx
+from panoptes.ling.glue.magic_token import POSSESSIVE_MARK
+from panoptes.ling.surface.number import Number
+from panoptes.ling.surface.arg import Argument, ArgPositionRequirement, \
+    SayContext
 
 
 def is_noun_sentient(noun):

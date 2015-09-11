@@ -1,8 +1,8 @@
-from ling.morph.plural import PluralManager
+from panoptes.ling.morph.plural import PluralManager
 
 
 def main():
-    d = 'config/plural/'
+    d = 'panoptes/config/plural/'
     cat_f = d + 'categories.yaml'
     rule_f = d + 'rules.txt'
     nonsuffix_f = d + 'nonsuffixable.txt'

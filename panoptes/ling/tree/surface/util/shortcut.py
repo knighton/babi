@@ -1,11 +1,11 @@
 from collections import defaultdict
 
-from etc.dicts import v2k_from_k2vv, v2kk_from_k2v
-from etc.enum import enum
-from ling.glue.correlative import SurfaceCorrelative
-from ling.glue.grammatical_number import N2
-from ling.tree.common.base import SayResult
-from ling.tree.surface.util.count_restriction import CountRestriction
+from panoptes.etc.dicts import v2k_from_k2vv, v2kk_from_k2v
+from panoptes.etc.enum import enum
+from panoptes.ling.glue.correlative import SurfaceCorrelative
+from panoptes.ling.glue.grammatical_number import N2
+from panpotes.ling.tree.common.base import SayResult
+from panoptes.ling.tree.surface.util.count_restriction import CountRestriction
 
 
 ShortcutColumn = enum("""ShortcutColumn =

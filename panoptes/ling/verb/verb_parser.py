@@ -4,10 +4,10 @@ import json
 import os
 import sys
 
-from etc.combinatorics import each_choose_one_from_each, \
+from panoptes.etc.combinatorics import each_choose_one_from_each, \
     collapse_int_tuples_to_wildcards
-from ling.verb.conjugation import Conjugator, MAGIC_INTS_LEMMA
-from ling.verb.verb import SurfaceVerb
+from panoptes.ling.verb.conjugation import Conjugator, MAGIC_INTS_LEMMA
+from panoptes.ling.verb.verb import SurfaceVerb
 
 
 def remove_lemma_specific_word(sss):
