@@ -25,8 +25,8 @@ class SurfaceToText(object):
 
 class English(object):
     def __init__(self):
-        conj_f = 'config/conjugations.csv'
-        verb_f = '../data/verbs.json'
+        conj_f = 'panoptes/config/conjugations.csv'
+        verb_f = 'data/verbs.json'
         verb_mgr = VerbManager.from_files(conj_f, verb_f)
 
         count_restriction_checker = CountRestrictionChecker()
@@ -36,10 +36,10 @@ class English(object):
         inflection_mgr = InflectionManager()
         personal_mgr = PersonalManager(inflection_mgr)
 
-        cat_f = 'config/plural/categories.yaml'
-        rule_f = 'config/plural/rules.txt'
-        nonsuffixable_f = 'config/plural/nonsuffixable.txt'
-        cap_f = 'config/plural/capitalized.txt'
+        cat_f = 'panoptes/config/plural/categories.yaml'
+        rule_f = 'panoptes/config/plural/rules.txt'
+        nonsuffixable_f = 'panoptes/config/plural/nonsuffixable.txt'
+        cap_f = 'panoptes/config/plural/capitalized.txt'
         plural_mgr = PluralManager.from_files(
             cat_f, rule_f, nonsuffixable_f, cap_f)
 

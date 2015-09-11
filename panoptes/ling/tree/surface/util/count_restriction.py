@@ -1,5 +1,5 @@
-from etc.enum import enum
-from ling.glue.grammatical_number import N2, compints_from_nx, nx_to_nx
+from panoptes.etc.enum import enum
+from panoptes.ling.glue.grammatical_number import N2, compints_from_nx, nx_to_nx
 
 
 CountRestriction = enum("""CountRestriction =

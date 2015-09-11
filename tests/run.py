@@ -1,14 +1,9 @@
-from agent import Agent
-from datasets import get_problems
-from ling.verb.verb_manager import VerbManager
+from panoptes.agent import Agent
+from panoptes.datasets import get_problems
 
 
 def main():
-    conj_f = 'config/conjugations.csv'
-    verb_f = '../data/verbs.json'
-    verb_mgr = VerbManager.from_files(conj_f, verb_f)
-
-    d = '../data/tasks_1-20_v1-2/en/'
+    d = 'data/tasks_1-20_v1-2/en/'
     problems = get_problems(d)
     problem = problems[1]
     in_s, want_out = problem[0]
@@ -33,7 +28,11 @@ def main():
 
     a = Agent()
     for s in ss:
+        print
+        print
         a.put(s)
+        print
+        print
 
     #got_out = a.put(in_s)
     #assert want_out == got_out
