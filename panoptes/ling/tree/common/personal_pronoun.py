@@ -34,11 +34,11 @@ class PersonalPronoun(CommonArgument):
         # found in the cor_or_pos field of common nouns, so we're fine.
         return PPCASE2ARG_POS_RES[self.ppcase]
 
-    def decide_conjugation(self, state):
+    def decide_conjugation(self, state, idiolect, context):
         return state.personal_mgr.perspro_decide_conjugation(self)
 
-    def say(self, state, context):
-        return state.personal_mgr.perspro_say(self, context.use_whom)
+    def say(self, state, idiolect, context):
+        return state.personal_mgr.perspro_say(self, idiolect.whom)
 
 
 def table_from_str(s, row_enum, col_enum, invalid_entry):

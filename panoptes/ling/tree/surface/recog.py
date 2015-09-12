@@ -1,11 +1,12 @@
 from copy import deepcopy
 
 from panoptes.etc.combinatorics import each_choose_one_from_each
+from panoptes.ling.glue.idiolect import Idiolect
 from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.glue.purpose import EndPunctClassifier
 from panoptes.ling.parse.parse import Parse
 from panoptes.ling.tree.common.proper_noun import ProperNoun
-from panoptes.ling.tree.surface.base import SayState
+from panoptes.ling.tree.surface.base import SayContext, SayState
 from panoptes.ling.tree.surface.content_clause import Complementizer, \
     ContentClause
 from panoptes.ling.tree.surface.sentence import Sentence
@@ -103,6 +104,12 @@ class ParseToSurface(object):
     """
 
     def __init__(self, perspro_mgr, say_state, verb_mgr):
+        # For extracting the correct verb conjugation from subjects.
+        self.arbitrary_idiolect = Idiolect()
+        self.say_state = say_state
+        self.subject_say_context = SayContext(
+            prep=None, has_left=True, has_right=True, is_possessive=False)
+
         self.end_punct_clf = EndPunctClassifier()
         self.verb_extractor = VerbExtractor(verb_mgr)
 
@@ -112,7 +119,6 @@ class ParseToSurface(object):
         }
 
         self.perspro_mgr = perspro_mgr
-        self.say_state = say_state
 
     def recog_nnp(self, root_token):
         name = root_token.text,
@@ -199,14 +205,18 @@ class ParseToSurface(object):
             return set([Conjugation.S2, Conjugation.P2])
 
         # Get the required conjugation from the subject.
-        conj = pp_nn[subj_argx][1].decide_conjugation(self.say_state)
+        conj = pp_nn[subj_argx][1].decide_conjugation(
+            self.say_state, self.arbitrary_idiolect,
+            self.subject_say_context)
 
         # In case of existential there, get conjugation from the object instead.
         if not conj:
             x = subj_argx + 1
             if not (0 <= x < len(pp_nn)):
                 return []  # Ex-there but no object = can't parse it.
-            conj = pp_nn[x][1].decide_conjugation(self.say_state)
+            conj = pp_nn[x][1].decide_conjugation(
+                self.say_state, self.arbitrary_idiolect,
+                self.subject_say_context)
 
         return set([conj])
 

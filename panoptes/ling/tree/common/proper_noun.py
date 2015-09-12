@@ -18,17 +18,17 @@ class ProperNoun(CommonArgument):
         self.is_plur = is_plur
         assert isinstance(self.is_plur, bool)
 
-    def decide_conjugation(self, state):
+    def decide_conjugation(self, state, idiolect, context):
         if self.is_plur:
             return Conjugation.P2
         else:
             return Conjugation.S2
 
-    def say(self, state, context):
+    def say(self, state, idiolect, context):
         ss = list(name)
         if context.is_possessive:
             ss.append(POSSESSIVE_MARK)
 
-        conj = self.decide_conjugation()
+        conj = self.decide_conjugation(state, idiolect, context)
 
         return SayResult(tokens=ss, conjugation=conj, eat_prep=False)

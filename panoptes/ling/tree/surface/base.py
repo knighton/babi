@@ -84,10 +84,13 @@ class SurfaceArgument(BaseArgument):
 
     def say(self, state, idiolect, context):
         """
-        SayState, SayContext -> SayResult
+        SayState, Idiolect, SayContext or None -> SayResult
 
-        Render this object (to words, a conjugation, whether to drop the
-        referring preposition, etc).
+        The context is None if we are not a standalone argument ("3 feet" vs "a
+        3 foot wall").
+
+        Render this object (words, conjugation if it's the subject, whether to
+        drop the owning preposition).
 
         Nontrivial objects depend on external state to be said.
         """

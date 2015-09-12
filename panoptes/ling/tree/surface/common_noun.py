@@ -13,10 +13,6 @@ def is_noun_sentient(noun):
     return noun == 'person'
 
 
-ARBITRARY_SAY_CONTEXT = SayContext(
-    idiolect=Idiolect.default(), has_left=False, has_right=True, prep=None)
-
-
 class CommonNoun(Argument):
     """
     (Recursive) noun phrases and bare common nouns, as well as different types
@@ -142,10 +138,10 @@ class CommonNoun(Argument):
         else:
             return None
 
-    def decide_conjugation(self, state):
-        return self.say(state, ARBITRARY_SAY_CONTEXT).conjugation
+    def decide_conjugation(self, state, idiolect, context):
+        return self.say_head(state, idiolect, context).conjugation
 
-    def say_head_as_shortcut(self, state, context):
+    def say_head_as_shortcut(self, state, idiolect, context):
         """
         Eg, therefore
         """
@@ -154,10 +150,9 @@ class CommonNoun(Argument):
 
         return state.shortcut_mgr.say(
             context.prep, self.gram_number, self.gram_of_number,
-            self.correlative, self.noun,
-            context.idiolect.allow_archaic_shortcuts)
+            self.correlative, self.noun, idiolect.allow_archaic_shortcuts)
 
-    def say_head_as_correlative(self, state, context):
+    def say_head_as_correlative(self, state):
         """
         Eg, what
         """
@@ -167,7 +162,7 @@ class CommonNoun(Argument):
         return state.correlative_mgr.say(
             self.correlative, self.gram_number, self.gram_of_number, True)
 
-    def say_head_as_possessive_pronoun(self, state, context):
+    def say_head_as_possessive_pronoun(self, state, idiolect, context):
         """
         Eg, yours
         """
@@ -178,12 +173,12 @@ class CommonNoun(Argument):
             return None
 
         ss = state.personal_mgr.pospro_say(
-            self.possessor.declension, context.idiolect.use_whom)
+            self.possessor.declension, idiolect.whom)
         conj = nx_to_nx(self.gram_number, N2)
         eat_prep = False
         return SayResult(ss, conj, eat_prep)
 
-    def say_head_as_number(self, state, context):
+    def say_head_as_number(self, state, idiolect, context):
         """
         Eg, three
         """
@@ -192,13 +187,10 @@ class CommonNoun(Argument):
 
         if self.possessor:
             # Eg, "your three".
-            left = context.has_left
-            right = True
-            is_pos = True
-            is_arg = True
             sub_context = SayContext(
-                context.idiolect, left, right, context.prep, is_pos, is_arg)
-            r = self.possessor.say(state, sub_context)
+                prep=None, has_left=context.has_left, has_right=True,
+                is_possessive=True)
+            r = self.possessor.say(state, idiolect, sub_context)
             num_has_left = True
         elif self.correlative == SurfaceCorrelative.INDEF:
             # Eg, "three".
@@ -226,28 +218,21 @@ class CommonNoun(Argument):
         else:
             left = context.has_left
 
-        is_arg = False
-        sub_context = SayContext(
-            context.idiolect, left, context.has_right, context.prep,
-            context.is_possessive, is_arg)
-        r2 += self.number.say(sub_context)
+        r2 += self.number.say(None)
         r.tokens += r2.tokens
         return r
 
-    def say_head_as_full(self, state, context, override_noun):
+    def say_head_as_full(self, state, idiolect, context, override_noun):
         """
         Eg, cats, whichever three wise men
         """
         # Say the front part (correlative or possessive).
         if self.possessor:
             # Say the potentially recursive possessor tree.
-            has_right = True
-            is_pos = True
-            is_arg = True
             sub_context = SayContext(
-                context.idiolect, context.has_left, has_right, context.prep,
-                is_pos, is_arg)
-            r = self.possessor.say(state, sub_context)
+                prep=None, has_left=context.has_left, has_right=True,
+                is_possessive=True)
+            r = self.possessor.say(state, idiolect, sub_context)
 
             # If that failed, bail.
             if not r:
@@ -278,14 +263,7 @@ class CommonNoun(Argument):
 
         # Say the explicit number.
         if self.explicit_number:
-            left = True
-            right = True
-            prep = None
-            is_pos = False
-            is_arg = False
-            sub_context = SayContext(
-                context.idiolect, left, right, prep, is_pos, is_arg)
-            r2 = self.explicit_number.say(state, context)
+            r2 = self.explicit_number.say(state, idiolect, None)
             r.tokens += r2.tokens
 
         # Say the attributes.
@@ -301,23 +279,24 @@ class CommonNoun(Argument):
 
         return r
 
-    def say_head(self, state, context):
+    def say_head(self, state, idiolect, context):
         # Try various options for rendering it.
         if self.say_noun:
-            r = self.say_head_as_shortcut(state, context)
+            r = self.say_head_as_shortcut(state, idiolect, context)
             if not r:
-                r = self.say_head_as_full(state, context, self.noun)
+                r = self.say_head_as_full(state, idiolect, context, self.noun)
         else:
-            r = self.say_head_as_correlative(state, context)
+            r = self.say_head_as_correlative(state)
             if not r:
-                r = self.say_head_as_possessive_pronoun(state, context)
+                r = self.say_head_as_possessive_pronoun(
+                    state, idiolect, context)
             if not r:
-                self.say_head_as_number(state, context)
+                self.say_head_as_number(state, idiolect, context)
 
         # Fall back to tying full as "one" (can still fail if invalid
         # configuration).
         if not r:
-            r = self.say_head_as_full(state, context, 'one')
+            r = self.say_head_as_full(state, idiolect, context, 'one')
 
         # Crash if the wrong correlative was chosen for its grammatical counts,
         # etc.  Could not happen during parsing.  If this crashes, structure
@@ -326,27 +305,22 @@ class CommonNoun(Argument):
 
         return r
 
-    def say_tail(self, state, context):
+    def say_tail(self, state, idiolect, context):
         if self.preps_nargs:
             assert False  # TOOD: not in MVP.
 
         return []
 
-    def say(self, state, context):
-        left = context.has_left
+    def say(self, state, idiolect, context):
         right = context.has_right or self.preps_nargs
         sub_context = SayContext(
-            context.idiolect, left, right, context.prep, context.is_possessive,
-            context.is_arg)
+            prep=context.prep, has_left=context.has_left, has_right=right,
+            is_possessive=context.is_possessive)
         r = self.say_head(state, sub_context)
 
-        left = True
-        right = context.has_right
-        prep = None
-        is_pos = False
-        is_arg = False
         sub_context = SayContext(
-            context.idiolect, left, right, prep, is_pos, is_arg)
+            prep=None, has_left=True, has_right=context.has_right,
+            is_possessive=False)
         r.tokens += self.say_tail(state, sub_context)
 
         if context.is_possessive:
