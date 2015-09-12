@@ -2,7 +2,8 @@ from panoptes.etc.dicts import v2kk_from_k2v, v2k_from_k2v
 from panoptes.etc.enum import enum
 from panoptes.ling.glue.inflection import Conjugation, Declension
 from panoptes.ling.glue.magic_token import POSSESSIVE_MARK
-from panoptes.ling.tree.common.base import *
+from panoptes.ling.tree.base import ArgPosRestriction
+from panoptes.ling.tree.common.base import CommonArgument
 
 
 PersonalPronounCase = enum('PersonalPronounCase = SUBJECT OBJECT REFLEXIVE')
@@ -16,7 +17,7 @@ PPCASE2ARG_POS_RES = {
 }
 
 
-class PersonalPronoun(Argument):
+class PersonalPronoun(CommonArgument):
     """
     (Non-possessive) personal pronouns.
     """
@@ -180,8 +181,8 @@ class PersonalManager(object):
         """
         PersonalPronoun -> Conjugation
         """
-        dec = self.inflection_mgr.get_declension(p.declension)
-        return dec.decide_conjugation(True)
+        info = self.inflection_mgr.get_declension(p.declension)
+        return info.decide_conjugation(True)
 
     def perspro_say(self, p, use_whom):
         """

@@ -1,8 +1,8 @@
 from panoptes.ling.glue.inflection import InflectionManager
 from panoptes.ling.morph.plural import PluralManager
 from panoptes.ling.parse.parser import Parser as TextToParse
-from panoptes.ling.tree.common.base import SayState
 from panoptes.ling.tree.common.personal_pronoun import PersonalManager
+from panoptes.ling.tree.surface.base import SayState
 from panoptes.ling.tree.surface.recog import ParseToSurface
 from panoptes.ling.tree.surface.util.correlative import CorrelativeManager
 from panoptes.ling.tree.surface.util.count_restriction import \

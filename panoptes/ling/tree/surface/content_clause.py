@@ -1,6 +1,6 @@
 from panoptes.etc.enum import enum
 from panoptes.ling.glue.inflection import Conjugation
-from panoptes.ling.tree.surface.base import Argument
+from panoptes.ling.tree.surface.base import SurfaceArgument
 
 
 Complementizer = enum('Complementizer = ZERO THAT WHETHER IF')
@@ -14,7 +14,7 @@ COMPLEMENTIZER2WORD = {
 }
 
 
-class ContentClause(Argument):
+class ContentClause(SurfaceArgument):
     def __init__(self, ctzr, verb, preps_vargs, vmain_index):
         # Complementizer.
         #
@@ -35,7 +35,7 @@ class ContentClause(Argument):
         #                       words     words
         #
         # At most one of the verb args can be None, due to being fronted.
-        self.preps_vargs = preps_vargs  # List of (str tuple, Argument).
+        self.preps_vargs = preps_vargs  # List of (str tuple, SurfaceArgument).
 
         # Index into preps_vargs of where the main verb words are to be
         # inserted.
@@ -59,7 +59,7 @@ class ContentClause(Argument):
             if p:
                 assert isinstance(p, tuple)
             if n:
-                assert isinstance(n, Argument)
+                assert isinstance(n, SurfaceArgument)
                 missing_args += 1
         assert missing_args in (0, 1)
 

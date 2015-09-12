@@ -1,5 +1,16 @@
-from panoptes.ling.tree.common.base import Argument
+from panoptes.ling.tree.base import BaseArgument
 
 
-class DeepArgument(Argument):
-    pass
+class DeepArgument(BaseArgument):
+    """
+    An argument in deep structure.
+    """
+
+    def generate(self):
+        """
+        -> SurfaceArgument
+
+        Generate my corresponding surface structure, after applying
+        transformations like fronting.
+        """
+        raise NotImplementedError

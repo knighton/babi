@@ -1,9 +1,10 @@
 from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.glue.magic_token import POSSESSIVE_MARK
-from panoptes.ling.tree.common.base import *
+from panoptes.ling.tree.common.base import CommonArgument
+from panoptes.ling.tree.surface.base import SayResult
 
 
-class ProperNoun(Argument):
+class ProperNoun(CommonArgument):
     """
     A simple proper noun.
     """

@@ -6,7 +6,7 @@ from panoptes.ling.glue.correlative import SurfaceCorrelative
 from panoptes.ling.glue.grammatical_number import N2, N5
 from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.glue.magic_token import A_OR_AN
-from panoptes.ling.tree.common.base import SayResult
+from panoptes.ling.tree.surface.base import SayResult
 from panoptes.ling.tree.surface.util.count_restriction import CountRestriction
 
 

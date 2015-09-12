@@ -4,8 +4,8 @@ from panoptes.etc.combinatorics import each_choose_one_from_each
 from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.glue.purpose import EndPunctClassifier
 from panoptes.ling.parse.parse import Parse
-from panoptes.ling.tree.common.base import SayState
 from panoptes.ling.tree.common.proper_noun import ProperNoun
+from panoptes.ling.tree.surface.base import SayState
 from panoptes.ling.tree.surface.content_clause import Complementizer, \
     ContentClause
 from panoptes.ling.tree.surface.sentence import Sentence
