@@ -3,7 +3,7 @@ from collections import defaultdict
 from panoptes.etc.dicts import v2kk_from_k2v
 from panoptes.etc.enum import enum
 from panoptes.ling.glue.correlative import SurfaceCorrelative
-from panoptes.ling.glue.grammatical_number import N2, N5
+from panoptes.ling.glue.grammatical_number import N2, N3, N5, nx_to_nxs
 from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.glue.magic_token import A_OR_AN
 from panoptes.ling.tree.surface.base import SayResult

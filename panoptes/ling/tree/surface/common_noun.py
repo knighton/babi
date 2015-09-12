@@ -1,19 +1,16 @@
 from collections import defaultdict
 
-from panoptes.ling.glue.correlative import Correlative, \
-    CORRELATIVE2IS_INTERROGATIVE
-from panoptes.ling.glue.grammatical_number import N3, N5, nx_le_nx
+from panoptes.ling.glue.correlative import SurfaceCorrelative
+from panoptes.ling.glue.grammatical_number import N3, N5, nx_le_nx_is_possible
 from panoptes.ling.glue.magic_token import POSSESSIVE_MARK
-from panoptes.ling.surface.number import Number
-from panoptes.ling.surface.arg import Argument, ArgPositionRequirement, \
-    SayContext
+from panoptes.ling.tree.surface.base import SayContext, SurfaceArgument
 
 
 def is_noun_sentient(noun):
     return noun == 'person'
 
 
-class CommonNoun(Argument):
+class CommonNoun(SurfaceArgument):
     """
     (Recursive) noun phrases and bare common nouns, as well as different types
     of proforms that map to this structure.
@@ -42,7 +39,7 @@ class CommonNoun(Argument):
         self.possessor = possessor
         if self.possessor:
             assert isinstance(self.possessor, Argument)
-            assert correlative = SurfaceCorrelative.DEFINITE
+            assert correlative == SurfaceCorrelative.DEFINITE
 
         # Grammatical clues about the number (eg, "that cat", "those cats",
         # "every cat", "all cats").  They have to jive with each other.
@@ -53,24 +50,26 @@ class CommonNoun(Argument):
         self.gram_number = gram_number         # Roughly how many there are.
         self.gram_of_number = gram_of_number   # Out of roughly how many the
                                                # complete expression matches.
-        assert SurfaceCorrealtive.is_valid(self.correlative)
+        assert SurfaceCorrelative.is_valid(self.correlative)
         assert N3.is_valid(self.gram_number)
         assert N5.is_valid(self.gram_of_number)
-        assert nx_le_nx(self.gram_number, self.gram_of_number)
+        assert nx_le_nx_is_possible(self.gram_number, self.gram_of_number)
         # TODO: crosscheck correlative against grammatical numbers.
 
         # Explicit count or amount that converts to N3.  If present, must match
         # grammatical clues about number above.
         self.explicit_number = explicit_number
         if self.explicit_number:
-            assert isinstance(self.explicit_number, Number)
+            assert False  # TODO: not in demo.
+            # assert isinstance(self.explicit_number, Number)
             # TODO: crosscheck explicit nubmer against grammatical numbers.
 
         # List of restrictive or descriptive attributes.
         self.attrs = attrs
         assert isinstance(self.attrs, list)
         for a in self.attrs:
-            assert isinstance(a, Attribute)
+            assert False  # TODO: not in demo.
+            # assert isinstance(a, Attribute)
 
         # The word(s) for its type, unit, noun, etc.
         #
@@ -83,13 +82,14 @@ class CommonNoun(Argument):
         self.noun = noun
         self.say_noun = say_noun
         if self.say_noun or self.noun:
-            assert isinstance(self.noun, str)
+            assert isinstance(self.noun, basestring)
             assert self.noun
 
         # Descriptive or restrictive child structures coming after the head.
-        # TODO: not used in this demo.
         self.preps_nargs = preps_nargs
         assert isinstance(self.preps_nargs, list)
+        for p, n in self.preps_nargs:
+            assert False  # TODO: not used in this demo.
 
         # We can have at most one relative child (eg, "the castle whose king",
         # "the castle the kind of which").

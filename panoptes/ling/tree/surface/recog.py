@@ -1,12 +1,14 @@
 from copy import deepcopy
 
 from panoptes.etc.combinatorics import each_choose_one_from_each
+from panoptes.ling.glue.grammatical_number import N2, nx_eq_nx_is_possible
 from panoptes.ling.glue.idiolect import Idiolect
 from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.glue.purpose import EndPunctClassifier
 from panoptes.ling.parse.parse import Parse
 from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.surface.base import SayContext, SayState
+from panoptes.ling.tree.surface.common_noun import CommonNoun
 from panoptes.ling.tree.surface.content_clause import Complementizer, \
     ContentClause
 from panoptes.ling.tree.surface.sentence import Sentence
@@ -103,7 +105,8 @@ class ParseToSurface(object):
     Objects that converts parses to surface structure.
     """
 
-    def __init__(self, perspro_mgr, say_state, verb_mgr):
+    def __init__(self, correlative_mgr, perspro_mgr, plural_mgr, say_state,
+                 verb_mgr):
         # For extracting the correct verb conjugation from subjects.
         self.arbitrary_idiolect = Idiolect()
         self.say_state = say_state
@@ -113,12 +116,47 @@ class ParseToSurface(object):
         self.end_punct_clf = EndPunctClassifier()
         self.verb_extractor = VerbExtractor(verb_mgr)
 
+        self.correlative_mgr = correlative_mgr
+        self.perspro_mgr = perspro_mgr
+        self.plural_mgr = plural_mgr
+
         self.tag2recognize = {
+            'NN': self.recog_nn,
+            'NNS': self.recog_nns,
             'NNP': self.recog_nnp,
             'PRP': self.recog_prp,
         }
 
-        self.perspro_mgr = perspro_mgr
+    def recog_common_noun(self, root_token, noun, n2):
+        if not len(root_token.downs) == 1:
+            return []
+
+        dep, child = root_token.downs[0]
+        if dep != 'det':
+            return []
+
+        s = child.text
+        nn = []
+        for cor, n, of_n in self.correlative_mgr.parse(s):
+            if not nx_eq_nx_is_possible(n, n2):
+                continue
+            n = CommonNoun(
+                possessor=None, correlative=cor, gram_number=n,
+                gram_of_number=of_n, explicit_number=None, attrs=[], noun=noun,
+                say_noun=True, preps_nargs=[])
+            nn.append(n)
+        return nn
+
+    def recog_nn(self, root_token):
+        sing = root_token.text
+        return self.recog_common_noun(root_token, sing, N2.SING)
+
+    def recog_nns(self, root_token):
+        rr = []
+        for sing in self.plural_mgr.to_singular(root_token.text):
+            for r in self.recog_common_noun(root_token, sing, N2.PLUR):
+                rr.append(r)
+        return rr
 
     def recog_nnp(self, root_token):
         name = root_token.text,

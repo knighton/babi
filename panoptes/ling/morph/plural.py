@@ -1,6 +1,7 @@
 from collections import defaultdict
 import yaml
 
+from panoptes.etc.dicts import v2k_from_k2v
 from panoptes.etc.suffix_fanout_map import SuffixFanoutMap
 
 
@@ -154,8 +155,12 @@ class PluralManager(object):
         self.plur2xx_pedantic_ok = SuffixFanoutMap(plur2xx_pedantic_ok, [], min)
 
         self.rules = rules
+
         self.nonsuffixable_sing2plur = nonsuffixable_sing2plur
+        self.nonsuffixable_plur2sing = v2k_from_k2v(nonsuffixable_sing2plur)
+
         self.capitalized_sing2plur = capitalized_sing2plur
+        self.capitalized_plur2sing = v2k_from_k2v(capitalized_sing2plur)
 
     def name_to_plural(self, s):
         for sing_suffix in each_suffix_shortest_first(s):
@@ -194,7 +199,7 @@ class PluralManager(object):
 
     def name_to_singular(self, s):
         for plur_suffix in each_suffix_shortest_first(s):
-            sing_suffix = self.plur2sing_capitalized.get(plur_suffix)
+            sing_suffix = self.capitalized_plur2sing.get(plur_suffix)
             if not sing_suffix:
                 continue
             return remove_then_append(s, plur_suffix, sing_suffix)
