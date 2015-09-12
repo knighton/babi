@@ -10,12 +10,7 @@ class Sentence(object):
         assert isinstance(self.end_punct, str)
 
     def say(self, state, idiolect):
-        has_left = False
-        has_right = False
-        prep = None
-        is_pos = False
-        is_arg = False
-        context = SayContext(
-            idiolect, has_left, has_right, prep, is_pos, is_arg)
-        r = self.root.say(state, context)
+        context = SayContext(prep=None, has_left=False, has_right=False,
+                             is_possessive=False)
+        r = self.root.say(state, idiolect, context)
         return r.tokens + [self.end_punct]
