@@ -237,8 +237,13 @@ class GrammaticalNumberManager(object):
 
     def compints_from_int(self, i):
         for x, span in enumerate(self.spans):
-            if not (span[0] <= i <= span[1]):
-                continue
+            a, b = span
+            if b is None:
+                if not (a <= i):
+                    continue
+            else:
+                if not (a <= i <= b):
+                    continue
 
             cc = self.compint_groups[x]
             if len(cc) == 1:
@@ -274,7 +279,7 @@ class GrammaticalNumberManager(object):
         bb = self.compints_from_int(i)
         return aa[-1] <= bb[0]
 
-    def nx_eq_nx_is_possible(self, nx, i):
+    def nx_eq_int_is_possible(self, nx, i):
         aa = self.nx2compints[nx]
         bb = self.compints_from_int(i)
         aa = set(aa)
@@ -283,7 +288,7 @@ class GrammaticalNumberManager(object):
                 return True
         return False
 
-    def nx_eq_nx_is_guaranteed(self, nx, i):
+    def nx_eq_int_is_guaranteed(self, nx, i):
         aa = self.nx2compints[nx]
         bb = self.nx2compints[i]
         return len(aa) == 1 and aa == bb
@@ -322,3 +327,27 @@ def nx_to_nx(nx, klass):
 
 def nx_to_nxs(nx, klass):
     return _MGR.nx_to_nxs(nx, klass)
+
+
+def nx_lt_nx_is_possible(a, b):
+    return _MGR.nx_lt_nx_is_possible(a, b)
+
+
+def nx_lt_nx_is_guaranteed(a, b):
+    return _MGR.nx_lt_nx_is_guaranteed(a, b)
+
+
+def nx_le_nx_is_possible(a, b):
+    return _MGR.nx_le_nx_is_possible(a, b)
+
+
+def nx_le_nx_is_guaranteed(a, b):
+    return _MGR.nx_le_nx_is_guaranteed(a, b)
+
+
+def nx_eq_nx_is_possible(a, b):
+    return _MGR.nx_eq_nx_is_possible(a, b)
+
+
+def nx_eq_nx_is_guaranteed(a, b):
+    return _MGR.nx_eq_nx_is_guaranteed(a, b)
