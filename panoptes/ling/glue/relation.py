@@ -14,7 +14,7 @@ RELATION_TEXT = """
 
   - relation: WHEN
     position: OBLIQUE
-    order: -100]
+    order: -100
     preps:
       - when FINITE_CLAUSE
 
@@ -72,7 +72,7 @@ RELATION_TEXT = """
     preps:
       - at THING
 
-  - relation: ON
+  - relation: "ON"
     position: OBLIQUE
     order: 30
     preps:
@@ -96,7 +96,7 @@ RELATION_TEXT = """
 """
 
 
-dd = yaml.loads(RELATION_TEXT)
+dd = yaml.load(RELATION_TEXT)
 relations = map(lambda d: d['relation'], dd)
 text = 'Relation = %s' % ' '.join(relations)
 Relation = enum(text)
@@ -153,7 +153,7 @@ class RelationInfo(object):
         for s in d['preps']:
             ss = s.split()
             prep = tuple(ss[:-1])
-            if prep == 'X',:
+            if prep == ('X',):
                 prep = None
             rat = RelationArgType.from_str[ss[-1]]
             preps_types.append((prep, rat))
@@ -164,7 +164,7 @@ class RelationInfo(object):
 class RelationManager(object):
     def __init__(self):
         # Relation -> RelationInfo.
-        dd = yaml.loads(RELATION_TEXT)
+        dd = yaml.load(RELATION_TEXT)
         infos = map(RelationInfo.from_config, dd)
         self.relation2info = \
             dict(zip(map(lambda info: info.relation, infos), infos))
@@ -175,7 +175,7 @@ class RelationManager(object):
         # important one.
         self.core2importance = {
             RelationPosition.SUBJECT: 2,
-            RelationPosition:INDIRECT_OBJECT: 1,
+            RelationPosition.INDIRECT_OBJECT: 1,
             RelationPosition.DIRECT_OBJECT: 0,
         }
 
@@ -191,7 +191,7 @@ class RelationManager(object):
         # error if this fails).
         core_positions = []
         for rel in rels:
-            pos = self.rel2info[rel].position
+            pos = self.relation2info[rel].position
             if is_core_position(pos):
                 core_positions.append(pos)
         assert len(core_positions) == len(set(core_positions))
