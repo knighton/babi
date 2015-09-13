@@ -26,7 +26,7 @@ class CommonNoun(SurfaceArgument):
     """
 
     def __init__(self, possessor, correlative, gram_number, gram_of_number,
-                 explicit_number, attrs, noun, say_noun, preps_nargs):
+                 explicit_number, attributes, noun, say_noun, preps_nargs):
         # Possessor.
         #
         # If it has a possessor, correlative must be DEFINITE (eg, "[Tim's] cat"
@@ -38,7 +38,7 @@ class CommonNoun(SurfaceArgument):
         # * [The boy's dog's] doghouse
         self.possessor = possessor
         if self.possessor:
-            assert isinstance(self.possessor, Argument)
+            assert isinstance(self.possessor, SurfaceArgument)
             assert correlative == SurfaceCorrelative.DEFINITE
 
         # Grammatical clues about the number (eg, "that cat", "those cats",
@@ -65,9 +65,9 @@ class CommonNoun(SurfaceArgument):
             # TODO: crosscheck explicit nubmer against grammatical numbers.
 
         # List of restrictive or descriptive attributes.
-        self.attrs = attrs
-        assert isinstance(self.attrs, list)
-        for a in self.attrs:
+        self.attributes = attributes
+        assert isinstance(self.attributes, list)
+        for a in self.attributes:
             assert False  # TODO: not in demo.
             # assert isinstance(a, Attribute)
 
@@ -102,7 +102,7 @@ class CommonNoun(SurfaceArgument):
         assert count in (0, 1)
 
     def is_interrogative(self):
-        if CORRELATIVE2IS_INTERROGATIVE[self.correlative]:
+        if self.correlative == SurfaceCorrelative.INTR:
             return True
 
         if self.possessor:
