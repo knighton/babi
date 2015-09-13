@@ -6,7 +6,7 @@ class DeepArgument(BaseArgument):
     An argument in deep structure.
     """
 
-    def to_surface(self):
+    def to_surface(self, idiolect):
         """
         -> SurfaceArgument
 
