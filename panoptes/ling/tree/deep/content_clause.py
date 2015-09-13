@@ -33,6 +33,26 @@ def is_you(n):
     return n.declension in (Declension.YOU, Declension.YALL)
 
 
+def decide_arg_to_front(rels_vargs, purpose, subj_index):
+    # Only wh-questions might front.
+    if purpose != Purpose.WH_Q:
+        return None
+
+    # Collect q-args.
+    q = 0
+    last = None
+    for i, (r, n) in enumerate(rels_vargs):
+        if n.is_interrogative():
+            q += 1
+            last = i
+
+    # Don't front subjects.
+    if q == 1 and last != subj_index:
+        return last
+
+    return None
+
+
 class ContentClause(DeepArgument):
     def __init__(self, status, purpose, verb, rels_vargs, subj_index):
         self.status = status
@@ -74,5 +94,43 @@ class ContentClause(DeepArgument):
                 cant_be = ArgPosRestriction.SUBJECT
             assert res != cant_be
 
+        # TODO: crosscheck purpose and wh-arg count.
+
+    def decide_voice(self):
+        subj_rel = self.rels_vargs[self.subj_index][0]
+        if subj_rel == Relation.AGENT:
+            return Voice.ACTIVE
+        else:
+            return Voice.PASSIVE
+
+    def decide_conjugation(self, idiolect):
+        subj = self.rels_vargs[self.subj_index][1]
+        conj = subj.to_surface(idiolect).decide_conjugation()
+        if conj is not None:
+            return conj
+
+        if len(self.rels_vargs) <= self.subj_index + 1:
+            return None
+
+        obj = self.rels_vargs[self.subj_index + 1][1]
+        return obj.to_surface(idiolect).decide_conjugation()
+
     def to_surface(self, idiolect):
-        assert False  # TODO
+        argx_to_front = decide_arg_to_front(
+            self.rels_vargs, self.purpose, self.subj_index)
+
+        # Verb context.
+        voice = self.decide_voice()
+        conj = self.decide_conjugation(idiolect)
+        assert conj
+        is_fronting = argx_to_front is not None
+        is_split = XXX
+        relative_cont = RelativeContainment.NOT_REL
+        contract_not = idiolect.contractions
+        split_inf = idiolect.split_infinitive
+        if idiolect.subjunctive_were:
+            sbj_handling = SubjunctiveHandling.WERE_SBJ
+        else:
+            sbj_handling = SubjunctiveHandling.WAS_SBJ
+        verb = SurfaceVerb(self.verb, voice, conj, is_split, relative_cont,
+                           contract_not, split_inf, sbj_handling)
