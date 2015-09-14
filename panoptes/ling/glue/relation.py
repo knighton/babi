@@ -169,17 +169,21 @@ class RelationManager(object):
         self.relation2info = \
             dict(zip(map(lambda info: info.relation, infos), infos))
 
-        # The natural order of the core semantic roles is SUBJ > IOBJ > DOBJ.
+        # The natural order of the core semantic roles when using active voice.
         #
-        # Use prepositions if a more 'important' one comes after a less
-        # important one.
-        self.active_core_order = [
+        #   "I baked you a cake"
+        #
+        # If you deviate from this order, you must use a preposition.
+        self.active_prepless_order = [
             RelationPosition.SUBJECT,
             RelationPosition.INDIRECT_OBJECT,
             RelationPosition.DIRECT_OBJECT,
         ]
 
-        self.passive_core_order = [
+        # Natural core order when in passive voice.
+        #
+        #   "You were baked a cake"
+        self.passive_prepless_order = [
             RelationPosition.INDIRECT_OBJECT,
             RelationPosition.DIRECT_OBJECT,
         ]
@@ -203,9 +207,9 @@ class RelationManager(object):
 
         # Prefer one ordering if active voice, a different one if passive voice.
         if rels_rats[subject_index][0] == Relation.AGENT:
-            preferred_core_order = self.active_core_order
+            preferred_core_order = self.active_prepless_order
         else:
-            preferred_core_order = self.passive_core_order
+            preferred_core_order = self.passive_prepless_order
 
         # Collect each prep.
         preps = []

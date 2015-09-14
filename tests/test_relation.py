@@ -97,7 +97,7 @@ def misc(m):
     assert m.decide_preps(rels_rats, subj) == [None, ('to',)]
 
     # "Because I like you, I walk to your house during the sunrise."
-    rels_cats = [
+    rels_rats = [
         (Relation.BECAUSE, RelationArgType.FINITE_CLAUSE),
         (Relation.AGENT, THING),
         (Relation.TO_LOCATION, THING),
@@ -108,7 +108,7 @@ def misc(m):
         [('because',), None, ('to',), ('during',)]
 
     # "Because I like you, I walk to your house while the sun rises."
-    rels_cats = [
+    rels_rats = [
         (Relation.BECAUSE, RelationArgType.FINITE_CLAUSE),
         (Relation.AGENT, THING),
         (Relation.TO_LOCATION, THING),
