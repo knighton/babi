@@ -173,13 +173,18 @@ class RelationManager(object):
         #
         # Use prepositions if a more 'important' one comes after a less
         # important one.
-        self.core2importance = {
-            RelationPosition.SUBJECT: 2,
-            RelationPosition.INDIRECT_OBJECT: 1,
-            RelationPosition.DIRECT_OBJECT: 0,
-        }
+        self.active_core_order = [
+            RelationPosition.SUBJECT,
+            RelationPosition.INDIRECT_OBJECT,
+            RelationPosition.DIRECT_OBJECT,
+        ]
 
-    def decide_preps(self, rels_rats):
+        self.passive_core_order = [
+            RelationPosition.INDIRECT_OBJECT,
+            RelationPosition.DIRECT_OBJECT,
+        ]
+
+    def decide_preps(self, rels_rats, subject_index):
         """
         list of (Relation, RelationArgType) -> list of (prep tuple or None).
         """
@@ -196,26 +201,39 @@ class RelationManager(object):
                 core_positions.append(pos)
         assert len(core_positions) == len(set(core_positions))
 
-        preps = []
-        min_importance_seen = None
-        for rel, rat in rels_rats:
-            info = self.relation2info[rel]
+        # Prefer one ordering if active voice, a different one if passive voice.
+        if rels_rats[subject_index][0] == Relation.AGENT:
+            preferred_core_order = self.active_core_order
+        else:
+            preferred_core_order = self.passive_core_order
 
-            importance = self.core2importance.get(info.position)
-            if importance is None:
+        # Collect each prep.
+        preps = []
+        index = 0
+        for rel, arg_type in rels_rats:
+            info = self.relation2info[rel]
+            if not is_core_position(info.position):
                 use_prep = True
-            elif min_importance_seen is None:
-                min_importance_seen = importance
-                use_prep = False
-            elif importance < min_importance_seen:
-                min_importance_seen = importance
-                use_prep = False
             else:
-                use_prep = True
+                while True:
+                    if index == len(preferred_core_order):
+                        use_prep = True
+                        break
+
+                    if info.position == preferred_core_order[index]:
+                        use_prep = False
+                        break
+
+                    index += 1
 
             if use_prep:
-                prep = info.decide_prep(rat)
-                assert prep
+                prep = info.decide_prep(arg_type)
+
+                # Allow the iffy construction "you were baked by me a cake" for
+                # the sake of having all the core argument order permutations.
+                # Check everything else.
+                if rel != Relation.TARGET:
+                    assert prep
             else:
                 prep = None
 
