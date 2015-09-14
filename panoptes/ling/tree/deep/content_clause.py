@@ -53,6 +53,14 @@ def decide_arg_to_front(rels_vargs, purpose, subj_index):
     return None
 
 
+# TODO: replace this with a method in all deep args.
+def relation_arg_type_from_arg(a):
+    if isinstance(a, DeepContentClause) and a.verb.verb_form == VerbForm.FINITE:
+        return RelationArgType.FINITE_CLAUSE
+    else:
+        return RelationArgType.THING
+
+
 class ContentClause(DeepArgument):
     def __init__(self, status, purpose, verb, rels_vargs, subj_index):
         self.status = status
@@ -115,7 +123,7 @@ class ContentClause(DeepArgument):
         obj = self.rels_vargs[self.subj_index + 1][1]
         return obj.to_surface(idiolect).decide_conjugation()
 
-    def to_surface(self, idiolect):
+    def to_surface(self, state, idiolect):
         argx_to_front = decide_arg_to_front(
             self.rels_vargs, self.purpose, self.subj_index)
 
@@ -124,7 +132,8 @@ class ContentClause(DeepArgument):
         conj = self.decide_conjugation(idiolect)
         assert conj
         is_fronting = argx_to_front is not None
-        is_split = XXX
+        is_split = state.purpose_mgr.purpose2info[self.purpose].split_verb(
+            is_fronting)
         relative_cont = RelativeContainment.NOT_REL
         contract_not = idiolect.contractions
         split_inf = idiolect.split_infinitive
@@ -132,5 +141,35 @@ class ContentClause(DeepArgument):
             sbj_handling = SubjunctiveHandling.WERE_SBJ
         else:
             sbj_handling = SubjunctiveHandling.WAS_SBJ
-        verb = SurfaceVerb(self.verb, voice, conj, is_split, relative_cont,
-                           contract_not, split_inf, sbj_handling)
+        surface_verb = SurfaceVerb(
+            self.verb, voice, conj, is_split, relative_cont, contract_not,
+            split_inf, sbj_handling)
+        surface_verb.check(allow_wildcards=False)
+
+        # Figure out prepositions for our relations.
+        rels_types = []
+        for rel, arg in self.rels_vargs:
+            arg_type = relation_arg_type_from_arg(arg)
+            rels_types.append((rel, arg_type))
+        preps = state.relation_mgr.decide_preps(rels_types)
+
+        # Build list of properly prepositioned surface arguments (without
+        # fronting or imperative subject omission).
+        orig_preps_surfs = []
+        for (rel, arg), prep in zip(self.rels_vargs, preps):
+            surface = arg.to_surface(sttae, idiolect)
+            orig_preps_surfs.append((prep, surface))
+
+        # If imperative, we disappear the subject ("do this" vs "you do this").
+        is_imperative = self.verb.modality.flavor == ModalFlavor.IMPERATIVE
+
+        # Apply transformations to get surface structure for args (eg, fronting).
+        preps_surfs, vmain_index = transform(
+            orig_preps_surfs, self.subj_index, is_imperative, argx_to_front,
+            idiolect.stranding)
+
+        # Get the complementizer.
+        ctzr = STATUS2COMPLEMENTIZER[self.status]
+
+        return SurfaceContentClause(
+            ctzr, surface_verb, preps_surfs, vmain_index)
