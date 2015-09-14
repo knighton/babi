@@ -1,12 +1,17 @@
-from panoptes.ling.tree.common.base import *
+from panoptes.ling.glue.relation import RelationArgType
+from panoptes.ling.tree.common.base import CommonArgument
+from panoptes.ling.tree.surface.base import SayResult
 
 
-class ExistentialThere(Argument):
+class ExistentialThere(CommonArgument):
     """
     Existential there as a verb argument.
 
     Eg, "[There] are cats here.", "Because of the cats, [there] are fewer mice".
     """
+
+    def relation_arg_type(self):
+        return RelationArgType.INERT
 
     def arg_position_restriction(self):
         return ArgPositionRestriction.SUBJECT

@@ -1,5 +1,6 @@
 from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.glue.magic_token import POSSESSIVE_MARK
+from panoptes.ling.glue.relation import RelationArgType
 from panoptes.ling.tree.common.base import CommonArgument
 from panoptes.ling.tree.surface.base import SayResult
 
@@ -17,6 +18,9 @@ class ProperNoun(CommonArgument):
 
         self.is_plur = is_plur
         assert isinstance(self.is_plur, bool)
+
+    def relation_arg_type(self):
+        return RelationArgType.INERT
 
     def decide_conjugation(self, state, idiolect, context):
         if self.is_plur:

@@ -6,4 +6,12 @@ class CommonArgument(DeepArgument, SurfaceArgument):
     """
     An argument that can pass as both surface and deep structure.
     """
-    pass
+
+    def to_surface(self, state, idiolect):
+        """
+        -> SurfaceArgument
+
+        Since we don't contain any surface-only structure because we are a
+        "common" argument, to_surface() just means return ourselves.
+        """
+        return self

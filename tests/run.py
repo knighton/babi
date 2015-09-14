@@ -24,6 +24,8 @@ def main():
         u'Tim saw Tom.',
         u'I watched them.',
         u'I saw you.',
+        u'I walked.',
+        u'I walked the dog.',
     ]
 
     a = Agent()

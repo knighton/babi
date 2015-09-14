@@ -2,6 +2,7 @@ from panoptes.etc.dicts import v2kk_from_k2v, v2k_from_k2v
 from panoptes.etc.enum import enum
 from panoptes.ling.glue.inflection import Conjugation, Declension
 from panoptes.ling.glue.magic_token import POSSESSIVE_MARK
+from panoptes.ling.glue.relation import RelationArgType
 from panoptes.ling.tree.base import ArgPosRestriction
 from panoptes.ling.tree.common.base import CommonArgument
 
@@ -28,6 +29,9 @@ class PersonalPronoun(CommonArgument):
 
         self.ppcase = ppcase
         assert PersonalPronounCase.is_valid(self.ppcase)
+
+    def relation_arg_type(self):
+        return RelationArgType.INERT
 
     def arg_position_restriction(self):
         # This is not called for personal determiners, which exclusively are

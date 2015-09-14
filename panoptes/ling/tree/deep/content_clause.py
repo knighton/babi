@@ -53,14 +53,6 @@ def decide_arg_to_front(rels_vargs, purpose, subj_index):
     return None
 
 
-# TODO: replace this with a method in all deep args.
-def relation_arg_type_from_arg(a):
-    if isinstance(a, DeepContentClause) and a.verb.verb_form == VerbForm.FINITE:
-        return RelationArgType.FINITE_CLAUSE
-    else:
-        return RelationArgType.THING
-
-
 def is_you(you):
     if not isinstance(you, PersonalPronoun):
         return False
@@ -159,6 +151,12 @@ class ContentClause(DeepArgument):
 
         # TODO: crosscheck purpose and wh-arg count.
 
+    def relation_arg_type(self):
+        if self.verb.verb_form == VerbForm.FINITE:
+            return RelationArgType.FINITE_CLAUSE
+        else:
+            return RelationArgType.INERT
+
     def decide_voice(self):
         subj_rel = self.rels_vargs[self.subj_index][0]
         if subj_rel == Relation.AGENT:
@@ -204,8 +202,7 @@ class ContentClause(DeepArgument):
         # Figure out prepositions for our relations.
         rels_types = []
         for rel, arg in self.rels_vargs:
-            arg_type = relation_arg_type_from_arg(arg)
-            rels_types.append((rel, arg_type))
+            rels_types.append((rel, arg.relation_arg_type()))
         preps = state.relation_mgr.decide_preps(rels_types)
 
         # Build list of properly prepositioned surface arguments (without

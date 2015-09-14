@@ -140,10 +140,13 @@ class ParseToSurface(object):
         for cor, n, of_n in self.correlative_mgr.parse(s):
             if not nx_eq_nx_is_possible(n, n2):
                 continue
-            n = CommonNoun(
-                possessor=None, correlative=cor, gram_number=n,
-                gram_of_number=of_n, explicit_number=None, attrs=[], noun=noun,
-                say_noun=True, preps_nargs=[])
+            possessor = None
+            explicit_number = None
+            attributes = []
+            say_noun = True
+            preps_nargs = []
+            n = CommonNoun(possessor, cor, n, of_n, explicit_number, attributes,
+                           noun, say_noun, preps_nargs)
             nn.append(n)
         return nn
 

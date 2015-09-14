@@ -20,61 +20,61 @@ RELATION_TEXT = """
     position: SUBJECT
     order: 0
     preps:
-      - by THING
+      - by INERT
 
   - relation: TARGET
     position: DIRECT_OBJECT
     order: 3
     preps:
-      - X THING
+      - X INERT
 
   - relation: TO_RECIPIENT
     position: INDIRECT_OBJECT
     order: 1
     preps:
-      - to THING
+      - to INERT
 
   - relation: FOR_RECIPIENT
     position: INDIRECT_OBJECT
     order: 1
     preps:
-      - for THING
+      - for INERT
 
   - relation: BENEFICIARY
     position: OBLIQUE
     order: 5
     preps:
-      - for THING
+      - for INERT
 
   - relation: TO_LOCATION
     position: OBLIQUE
     order: 5
     preps:
-      - to THING
+      - to INERT
 
   - relation: OF
     position: OBLIQUE
     order: 10
     preps:
-      - of THING
+      - of INERT
 
   - relation: ABOUT
     position: OBLIQUE
     order: 10
     preps:
-      - about THING
+      - about INERT
 
   - relation: AT
     position: OBLIQUE
     order: 30
     preps:
-      - at THING
+      - at INERT
 
   - relation: "ON"
     position: OBLIQUE
     order: 30
     preps:
-      - on THING
+      - on INERT
 
   - relation: DURING
     position: OBLIQUE
@@ -82,13 +82,13 @@ RELATION_TEXT = """
     preps:
       - while FINITE_CLAUSE
       - while PREPLESS_GERUND
-      - during THING
+      - during INERT
 
   - relation: BECAUSE
     position: OBLIQUE
     order: 100
     preps:
-      - because of THING
+      - because of INERT
       - because FINITE_CLAUSE
       - since FINITE_CLAUSE
 """
@@ -112,7 +112,9 @@ def is_core_position(pos):
     return pos != RelationPosition.OBLIQUE
 
 
-RelationArgType = enum('RelationArgType = FINITE_CLAUSE THING PREPLESS_GERUND')
+# INERT is most args, and non-finite clauses.
+# FINITE_CLAUSE is finite clauses.
+RelationArgType = enum('RelationArgType = INERT FINITE_CLAUSE PREPLESS_GERUND')
 
 
 class RelationInfo(object):

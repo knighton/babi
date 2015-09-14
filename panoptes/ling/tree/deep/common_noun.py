@@ -1,3 +1,4 @@
+from panoptes.ling.glue.relation import RelationArgType
 from panoptes.ling.tree.deep.base import DeepArgument
 from panoptes.ling.tree.surface.common_noun import CommonNoun as \
     SurfaceCommonNoun
@@ -36,6 +37,9 @@ class CommonNoun(DeepArgument):
         self.rels_nargs = rels_nargs
         for r, n in self.rels_nargs:
             assert False  # TODO: not in demo.
+
+    def relation_arg_type(self):
+        return RelationArgType.INERT
 
     def is_interrogative(self):
         if self.correlative == DeepCorrelative.INTR:
