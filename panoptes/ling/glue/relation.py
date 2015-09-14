@@ -1,5 +1,3 @@
-# Prepositions and grammatical relations.
-
 import yaml
 
 from panoptes.etc.enum import enum
@@ -96,10 +94,14 @@ RELATION_TEXT = """
 """
 
 
-dd = yaml.load(RELATION_TEXT)
-relations = map(lambda d: d['relation'], dd)
-text = 'Relation = %s' % ' '.join(relations)
-Relation = enum(text)
+def make_relation_enum(relation_text):
+    dd = yaml.load(relation_text)
+    relations = map(lambda d: d['relation'], dd)
+    enum_content = 'Relation = %s' % ' '.join(relations)
+    return enum(enum_content)
+
+
+Relation = make_relation_enum(RELATION_TEXT)
 
 
 RelationPosition = enum("""
@@ -162,6 +164,10 @@ class RelationInfo(object):
 
 
 class RelationManager(object):
+    """
+    Manages knowledge about grammatical relations and prepositions.
+    """
+
     def __init__(self):
         # Relation -> RelationInfo.
         dd = yaml.load(RELATION_TEXT)

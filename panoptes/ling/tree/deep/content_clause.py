@@ -61,6 +61,61 @@ def relation_arg_type_from_arg(a):
         return RelationArgType.THING
 
 
+def is_you(you):
+    if not isinstance(you, PersonalPronoun):
+        return False
+
+    return you.declension in (Declension.YOU, Declension.YALL)
+
+
+def transform(orig_preps_vargs, subj_index, is_imperative, argx_to_front,
+              strand_fronted_prep):
+    """
+    args -> (transformed preps_vargs, vmain index)
+    """
+
+    if is_imperative:
+        you = orig_preps_vargs[subj_index][1]
+        assert is_you(you)
+
+    if argx_to_front is not None:
+        assert subj_index < argx_to_front
+
+    rr = []
+
+    # Pre-args.
+    for prep, arg in orig_preps_args[:subj_index]:
+        rr.append((pre, arg))
+
+    # Fronted arg.
+    stranded_prep = None
+    if argx_to_front is not None:
+        if strand_fronted_prep:
+            stranded_prep, n = orig_preps_vargs[argx_to_front]
+            fronted_prep = None
+        else:
+            fronted_prep, n = orig_preps_vargs[argx_to_front]
+        rr.append((fronted_prep, n))
+
+    # Subject.
+    if not is_imperative:
+        rr.append(orig_preps_vargs[subj_index])
+
+    # Now calculate vmain_index.
+    vmain_index = len(rr)
+
+    # Post-args.
+    for x in xrange(subj_index + 1, len(orig_preps_vargs)):
+        prep, arg = orig_preps_vargs[x]
+        if x == argx_to_front:
+            if stranded_prep:
+                rr.append((stranded_prep, None))
+        else:
+            rr.append((prep, arg))
+
+    return rr, vmain_index
+
+
 class ContentClause(DeepArgument):
     def __init__(self, status, purpose, verb, rels_vargs, subj_index):
         self.status = status
@@ -163,7 +218,8 @@ class ContentClause(DeepArgument):
         # If imperative, we disappear the subject ("do this" vs "you do this").
         is_imperative = self.verb.modality.flavor == ModalFlavor.IMPERATIVE
 
-        # Apply transformations to get surface structure for args (eg, fronting).
+        # Apply transformations to get surface structure for args (eg,
+        # fronting).
         preps_surfs, vmain_index = transform(
             orig_preps_surfs, self.subj_index, is_imperative, argx_to_front,
             idiolect.stranding)
