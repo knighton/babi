@@ -1,4 +1,6 @@
 from panoptes.ling.tree.deep.base import DeepArgument
+from panoptes.ling.tree.surface.common_noun import CommonNoun as \
+    SurfaceCommonNoun
 
 
 class CommonNoun(DeepArgument):
@@ -55,3 +57,27 @@ class CommonNoun(DeepArgument):
                 return True
 
         return False
+
+    def to_surface(self, state, idiolect):
+        if self.possessor:
+            possessor = self.possessor.to_surface(idiolect)
+        else:
+            possessor = None
+
+        if self.explicit_number:
+            explicit_number = self.explicit_number.to_surface(idiolect)
+        else:
+            explicit_number = None
+
+        attributes = map(lambda a: a.to_surface(idiolect), self.attributes)
+
+        preps_nargs = []
+        for rel, arg in self.rels_nargs:
+            arg_type = arg.relation_arg_type()
+            prep = state.relation_mgr.get(rel).decide_prep(arg_type)
+            narg = arg.to_surface(idiolect)
+            preps_nargs.append((prep, narg))
+
+        return SurfaceCommonNoun(
+            possessor, self.correlative, self.gram_number, self.gram_of_number,
+            explicit_number, attributes, self.noun, self.say_noun, preps_nargs)

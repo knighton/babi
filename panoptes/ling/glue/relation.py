@@ -249,3 +249,6 @@ class RelationManager(object):
 
             preps.append(prep)
         return preps
+
+    def get(self, relation):
+        return self.relation2info[relation]
