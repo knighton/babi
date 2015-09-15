@@ -22,6 +22,15 @@ class BaseArgument(object):
     it will always be able to be used on its own.
     """
 
+    def to_d(self):
+        """
+        -> dict
+
+        Return a dict that can be used to reconstruct ourselves, containing
+        nothing but primitive types and the string names of enum values.
+        """
+        raise NotImplementedError
+
     def is_interrogative(self):
         """
         -> bool

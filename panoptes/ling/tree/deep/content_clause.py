@@ -108,7 +108,7 @@ def transform(orig_preps_vargs, subj_index, is_imperative, argx_to_front,
     return rr, vmain_index
 
 
-class ContentClause(DeepArgument):
+class DeepContentClause(DeepArgument):
     def __init__(self, status, purpose, verb, rels_vargs, subj_index):
         self.status = status
         assert Status.is_valid(self.status)
@@ -150,6 +150,28 @@ class ContentClause(DeepArgument):
             assert res != cant_be
 
         # TODO: crosscheck purpose and wh-arg count.
+
+    # --------------------------------------------------------------------------
+    # From base.
+
+    def to_d(self):
+        rels_vargs = []
+        for rel, arg in self.rels_vargs:
+            rel = Relation.to_str[rel]
+            arg = arg.to_d()
+            rels_vargs.append((rel, arg))
+
+        return {
+            'type': 'DeepContentClause',
+            'status': Status.to_str[self.status],
+            'purpose': Purpose.to_str[self.purpose],
+            'verb': self.verb.to_d(),
+            'rels_vargs': rels_vargs,
+            'subj_index': self.subj_index,
+        }
+
+    # --------------------------------------------------------------------------
+    # From deep.
 
     def relation_arg_type(self):
         if self.verb.verb_form == VerbForm.FINITE:
@@ -226,3 +248,17 @@ class ContentClause(DeepArgument):
 
         return SurfaceContentClause(
             ctzr, surface_verb, preps_surfs, vmain_index)
+
+    # --------------------------------------------------------------------------
+    # Static.
+
+    @staticmethod
+    def from_d(d, from_dicter):
+        status = Status.from_str[d['status']]
+        purpose = Purpose.from_str[d['purpose']]
+        verb = DeepVerb.from_d(d['verb'])
+        for rel, arg in d['rels_vargs']:
+            rel = Relation.from_str[rel]
+            arg = from_dicter.from_d(arg)
+        subj_index = d['subj_index']
+        return DeepVerb(status, purpose, verb, rels_vargs, subj_index)
