@@ -27,14 +27,14 @@ class Polarity(object):
         else:
             assert isinstance(self.is_contrary, bool)
 
-    def to_d(self):
+    def dump(self):
         return {
             'tf': self.tf,
             'is_contrary': self.is_contrary,
         }
 
     @staticmethod
-    def from_d(d):
+    def load(d):
         return Polarity(d['tf'], d['is_contrary'])
 
 
@@ -60,14 +60,14 @@ class Aspect(object):
             assert isinstance(self.is_perf, bool)
             assert isinstance(self.is_prog, bool)
 
-    def to_d(self):
+    def dump(self):
         return {
             'is_perf': self.is_perf,
             'is_prog': self.is_prog,
         }
 
     @staticmethod
-    def from_d(d):
+    def load(d):
         return Aspect(d['is_perf'], d['is_prog'])
 
 
@@ -107,9 +107,7 @@ ModalFlavor = enum("""ModalFlavor =
 class Modality(object):
     def __init__(self, flavor, is_cond):
         self.flavor = flavor
-
-        # TODO: check where is_cond is wildcarded.
-        self.is_cond = is_cond
+        self.is_cond = is_cond  # TODO: check where is_cond is wildcarded.
         self.check()
 
     def check(self, allow_wildcards=True):
@@ -119,7 +117,7 @@ class Modality(object):
         else:
             assert isinstance(self.is_cond, bool)
 
-    def to_d(self):
+    def dump(self):
         return {
             'flavor': ModalFlavor.to_str[self.flavor],
             'is_cond': self.is_cond,
@@ -129,7 +127,7 @@ class Modality(object):
         return self.flavor == ModalFlavor.INDICATIVE and not self.is_cond
 
     @staticmethod
-    def from_d(d):
+    def load(d):
         flavor = ModalFlavor.from_str[d['flavor']]
         return Modality(flavor, d['is_cond'])
 
@@ -178,26 +176,26 @@ class DeepVerb(object):
         assert VerbForm.is_valid(self.verb_form)
         assert isinstance(self.is_pro_verb, bool)
 
-    def to_d(self):
+    def dump(self):
         if self.tense:
             tense = Tense.to_str[self.tense]
         else:
             tense = self.tense
         return {
             'lemma': self.lemma,
-            'polarity': self.polarity.to_d(),
+            'polarity': self.polarity.dump(),
             'tense': tense,
-            'aspect': self.aspect.to_d(),
-            'modality': self.modality.to_d(),
+            'aspect': self.aspect.dump(),
+            'modality': self.modality.dump(),
             'verb_form': VerbForm.to_str[self.verb_form],
             'is_pro_verb': self.is_pro_verb,
         }
 
     @staticmethod
-    def from_d(d):
-        polarity = Polarity.from_d[d['polarity']]
-        aspect = Aspect.from_d[d['aspect']]
-        modality = Modality.from_d[d['modality']]
+    def load(d):
+        polarity = Polarity.load[d['polarity']]
+        aspect = Aspect.load[d['aspect']]
+        modality = Modality.load[d['modality']]
         verb_form = VerbForm.from_s[d['verb_form']]
         return DeepVerb(d['lemma'], polarity, d['tense'], aspect, modality,
                         verb_form, d['is_pro_verb'])
@@ -317,7 +315,7 @@ class SurfaceVerb(object):
 
         return True
 
-    def to_d(self):
+    def dump(self):
         if self.conj:
             conj = Conjugation.to_str[self.conj]
         else:
@@ -327,7 +325,7 @@ class SurfaceVerb(object):
         else:
             sbj = self.sbj_handling
         return {
-            'intrinsics': self.intrinsics.to_d(),
+            'intrinsics': self.intrinsics.dump(),
             'voice': Voice.to_str[self.voice],
             'conj': conj,
             'is_split': self.is_split,
@@ -412,8 +410,8 @@ class SurfaceVerb(object):
         return SurfaceVerb.from_tuple(aa)
 
     @staticmethod
-    def from_d(d):
-        intrinsics = DeepVerb.from_d(d['intrinsics'])
+    def load(d):
+        intrinsics = DeepVerb.load(d['intrinsics'])
         voice = Voice.from_str[d['voice']]
         conj = Conjugation.from_str[d['conj']]
         is_split = d['is_split']
