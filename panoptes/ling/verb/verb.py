@@ -33,6 +33,10 @@ class Polarity(object):
             'is_contrary': self.is_contrary,
         }
 
+    @staticmethod
+    def from_d(d):
+        return Polarity(d['tf'], d['is_contrary'])
+
 
 class Aspect(object):
     """
@@ -61,6 +65,10 @@ class Aspect(object):
             'is_perf': self.is_perf,
             'is_prog': self.is_prog,
         }
+
+    @staticmethod
+    def from_d(d):
+        return Aspect(d['is_perf'], d['is_prog'])
 
 
 # Modal "flavor".
@@ -119,6 +127,11 @@ class Modality(object):
 
     def is_indicative(self):
         return self.flavor == ModalFlavor.INDICATIVE and not self.is_cond
+
+    @staticmethod
+    def from_d(d):
+        flavor = ModalFlavor.from_str[d['flavor']]
+        return Modality(flavor, d['is_cond'])
 
 
 # Abstract sense of tense that is actually about time only.
@@ -179,6 +192,15 @@ class DeepVerb(object):
             'verb_form': VerbForm.to_str[self.verb_form],
             'is_pro_verb': self.is_pro_verb,
         }
+
+    @staticmethod
+    def from_d(d):
+        polarity = Polarity.from_d[d['polarity']]
+        aspect = Aspect.from_d[d['aspect']]
+        modality = Modality.from_d[d['modality']]
+        verb_form = VerbForm.from_s[d['verb_form']]
+        return DeepVerb(d['lemma'], polarity, d['tense'], aspect, modality,
+                        verb_form, d['is_pro_verb'])
 
 
 # Linguistic voice.
@@ -259,6 +281,62 @@ class SurfaceVerb(object):
             assert isinstance(self.split_inf, bool)
             assert SubjunctiveHandling.is_valid(self.sbj_handling)
 
+    def to_tuple(self):
+        i = self.intrinsics
+        return (i.lemma, i.polarity.tf, i.polarity.is_contrary, i.tense,
+                i.aspect.is_prog, i.aspect.is_perf, i.modality.flavor,
+                i.modality.is_cond, i.verb_form, i.is_pro_verb, self.voice,
+                self.conj, self.is_split, self.relative_cont, self.contract_not,
+                self.split_inf, self.sbj_handling)
+
+    def to_int_tuple(self, options_per_field):
+        """
+        Does not allow fields to be None.
+        """
+        aa = self.to_tuple()
+        nn = []
+        for a, options in zip(aa, options_per_field):
+            nn.append(options.index(a))
+        return nn
+
+    def can_be_in_root_clause(self):
+        # Most non-indicative moods are banned.
+        #
+        # "I wish I were here", "she requests you come", etc.
+        if self.intrinsics.modality.flavor in \
+                (ModalFlavor.SUBJUNCTIVE_CF, ModalFlavor.SUBJUNCTIVE_IMP):
+            return False
+
+        # The verb has to be finite (conjugated).
+        if self.intrinsics.verb_form != VerbForm.FINITE:
+            return False
+
+        # We can't be inside a relative clause at root.
+        if self.relative_cont != RelativeContainment.NOT_REL:
+            return False
+
+        return True
+
+    def to_d(self):
+        if self.conj:
+            conj = Conjugation.to_str[self.conj]
+        else:
+            conj = self.conj
+        if self.sbj_handling:
+            sbj = SubjunctiveHandling.to_str[self.sbj_handling]
+        else:
+            sbj = self.sbj_handling
+        return {
+            'intrinsics': self.intrinsics.to_d(),
+            'voice': Voice.to_str[self.voice],
+            'conj': conj,
+            'is_split': self.is_split,
+            'relative_cont': RelativeContainment.to_str[self.relative_cont],
+            'contract_not': self.contract_not,
+            'split_inf': self.split_inf,
+            'sbj_handling': sbj,
+        }
+
     @staticmethod
     def all_options(lemmas, is_pro_verb_options):
         bools = [False, True]
@@ -333,58 +411,16 @@ class SurfaceVerb(object):
             aa.append(a)
         return SurfaceVerb.from_tuple(aa)
 
-    def to_d(self):
-        if self.conj:
-            conj = Conjugation.to_str[self.conj]
-        else:
-            conj = self.conj
-        if self.sbj_handling:
-            sbj = SubjunctiveHandling.to_str[self.sbj_handling]
-        else:
-            sbj = self.sbj_handling
-        return {
-            'intrinsics': self.intrinsics.to_d(),
-            'voice': Voice.to_str[self.voice],
-            'conj': conj,
-            'is_split': self.is_split,
-            'relative_cont': RelativeContainment.to_str[self.relative_cont],
-            'contract_not': self.contract_not,
-            'split_inf': self.split_inf,
-            'sbj_handling': sbj,
-        }
-
-    def to_tuple(self):
-        i = self.intrinsics
-        return (i.lemma, i.polarity.tf, i.polarity.is_contrary, i.tense,
-                i.aspect.is_prog, i.aspect.is_perf, i.modality.flavor,
-                i.modality.is_cond, i.verb_form, i.is_pro_verb, self.voice,
-                self.conj, self.is_split, self.relative_cont, self.contract_not,
-                self.split_inf, self.sbj_handling)
-
-    def to_int_tuple(self, options_per_field):
-        """
-        Does not allow fields to be None.
-        """
-        aa = self.to_tuple()
-        nn = []
-        for a, options in zip(aa, options_per_field):
-            nn.append(options.index(a))
-        return nn
-
-    def can_be_in_root_clause(self):
-        # Most non-indicative moods are banned.
-        #
-        # "I wish I were here", "she requests you come", etc.
-        if self.intrinsics.modality.flavor in \
-                (ModalFlavor.SUBJUNCTIVE_CF, ModalFlavor.SUBJUNCTIVE_IMP):
-            return False
-
-        # The verb has to be finite (conjugated).
-        if self.intrinsics.verb_form != VerbForm.FINITE:
-            return False
-
-        # We can't be inside a relative clause at root.
-        if self.relative_cont != RelativeContainment.NOT_REL:
-            return False
-
-        return True
+    @staticmethod
+    def from_d(d):
+        intrinsics = DeepVerb.from_d(d['intrinsics'])
+        voice = Voice.from_str[d['voice']]
+        conj = Conjugation.from_str[d['conj']]
+        is_split = d['is_split']
+        relative_cont = RelativeContainment.from_str[d['relative_cont']]
+        contract_not = d['contract_not']
+        split_inf = d['split_inf']
+        sbj_handling = SubjunctiveHandling.from_str[d['sbj_handling']]
+        return SurfaceVerb(
+            intrinsics, voice, conj, is_split, relative_cont, contract_not,
+            split_inf, sbj_handling)
