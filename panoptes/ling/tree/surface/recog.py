@@ -173,53 +173,64 @@ class ParseToSurface(object):
     def recognize_verb_arg(self, root_token):
         return self.tag2recognize[root_token.tag](root_token)
 
-    def find_subject(self, verb_span_pair, token_indexes):
+    def find_subject(self, verb_span_pair, varg_root_indexes):
+        """
+        args -> subj arg index, vmain index
+        """
         a, b = verb_span_pair
         if a and b:
             # Both spans ("would you see?"): find the argument that goes between
             # the spans.
-            for i, x in enumerate(token_indexes):
-                if a[1] < x < b[0]:
-                    return i
+            for i, arg in enumerate(varg_root_indexes):
+                if a[1] < arg < b[0]:
+                    return i, i + 1
         elif a:
             # Just the pre span ("would you?"): find the argument directly
             # after the verb words.
-            for i, x in enumerate(token_indexes):
-                if a[1] < x:
-                    return i
+            for i, arg in enumerate(varg_root_indexes):
+                if a[1] < arg:
+                    return i, i + 1
         elif b:
-            # Just the main span ("you would", "go!"): find the argument
-            # preceding the one directly after the verb words, or return None if
-            # there isn't one (in the case of imperatives).
-            for i, x in enumerate(token_indexes):
-                if b[1] < x:
+            # Just the main span ("you would", "go!").
+
+            # Find the argument preceding the one directly after the verb words,
+            # or subject index = None if no subject (imperative).
+            for i, arg in enumerate(varg_root_indexes):
+                if b[1] < arg:
                     if 0 <= i - 1:
-                        return i - 1
+                        return i - 1, i
                     else:
-                        return None
+                        return None, i
+
+            # Didn't find any argument after the verb, so the last one is the
+            # subject.  TODO: "because of that, go!" -> because is not
+            # imperative subject.
+            n = len(varg_root_indexes) - 1
+            return n, n + 1
         else:
             assert False
 
     def extract_verb_args(self, root_token, verb_span_pair):
         """
-        root token, verb span pair -> subj arg index, options per arg
+        root token, verb span pair -> subj arg index, vmain idx, options per arg
 
         ... where an option is a (prep, verb arg).
         """
-        token_indexes = []
+        varg_root_indexes = []
         ppp_nnn = []
         for rel, t in root_token.downs:
             if rel not in ('nsubj', 'dobj'):
                 continue
-            token_indexes.append(t.index)
-            pp = [()]
+            varg_root_indexes.append(t.index)
+            pp = [None]
             nn = self.recognize_verb_arg(t)
             pp_nn = []
             for p, n in each_choose_one_from_each([pp, nn]):
                 pp_nn.append((p, n))
             ppp_nnn.append(pp_nn)
-        subj_argx = self.find_subject(verb_span_pair, token_indexes)
-        return subj_argx, ppp_nnn
+        subj_argx, vmain_index = \
+            self.find_subject(verb_span_pair, varg_root_indexes)
+        return subj_argx, vmain_index, ppp_nnn
 
     def conjs_from_verb(self, v):
         """
@@ -279,7 +290,7 @@ class ParseToSurface(object):
         cc = []
         for verb_span_pair, vv in \
                 self.verb_extractor.extract(root_token, is_root_clause):
-            subj_argx, ppp_nnn = self.extract_verb_args(
+            subj_argx, vmain_index, ppp_nnn = self.extract_verb_args(
                 root_token, verb_span_pair)
             for v in vv:
                 for pp_nn in each_choose_one_from_each(ppp_nnn):
@@ -288,7 +299,7 @@ class ParseToSurface(object):
                         new_v = deepcopy(v)
                         new_v.conj = conj
                         c = SurfaceContentClause(
-                            complementizer, new_v, deepcopy(pp_nn), subj_argx)
+                            complementizer, new_v, deepcopy(pp_nn), vmain_index)
                         cc.append(c)
         return cc
 
