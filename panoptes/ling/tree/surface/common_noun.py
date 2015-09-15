@@ -61,7 +61,7 @@ class SurfaceCommonNoun(SurfaceArgument):
         # grammatical clues about number above.
         self.explicit_number = explicit_number
         if self.explicit_number:
-            assert False  # TODO: not in demo.
+            assert False  # NOTE: not in demo.
             # assert isinstance(self.explicit_number, Number)
             # TODO: crosscheck explicit nubmer against grammatical numbers.
 
@@ -69,7 +69,7 @@ class SurfaceCommonNoun(SurfaceArgument):
         self.attributes = attributes
         assert isinstance(self.attributes, list)
         for a in self.attributes:
-            assert False  # TODO: not in demo.
+            assert False  # NOTE: not in demo.
             # assert isinstance(a, Attribute)
 
         # The word(s) for its type, unit, noun, etc.
@@ -90,7 +90,7 @@ class SurfaceCommonNoun(SurfaceArgument):
         self.preps_nargs = preps_nargs
         assert isinstance(self.preps_nargs, list)
         for p, n in self.preps_nargs:
-            assert False  # TODO: not used in this demo.
+            assert False  # NOTE: not used in this demo.
 
         # We can have at most one relative child (eg, "the castle whose king",
         # "the castle the kind of which").
@@ -304,7 +304,7 @@ class SurfaceCommonNoun(SurfaceArgument):
 
         # Say the attributes.
         if self.attributes:
-            assert False  # TODO: not in MVP.
+            assert False  # NOTE: not in demo.
 
         # Say the noun.
         if is_plur:

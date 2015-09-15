@@ -21,12 +21,12 @@ class DeepCommonNoun(DeepArgument):
 
         self.explicit_number = explicit_number
         if self.explicit_number:
-            assert False  # TODO: not in demo.
+            assert False  # NOTE: not in demo.
 
         self.attributes = attributes
         assert isinstance(self.attributes, list)
         for a in self.attributes:
-            assert False  # TODO: not in demo.
+            assert False  # NOTE: not in demo.
 
         self.noun = noun
         self.say_noun = say_noun
@@ -36,7 +36,7 @@ class DeepCommonNoun(DeepArgument):
 
         self.rels_nargs = rels_nargs
         for r, n in self.rels_nargs:
-            assert False  # TODO: not in demo.
+            assert False  # NOTE: not in demo.
 
     # --------------------------------------------------------------------------
     # From base.
