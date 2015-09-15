@@ -1,4 +1,5 @@
 from panoptes.ling.glue.correlative import SurfaceCorrelative
+from panoptes.ling.glue.grammatical_number import N3, N5
 from panoptes.ling.glue.relation import RelationArgType
 from panoptes.ling.tree.deep.base import DeepArgument
 from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun

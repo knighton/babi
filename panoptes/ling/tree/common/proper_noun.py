@@ -11,8 +11,7 @@ class ProperNoun(CommonArgument):
     """
 
     def __init__(self, name, is_plur):
-        self.name = name
-        assert isinstance(self.name, tuple)
+        self.name = tuple(name)
         for s in self.name:
             assert isinstance(s, basestring)
 
