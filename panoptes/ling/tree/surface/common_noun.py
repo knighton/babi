@@ -375,7 +375,7 @@ class SurfaceCommonNoun(SurfaceArgument):
         gram_number = N3.from_str[d['gram_number']]
         gram_of_number = N5.from_str[d['gram_of_number']]
         explicit_number = loader.load(d['explicit_number'])
-        attributes = map(lambda loader.load, d['attributes'])
+        attributes = map(loader.load, d['attributes'])
         noun = d['noun']
         say_noun = d['say_noun']
 
