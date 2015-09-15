@@ -58,8 +58,10 @@ class SurfaceContentClause(SurfaceArgument):
         for p, n in self.preps_vargs:
             if p:
                 assert isinstance(p, tuple)
+
             if n:
                 assert isinstance(n, SurfaceArgument)
+            else:
                 missing_args += 1
         assert missing_args in (0, 1)
 
