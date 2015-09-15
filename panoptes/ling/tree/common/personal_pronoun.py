@@ -33,7 +33,7 @@ class PersonalPronoun(CommonArgument):
     # --------------------------------------------------------------------------
     # From base.
 
-    def to_d(self):
+    def dump(self):
         return {
             'type': 'PersonalPronoun',
             'declension': Declension.to_str[self.declension],
@@ -64,7 +64,7 @@ class PersonalPronoun(CommonArgument):
     # Static.
 
     @staticmethod
-    def from_d(d, recursion):
+    def load(d, loader):
         dec = Declension.from_str[d['declension']]
         ppcase = PersonalPronounCase.from_str[d['ppcase']]
         return PersonalPronoun(dec, ppcase)

@@ -105,21 +105,21 @@ class SurfaceCommonNoun(SurfaceArgument):
     # --------------------------------------------------------------------------
     # From base.
 
-    def to_d(self):
+    def dump(self):
         if self.possessor:
-            pos = self.possessor.to_d()
+            pos = self.possessor.dump()
         else:
             pos = None
 
         if self.explicit_number:
-            num = self.explicit_number.to_d()
+            num = self.explicit_number.dump()
         else:
             num = None
 
         preps_nargs = []
         for prep, arg in self.preps_nargs:
             if arg:
-                arg = arg.to_d()
+                arg = arg.dump()
             preps_nargs.append((prep, arg))
 
         return {
@@ -129,7 +129,7 @@ class SurfaceCommonNoun(SurfaceArgument):
             'gram_number': N3.to_str[self.gram_number],
             'gram_of_number': N5.to_str[self.gram_of_number],
             'explicit_number': num,
-            'attributes': map(lambda a: a.to_d(), self.attributes),
+            'attributes': map(lambda a: a.dump(), self.attributes),
             'noun': self.noun,
             'say_noun': self.say_noun,
             'preps_nargs': preps_nargs,
@@ -369,20 +369,20 @@ class SurfaceCommonNoun(SurfaceArgument):
     # Static.
 
     @staticmethod
-    def from_d(d, recursion):
-        possessor = recursion.from_d(d['possessor'])
+    def load(d, loader):
+        possessor = loader.load(d['possessor'])
         correlative = SurfaceCorrelative.from_str[d['correlative']]
         gram_number = N3.from_str[d['gram_number']]
         gram_of_number = N5.from_str[d['gram_of_number']]
-        explicit_number = recursion.from_d(d['explicit_number'])
-        attributes = map(lambda recursion.from_d, d['attributes'])
+        explicit_number = loader.load(d['explicit_number'])
+        attributes = map(lambda loader.load, d['attributes'])
         noun = d['noun']
         say_noun = d['say_noun']
 
         preps_nargs = []
         for prep, arg in d['preps_nargs']:
             if arg:
-                arg = recursion.from_d(arg)
+                arg = loader.load(arg)
             preps_nargs.append((prep, arg))
 
         return SurfaceCommonNoun(

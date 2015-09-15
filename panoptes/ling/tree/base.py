@@ -22,7 +22,7 @@ class BaseArgument(object):
     it will always be able to be used on its own.
     """
 
-    def to_d(self):
+    def dump(self):
         """
         -> dict
 

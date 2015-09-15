@@ -13,7 +13,7 @@ class ExistentialThere(CommonArgument):
     # --------------------------------------------------------------------------
     # From base.
 
-    def to_d(self):
+    def dump(self):
         return {
             'type': 'ExistentialThere',
         }
@@ -42,5 +42,5 @@ class ExistentialThere(CommonArgument):
     # Static.
 
     @staticmethod
-    def from_d(d, recursion):
+    def load(d, loader):
         return ExistentialThere()

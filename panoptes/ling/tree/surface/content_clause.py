@@ -68,17 +68,17 @@ class SurfaceContentClause(SurfaceArgument):
     # --------------------------------------------------------------------------
     # From base.
 
-    def to_d(self):
+    def dump(self):
         preps_vargs = []
         for prep, aarg in self.preps_vargs:
             if arg:
-                arg = arg.to_d()
+                arg = arg.dump()
             preps_vargs.append((prep, arg))
 
         return {
             'type': 'SurfaceContentClause',
             'complementizer': Complementizer.to_str[self.complementizer],
-            'verb': self.verb.to_d(),
+            'verb': self.verb.dump(),
             'preps_vargs': preps_vargs,
             'vmain_index': self.vmain_index,
         }
@@ -126,14 +126,14 @@ class SurfaceContentClause(SurfaceArgument):
     # Static.
 
     @staticmethod
-    def from_d(d, recursion):
+    def load(d, loader):
         complementizer = Complementizer.from_str[d['complementizer']]
-        verb = SurfaceVerb.to_d(d['verb'])
+        verb = SurfaceVerb.load(d['verb'])
 
         preps_vargs = []
         for prep, arg in d['preps_vargs']:
             if arg:
-                arg = recursion.from_d(arg)
+                arg = loader.load(arg)
             preps_vargs.append((prep, arg))
 
         vmain_index = d['vmain_index']

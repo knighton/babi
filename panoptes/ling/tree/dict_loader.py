@@ -12,8 +12,8 @@ class DictLoader(object):
     Layer of indirection for loading a syntactic tree from a dict.
 
     Tree objects can be recursive (contain other trees of a variety of types).
-    We call out to this, which bounces back into the child tree's from_d()
-    method.
+    We call out to this, which bounces back into the child tree's load()
+    method once we know what kind of tree it is.
     """
 
     def __init__(self):
@@ -32,13 +32,13 @@ class DictLoader(object):
             SurfaceContentClause,
         ]
 
-        self.type2from_d
+        self.type2load
         for c in classes:
-            self.type2from_d[c.__name__] = c.from_d
+            self.type2load[c.__name__] = c.load
 
-    def from_d(self, d):
+    def load(self, d):
         if d is None:
             return d
 
         type = d['type']
-        return self.type2from_d[type](d)
+        return self.type2load[type](d)

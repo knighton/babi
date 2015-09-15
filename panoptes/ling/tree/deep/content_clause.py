@@ -154,18 +154,18 @@ class DeepContentClause(DeepArgument):
     # --------------------------------------------------------------------------
     # From base.
 
-    def to_d(self):
+    def dump(self):
         rels_vargs = []
         for rel, arg in self.rels_vargs:
             rel = Relation.to_str[rel]
-            arg = arg.to_d()
+            arg = arg.dump()
             rels_vargs.append((rel, arg))
 
         return {
             'type': 'DeepContentClause',
             'status': Status.to_str[self.status],
             'purpose': Purpose.to_str[self.purpose],
-            'verb': self.verb.to_d(),
+            'verb': self.verb.dump(),
             'rels_vargs': rels_vargs,
             'subj_index': self.subj_index,
         }
@@ -253,12 +253,12 @@ class DeepContentClause(DeepArgument):
     # Static.
 
     @staticmethod
-    def from_d(d, recursion):
+    def load(d, loader):
         status = Status.from_str[d['status']]
         purpose = Purpose.from_str[d['purpose']]
-        verb = DeepVerb.from_d(d['verb'])
+        verb = DeepVerb.load(d['verb'])
         for rel, arg in d['rels_vargs']:
             rel = Relation.from_str[rel]
-            arg = recursion.from_d(arg)
+            arg = loader.load(arg)
         subj_index = d['subj_index']
         return DeepVerb(status, purpose, verb, rels_vargs, subj_index)

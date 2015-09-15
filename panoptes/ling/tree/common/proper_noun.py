@@ -22,7 +22,7 @@ class ProperNoun(CommonArgument):
     # --------------------------------------------------------------------------
     # From base.
 
-    def to_d(self):
+    def dump(self):
         return {
             'type': 'ProperNoun',
             'name': self.name,
@@ -57,5 +57,5 @@ class ProperNoun(CommonArgument):
     # Static.
 
     @staticmethod
-    def from_d(d, recursion):
+    def load(d, loader):
         return ProperNoun(d['name'], d['is_plur'])
