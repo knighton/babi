@@ -8,3 +8,10 @@ A_OR_AN = '<A_OR_AN>'
 #   "It is James'." -> It is James <APOS_S> .
 #   "Tim's cat" -> Tim <APOS_S> cat
 POSSESSIVE_MARK = '<APOS_S>'
+
+
+# We treat certain extremely common adverbs like "here" and "now" like they are
+# actually common nouns with a zero preposition.  Makes the deep structure a lot
+# saner.
+PLACE_PREP = '<PLACE_PREP>'
+TIME_PREP = '<TIME_PREP>'
