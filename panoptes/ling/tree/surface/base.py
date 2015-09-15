@@ -76,7 +76,8 @@ class SurfaceArgument(BaseArgument):
         Behavior is undefined if we cannot be a subject.
 
         Override this method in order to not have to say the full object
-        (matters for complex objects like ContentClause, CommonNoun, etc).
+        (matters for complex objects like SurfaceContentClause,
+        SurfaceCommonNoun, etc).
 
         TODO: SubjectConjugation enum.
         """

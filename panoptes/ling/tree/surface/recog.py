@@ -8,9 +8,9 @@ from panoptes.ling.glue.purpose import EndPunctClassifier
 from panoptes.ling.parse.parse import Parse
 from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.surface.base import SayContext, SayState
-from panoptes.ling.tree.surface.common_noun import CommonNoun
+from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
 from panoptes.ling.tree.surface.content_clause import Complementizer, \
-    ContentClause
+    SurfaceContentClause
 from panoptes.ling.tree.surface.sentence import Sentence
 from panoptes.ling.verb.verb import ModalFlavor
 
@@ -145,8 +145,9 @@ class ParseToSurface(object):
             attributes = []
             say_noun = True
             preps_nargs = []
-            n = CommonNoun(possessor, cor, n, of_n, explicit_number, attributes,
-                           noun, say_noun, preps_nargs)
+            n = SurfaceCommonNoun(
+                possessor, cor, n, of_n, explicit_number, attributes, noun,
+                say_noun, preps_nargs)
             nn.append(n)
         return nn
 
@@ -273,7 +274,7 @@ class ParseToSurface(object):
 
     def recognize_clause(self, root_token, is_root_clause):
         """
-        root token -> yields ContentClause
+        root token -> yields SurfaceContentClause
         """
         cc = []
         for verb_span_pair, vv in \
@@ -286,7 +287,7 @@ class ParseToSurface(object):
                         ctzr = Complementizer.ZERO
                         new_v = deepcopy(v)
                         new_v.conj = conj
-                        c = ContentClause(
+                        c = SurfaceContentClause(
                             ctzr, new_v, deepcopy(pp_nn), subj_argx)
                         cc.append(c)
         return cc

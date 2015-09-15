@@ -11,7 +11,7 @@ def is_noun_sentient(noun):
     return noun == 'person'
 
 
-class CommonNoun(SurfaceArgument):
+class SurfaceCommonNoun(SurfaceArgument):
     """
     (Recursive) noun phrases and bare common nouns, as well as different types
     of proforms that map to this structure.

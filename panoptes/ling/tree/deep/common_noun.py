@@ -1,8 +1,7 @@
 from panoptes.ling.glue.correlative import SurfaceCorrelative
 from panoptes.ling.glue.relation import RelationArgType
 from panoptes.ling.tree.deep.base import DeepArgument
-from panoptes.ling.tree.surface.common_noun import CommonNoun as \
-    SurfaceCommonNoun
+from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
 
 
 class DeepCommonNoun(DeepArgument):
@@ -143,6 +142,6 @@ class DeepCommonNoun(DeepArgument):
             arg = from_dicter.from_d(arg)
             rels_nargs.append((rel, arg))
 
-        return CommonNoun(
+        return DeepCommonNoun(
             possessor, correlative, gram_number, gram_of_number,
             explicit_number, attributes, noun, say_noun, rels_nargs)
