@@ -3,8 +3,9 @@ from collections import defaultdict
 from panoptes.etc.dicts import v2kk_from_k2v
 from panoptes.etc.enum import enum
 from panoptes.ling.glue.correlative import SurfaceCorrelative
-from panoptes.ling.glue.grammatical_number import N2, N3, N5, nx_to_nxs
-from panoptes.ling.glue.inflection import Conjugation
+from panoptes.ling.glue.grammatical_number import N2, N3, N5, nx_to_nx, \
+    nx_to_nxs
+from panoptes.ling.glue.inflection import Conjugation, N2_TO_CONJ
 from panoptes.ling.glue.magic_token import A_OR_AN
 from panoptes.ling.tree.surface.base import SayResult
 from panoptes.ling.tree.surface.util.count_restriction import CountRestriction
@@ -120,7 +121,7 @@ class CorrelativeManager(object):
         Correlative, n, of_n -> N2 or None if invalid
         """
         # Verify counts against its correlative field.
-        restriction, override_gram_num = seslf.cor2counts[cor]
+        restriction, override_gram_num = self.cor2counts[cor]
         if not self.count_restriction_checker.is_possible(restriction, n, of_n):
             return None
 

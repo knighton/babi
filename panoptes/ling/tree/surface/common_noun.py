@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from panoptes.ling.glue.correlative import SurfaceCorrelative
 from panoptes.ling.glue.grammatical_number import N3, N5, nx_le_nx_is_possible
+from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.glue.magic_token import POSSESSIVE_MARK
 from panoptes.ling.tree.surface.base import SayContext, SurfaceArgument
 
@@ -145,18 +146,18 @@ class CommonNoun(SurfaceArgument):
         """
         Eg, therefore
         """
-        if self.possessor or self.explicit_number or self.attrs:
+        if self.possessor or self.explicit_number or self.attributes:
             return None
 
         return state.shortcut_mgr.say(
             context.prep, self.gram_number, self.gram_of_number,
-            self.correlative, self.noun, idiolect.allow_archaic_shortcuts)
+            self.correlative, self.noun, idiolect.archaic_shortcuts)
 
     def say_head_as_correlative(self, state):
         """
         Eg, what
         """
-        if self.possessor or self.explicit_number or self.attrs:
+        if self.possessor or self.explicit_number or self.attributes:
             return None
 
         return state.correlative_mgr.say(
@@ -166,7 +167,7 @@ class CommonNoun(SurfaceArgument):
         """
         Eg, yours
         """
-        if self.explicit_number or self.attrs:
+        if self.explicit_number or self.attributes:
             return None
 
         if not isinstance(self.possessor, PersonalPronoun):
@@ -182,7 +183,7 @@ class CommonNoun(SurfaceArgument):
         """
         Eg, three
         """
-        if self.attrs:
+        if self.attributes:
             return None
 
         if self.possessor:
@@ -267,7 +268,7 @@ class CommonNoun(SurfaceArgument):
             r.tokens += r2.tokens
 
         # Say the attributes.
-        if self.attrs:
+        if self.attributes:
             assert False  # TODO: not in MVP.
 
         # Say the noun.
