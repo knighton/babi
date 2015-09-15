@@ -41,4 +41,4 @@ class ArgLoader(object):
             return d
 
         type = d['type']
-        return self.type2load[type](d)
+        return self.type2load[type](d, self)

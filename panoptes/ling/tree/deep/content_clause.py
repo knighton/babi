@@ -1,8 +1,10 @@
 from panoptes.etc.enum import enum
 from panoptes.ling.glue.purpose import Purpose
+from panoptes.ling.glue.relation import Relation
+from panoptes.ling.tree.base import ArgPosRestriction
 from panoptes.ling.tree.deep.base import DeepArgument
 from panoptes.ling.tree.surface.content_clause import Complementizer
-from panoptes.ling.verb.verb import DeepVerb
+from panoptes.ling.verb.verb import DeepVerb, ModalFlavor
 
 
 # The truth value of the clause.
@@ -110,12 +112,16 @@ def transform(orig_preps_vargs, subj_index, is_imperative, argx_to_front,
 
 
 class DeepContentClause(DeepArgument):
-    def __init__(self, status, purpose, verb, rels_vargs, subj_index):
+    def __init__(self, status, purpose, is_intense, verb, rels_vargs,
+                 subj_index):
         self.status = status
         assert Status.is_valid(self.status)
 
         self.purpose = purpose
         assert Purpose.is_valid(self.purpose)
+
+        self.is_intense = is_intense
+        assert isinstance(self.is_intense, bool)
 
         self.verb = verb
         assert isinstance(self.verb, DeepVerb)
@@ -166,6 +172,7 @@ class DeepContentClause(DeepArgument):
             'type': 'DeepContentClause',
             'status': Status.to_str[self.status],
             'purpose': Purpose.to_str[self.purpose],
+            'is_intense': self.is_intense,
             'verb': self.verb.dump(),
             'rels_vargs': rels_vargs,
             'subj_index': self.subj_index,
@@ -257,9 +264,16 @@ class DeepContentClause(DeepArgument):
     def load(d, loader):
         status = Status.from_str[d['status']]
         purpose = Purpose.from_str[d['purpose']]
+        is_intense = d['is_intense']
+
+        rels_vargs = []
         verb = DeepVerb.load(d['verb'])
         for rel, arg in d['rels_vargs']:
             rel = Relation.from_str[rel]
             arg = loader.load(arg)
+            rels_vargs.append((rel, arg))
+
         subj_index = d['subj_index']
-        return DeepVerb(status, purpose, verb, rels_vargs, subj_index)
+
+        return DeepContentClause(status, purpose, is_intense, verb, rels_vargs,
+                                 subj_index)

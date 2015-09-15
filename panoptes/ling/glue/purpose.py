@@ -120,6 +120,9 @@ class PurposeManager(object):
 
                 self.args2purposes[tuple(args)].append(info.purpose)
 
+    def get(self, purpose):
+        return self.purpose2info[purpose]
+
 
 class EndPunctClassifier(object):
     def classify(self, token):
