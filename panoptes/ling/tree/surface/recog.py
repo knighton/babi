@@ -284,11 +284,11 @@ class ParseToSurface(object):
             for v in vv:
                 for pp_nn in each_choose_one_from_each(ppp_nnn):
                     for conj in self.possible_conjugations(v, pp_nn, subj_argx):
-                        ctzr = Complementizer.ZERO
+                        complementizer = Complementizer.ZERO
                         new_v = deepcopy(v)
                         new_v.conj = conj
                         c = SurfaceContentClause(
-                            ctzr, new_v, deepcopy(pp_nn), subj_argx)
+                            complementizer, new_v, deepcopy(pp_nn), subj_argx)
                         cc.append(c)
         return cc
 

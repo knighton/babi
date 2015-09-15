@@ -244,10 +244,10 @@ class DeepContentClause(DeepArgument):
             idiolect.stranding)
 
         # Get the complementizer.
-        ctzr = STATUS2COMPLEMENTIZER[self.status]
+        complementizer = STATUS2COMPLEMENTIZER[self.status]
 
         return SurfaceContentClause(
-            ctzr, surface_verb, preps_surfs, vmain_index)
+            complementizer, surface_verb, preps_surfs, vmain_index)
 
     # --------------------------------------------------------------------------
     # Static.

@@ -15,11 +15,11 @@ COMPLEMENTIZER2WORD = {
 
 
 class SurfaceContentClause(SurfaceArgument):
-    def __init__(self, ctzr, verb, preps_vargs, vmain_index):
+    def __init__(self, complementizer, verb, preps_vargs, vmain_index):
         # Complementizer.
         #
         # If we are the content of a relative clause, can only be ZERO.
-        self.ctzr = ctzr  # Complementizer.
+        self.complementizer = complementizer  # Complementizer.
 
         # SurfaceVerb.  Some of its fields are tield to other parameters.
         self.verb = verb  # SurfaceVerb.
@@ -47,9 +47,9 @@ class SurfaceContentClause(SurfaceArgument):
         # is guaranteed, making it just an offset (eg, "do you?").  Pre-words
         # only means that the purpose is a question.  Relative clauses cannot
         # have that purpose.  So vmain_index works in all cases.
-        self.vmain_index = vmain_index  # Int.
+        self.vmain_index = vmain_index  # int.
 
-        assert Complementizer.is_valid(self.ctzr)
+        assert Complementizer.is_valid(self.complementizer)
 
         assert isinstance(self.verb, SurfaceVerb)
 
@@ -76,7 +76,7 @@ class SurfaceContentClause(SurfaceArgument):
             preps_vargs.append((prep, arg))
 
         return {
-            'ctzr': Complementizer.to_str[self.ctzr],
+            'complementizer': Complementizer.to_str[self.complementizer],
             'verb': self.verb.to_d(),
             'preps_vargs': preps_vargs,
             'vmain_index': self.vmain_index,
@@ -92,7 +92,7 @@ class SurfaceContentClause(SurfaceArgument):
         ss = []
 
         # Get the complementizer, if any.
-        s = COMPLEMENTIZER2WORD[self.ctzr]
+        s = COMPLEMENTIZER2WORD[self.complementizer]
         if s:
             ss.append(s)
 
@@ -126,7 +126,7 @@ class SurfaceContentClause(SurfaceArgument):
 
     @staticmethod
     def from_d(d, recursion):
-        ctzr = Complementizer.from_str[d['ctzr']]
+        complementizer = Complementizer.from_str[d['complementizer']]
         verb = SurfaceVerb.to_d(d['verb'])
 
         preps_vargs = []
@@ -137,4 +137,5 @@ class SurfaceContentClause(SurfaceArgument):
 
         vmain_index = d['vmain_index']
 
-        return SurfaceContentClause(ctzr, verb, preps_vargs, vmain_index)
+        return SurfaceContentClause(
+            complementizer, verb, preps_vargs, vmain_index)
