@@ -126,20 +126,20 @@ class DeepCommonNoun(DeepArgument):
     # Static.
 
     @staticmethod
-    def from_d(d, from_dicter):
-        possessor = from_dicter.from_d(d['possessor'])
+    def from_d(d, recursion):
+        possessor = recursion.from_d(d['possessor'])
         correlative = SurfaceCorrelative.from_str[d['correlative']]
         gram_number = N3.from_str[d['gram_number']]
         gram_of_number = N5.from_str[d['gram_of_number']]
-        explicit_number = from_dicter.from_d(d['explicit_number'])
-        attributes = map(from_dicter.from_d, d['attributes'])
+        explicit_number = recursion.from_d(d['explicit_number'])
+        attributes = map(recursion.from_d, d['attributes'])
         noun = d['noun']
         say_noun = d['say_noun']
 
         rels_nargs = []
         for rel, arg in d['rels_nargs']:
             rel = Relation.from_str[rel]
-            arg = from_dicter.from_d(arg)
+            arg = recursion.from_d(arg)
             rels_nargs.append((rel, arg))
 
         return DeepCommonNoun(

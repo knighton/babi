@@ -253,12 +253,12 @@ class DeepContentClause(DeepArgument):
     # Static.
 
     @staticmethod
-    def from_d(d, from_dicter):
+    def from_d(d, recursion):
         status = Status.from_str[d['status']]
         purpose = Purpose.from_str[d['purpose']]
         verb = DeepVerb.from_d(d['verb'])
         for rel, arg in d['rels_vargs']:
             rel = Relation.from_str[rel]
-            arg = from_dicter.from_d(arg)
+            arg = recursion.from_d(arg)
         subj_index = d['subj_index']
         return DeepVerb(status, purpose, verb, rels_vargs, subj_index)

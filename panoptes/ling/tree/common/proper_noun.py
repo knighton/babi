@@ -19,8 +19,23 @@ class ProperNoun(CommonArgument):
         self.is_plur = is_plur
         assert isinstance(self.is_plur, bool)
 
+    # --------------------------------------------------------------------------
+    # From base.
+
+    def to_d(self):
+        return {
+            'name': self.name,
+            'is_plur': self.is_plur,
+        }
+
+    # --------------------------------------------------------------------------
+    # From deep.
+
     def relation_arg_type(self):
         return RelationArgType.INERT
+
+    # --------------------------------------------------------------------------
+    # From surface.
 
     def decide_conjugation(self, state, idiolect, context):
         if self.is_plur:
@@ -36,3 +51,10 @@ class ProperNoun(CommonArgument):
         conj = self.decide_conjugation(state, idiolect, context)
 
         return SayResult(tokens=ss, conjugation=conj, eat_prep=False)
+
+    # --------------------------------------------------------------------------
+    # Static.
+
+    @staticmethod
+    def from_d(d, recursion):
+        return ProperNoun(d['name'], d['is_plur'])

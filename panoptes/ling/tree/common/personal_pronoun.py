@@ -30,19 +30,43 @@ class PersonalPronoun(CommonArgument):
         self.ppcase = ppcase
         assert PersonalPronounCase.is_valid(self.ppcase)
 
-    def relation_arg_type(self):
-        return RelationArgType.INERT
+    # --------------------------------------------------------------------------
+    # From base.
+
+    def to_d(self):
+        return {
+            'declension': Declension.to_str[self.declension],
+            'ppcase': PersonalPronounCase.to_str[self.ppcase],
+        }
 
     def arg_position_restriction(self):
         # This is not called for personal determiners, which exclusively are
         # found in the cor_or_pos field of common nouns, so we're fine.
         return PPCASE2ARG_POS_RES[self.ppcase]
 
+    # --------------------------------------------------------------------------
+    # From deep.
+
+    def relation_arg_type(self):
+        return RelationArgType.INERT
+
+    # --------------------------------------------------------------------------
+    # From surface.
+
     def decide_conjugation(self, state, idiolect, context):
         return state.personal_mgr.perspro_decide_conjugation(self)
 
     def say(self, state, idiolect, context):
         return state.personal_mgr.perspro_say(self, idiolect.whom)
+
+    # --------------------------------------------------------------------------
+    # Static.
+
+    @staticmethod
+    def from_d(d, recursion):
+        dec = Declension.from_str[d['declension']]
+        ppcase = PersonalPronounCase.from_str[d['ppcase']]
+        return PersonalPronoun(dec, ppcase)
 
 
 def table_from_str(s, row_enum, col_enum, invalid_entry):
