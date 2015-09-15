@@ -11,7 +11,7 @@ from panoptes.ling.tree.surface.base import SayContext, SayState
 from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
 from panoptes.ling.tree.surface.content_clause import Complementizer, \
     SurfaceContentClause
-from panoptes.ling.tree.surface.sentence import Sentence
+from panoptes.ling.tree.surface.sentence import SurfaceSentence
 from panoptes.ling.verb.verb import ModalFlavor
 
 
@@ -305,7 +305,7 @@ class ParseToSurface(object):
 
     def recog(self, parse):
         """
-        Parse -> yields Sentence
+        Parse -> yields SurfaceSentence
         """
         assert isinstance(parse, Parse)
 
@@ -313,4 +313,4 @@ class ParseToSurface(object):
         end_punct = self.end_punct_clf.classify(parse.tokens[-1].text)
 
         for clause in self.recognize_clause(parse.root, is_root_clause=True):
-            yield Sentence(clause, end_punct)
+            yield SurfaceSentence(clause, end_punct)

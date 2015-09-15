@@ -1,6 +1,7 @@
 from panoptes.etc.enum import enum
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.tree.deep.base import DeepArgument
+from panoptes.ling.tree.surface.content_clause import Complementizer
 from panoptes.ling.verb.verb import DeepVerb
 
 

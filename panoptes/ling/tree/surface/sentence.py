@@ -1,7 +1,7 @@
 from panoptes.ling.tree.surface.content_clause import SurfaceContentClause
 
 
-class Sentence(object):
+class SurfaceSentence(object):
     def __init__(self, root, end_punct):
         self.root = root
         assert isinstance(self.root, SurfaceContentClause)

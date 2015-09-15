@@ -7,7 +7,7 @@ from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
 from panoptes.ling.tree.surface.content_clause import SurfaceContentClause
 
 
-class DictLoader(object):
+class ArgLoader(object):
     """
     Layer of indirection for loading a syntactic tree from a dict.
 
@@ -32,7 +32,7 @@ class DictLoader(object):
             SurfaceContentClause,
         ]
 
-        self.type2load
+        self.type2load = {}
         for c in classes:
             self.type2load[c.__name__] = c.load
 
