@@ -1,0 +1,260 @@
+  - text: I love you!
+    structure:
+        root:
+            type: DeepContentClause
+            status: ACTUAL
+            purpose: INFO
+            is_intense: true
+            verb:
+                lemma: love
+                polarity:
+                    tf: true
+                    is_contrary: false
+                tense: PRESENT
+                aspect:
+                    is_perf: false
+                    is_prog: false
+                modality:
+                    flavor: INDICATIVE
+                    is_cond: false
+                verb_form: FINITE
+                is_pro_verb: false
+            rels_vargs:
+              -
+                  - AGENT
+                  - type: PersonalPronoun
+                    declension: I
+                    ppcase: SUBJECT
+              -
+                  - TARGET
+                  - type: PersonalPronoun
+                    declension: YOU
+                    ppcase: OBJECT
+            subj_index: 0
+  - text: You were spotted by me.
+    structure:
+        root:
+            type: DeepContentClause
+            status: ACTUAL
+            purpose: INFO
+            is_intense: false
+            verb:
+                lemma: spot
+                polarity:
+                    tf: true
+                    is_contrary: false
+                tense: PAST
+                aspect:
+                    is_perf: false
+                    is_prog: false
+                modality:
+                    flavor: INDICATIVE
+                    is_cond: false
+                verb_form: FINITE
+                is_pro_verb: false
+            rels_vargs:
+              -
+                  - TARGET
+                  - type: PersonalPronoun
+                    declension: YOU
+                    ppcase: SUBJECT
+              -
+                  - AGENT
+                  - type: PersonalPronoun
+                    declension: I
+                    ppcase: OBJECT
+            subj_index: 0
+  - text: Tim was shown the boat.
+    structure:
+        root:
+            type: DeepContentClause
+            status: ACTUAL
+            purpose: INFO
+            is_intense: false
+            verb:
+                lemma: show
+                polarity:
+                    tf: true
+                    is_contrary: false
+                tense: PAST
+                aspect:
+                    is_perf: false
+                    is_prog: false
+                modality:
+                    flavor: INDICATIVE
+                    is_cond: false
+                verb_form: FINITE
+                is_pro_verb: false
+            rels_vargs:
+              -
+                  - TO_RECIPIENT
+                  - type: ProperNoun
+                    name: [Tim]
+                    is_plur: false
+              -
+                  - TARGET
+                  - type: DeepCommonNoun
+                    possessor:
+                    correlative: DEF
+                    gram_number: SING
+                    gram_of_number: MANY
+                    explicit_number:
+                    attributes: []
+                    noun: boat 
+                    say_noun: true
+                    rels_nargs: []
+            subj_index: 0
+  - text: The sailors dog the barmaids.
+    structure:
+        root:
+            type: DeepContentClause
+            status: ACTUAL
+            purpose: INFO
+            is_intense: false
+            verb:
+                lemma: dog
+                polarity:
+                    tf: true
+                    is_contrary: false
+                tense: PRESENT
+                aspect:
+                    is_perf: false
+                    is_prog: false
+                modality:
+                    flavor: INDICATIVE
+                    is_cond: false
+                verb_form: FINITE
+                is_pro_verb: false
+            rels_vargs:
+              -
+                  - AGENT
+                  - type: DeepCommonNoun
+                    possessor:
+                    correlative: DEF
+                    gram_number: PLUR
+                    gram_of_number: FEW
+                    explicit_number:
+                    attributes: []
+                    noun: sailor
+                    say_noun: true
+                    rels_nargs: []
+              -
+                  - TARGET
+                  - type: DeepCommonNoun
+                    possessor:
+                    correlative: DEF
+                    gram_number: PLUR
+                    gram_of_number: FEW
+                    explicit_number:
+                    attributes: []
+                    noun: barmaid
+                    say_noun: true
+                    rels_nargs: []
+            subj_index: 0
+  - text: Casey has been baking him a cake.
+    structure:
+        root:
+            type: DeepContentClause
+            status: ACTUAL
+            purpose: INFO
+            is_intense: false
+            verb:
+                lemma: bake
+                polarity:
+                    tf: true
+                    is_contrary: false
+                tense: PRESENT
+                aspect:
+                    is_perf: true
+                    is_prog: true
+                modality:
+                    flavor: INDICATIVE
+                    is_cond: false
+                verb_form: FINITE
+                is_pro_verb: false
+            rels_vargs:
+              -
+                  - AGENT
+                  - type: ProperNoun
+                    name: [Casey]
+                    is_plur: false
+              -
+                  - FOR_RECIPIENT
+                  - type: PersonalPronoun
+                    declension: HE
+                    ppcase: OBJECT
+              -
+                  - TARGET
+                  - type: DeepCommonNoun
+                    possessor:
+                    correlative: INDEF
+                    gram_number: SING
+                    gram_of_number: MANY
+                    explicit_number:
+                    attributes: []
+                    noun: cake
+                    say_noun: true
+                    rels_nargs: []
+            subj_index: 0
+  - text: Your books might be there now.
+    structure:
+        root:
+            type: DeepContentClause
+            status: ACTUAL
+            purpose: INFO
+            is_intense: false
+            verb:
+                lemma: is
+                polarity:
+                    tf: true
+                    is_contrary: false
+                tense: PRESENT
+                aspect:
+                    is_perf: false
+                    is_prog: false
+                modality:
+                    flavor: ABILITY
+                    is_cond: true
+                verb_form: FINITE
+                is_pro_verb: false
+            rels_vargs:
+              -
+                  - AGENT
+                  - type: DeepCommonNoun
+                    possessor:
+                        type: PersonalPronoun
+                        declension: YOU
+                        ppcase: OBJECT
+                    correlative: DEF
+                    gram_number: PLUR
+                    gram_of_number: MANY
+                    explicit_number:
+                    attributes: []
+                    noun: book
+                    say_noun: true
+                    rels_nargs: []
+              -
+                  - PLACE
+                  - type: DeepCommonNoun
+                    possessor:
+                    correlative: DIST
+                    gram_number: SING
+                    gram_of_number: MANY
+                    explicit_number:
+                    attributes: []
+                    noun: place
+                    say_noun: true
+                    rels_nargs: []
+              -
+                  - TIME
+                  - type: DeepCommonNoun
+                    possessor:
+                    correlative: PROX
+                    gram_number: SING
+                    gram_of_number: MANY
+                    explicit_number:
+                    attributes: []
+                    noun: time
+                    say_noun: true
+                    rels_nargs: []
+            subj_index: 0
