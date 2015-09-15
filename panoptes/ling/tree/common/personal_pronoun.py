@@ -35,6 +35,7 @@ class PersonalPronoun(CommonArgument):
 
     def to_d(self):
         return {
+            'type': 'PersonalPronoun',
             'declension': Declension.to_str[self.declension],
             'ppcase': PersonalPronounCase.to_str[self.ppcase],
         }

@@ -123,6 +123,7 @@ class SurfaceCommonNoun(SurfaceArgument):
             preps_nargs.append((prep, arg))
 
         return {
+            'type': 'SurfaceCommonNoun',
             'possessor': pos,
             'correlative': SurfaceCorrelative.to_str[self.correlative],
             'gram_number': N3.to_str[self.gram_number],

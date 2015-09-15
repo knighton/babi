@@ -24,6 +24,7 @@ class ProperNoun(CommonArgument):
 
     def to_d(self):
         return {
+            'type': 'ProperNoun',
             'name': self.name,
             'is_plur': self.is_plur,
         }

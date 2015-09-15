@@ -76,6 +76,7 @@ class SurfaceContentClause(SurfaceArgument):
             preps_vargs.append((prep, arg))
 
         return {
+            'type': 'SurfaceContentClause',
             'complementizer': Complementizer.to_str[self.complementizer],
             'verb': self.verb.to_d(),
             'preps_vargs': preps_vargs,
