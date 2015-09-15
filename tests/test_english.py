@@ -1,3 +1,4 @@
+import json
 import yaml
 
 from panoptes.ling.tree.deep.sentence import DeepSentence
@@ -12,6 +13,7 @@ def main():
         text = e['text']
         structure = e['structure']
         dsen = DeepSentence.load(structure, loader)
+        print json.dumps(dsen.dump(), indent=4)
 
 
 if __name__ == '__main__':

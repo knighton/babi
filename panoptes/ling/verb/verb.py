@@ -194,10 +194,11 @@ class DeepVerb(object):
     @staticmethod
     def load(d):
         polarity = Polarity.load(d['polarity'])
+        tense = Tense.from_str[d['tense']]
         aspect = Aspect.load(d['aspect'])
         modality = Modality.load(d['modality'])
         verb_form = VerbForm.from_str[d['verb_form']]
-        return DeepVerb(d['lemma'], polarity, d['tense'], aspect, modality,
+        return DeepVerb(d['lemma'], polarity, tense, aspect, modality,
                         verb_form, d['is_pro_verb'])
 
 

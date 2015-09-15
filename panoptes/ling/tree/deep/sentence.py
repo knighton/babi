@@ -10,7 +10,7 @@ class DeepSentence(object):
 
     def dump(self):
         return {
-            'root': self.root.to_d(),
+            'root': self.root.dump(),
         }
 
     def to_surface(self, state, idiolect):
