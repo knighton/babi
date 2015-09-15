@@ -102,6 +102,38 @@ class SurfaceCommonNoun(SurfaceArgument):
                 count += 1
         assert count in (0, 1)
 
+    # --------------------------------------------------------------------------
+    # From base.
+
+    def to_d(self):
+        if self.possessor:
+            pos = self.possessor.to_d()
+        else:
+            pos = None
+
+        if self.explicit_number:
+            num = self.explicit_number.to_d()
+        else:
+            num = None
+
+        preps_nargs = []
+        for prep, arg in self.preps_nargs:
+            if arg:
+                arg = arg.to_d()
+            preps_nargs.append((prep, arg))
+
+        return {
+            'possessor': pos,
+            'correlative': SurfaceCorrelative.to_str[self.correlative],
+            'gram_number': N3.to_str[self.gram_number],
+            'gram_of_number': N5.to_str[self.gram_of_number],
+            'explicit_number': num,
+            'attributes': map(lambda a: a.to_d(), self.attributes),
+            'noun': self.noun,
+            'say_noun': self.say_noun,
+            'preps_nargs': preps_nargs,
+        }
+
     def is_interrogative(self):
         if self.correlative == SurfaceCorrelative.INTR:
             return True
@@ -124,6 +156,9 @@ class SurfaceCommonNoun(SurfaceArgument):
                 return True
 
         return False
+
+    # --------------------------------------------------------------------------
+    # From surface.
 
     def is_sentient(self):
         """
@@ -328,3 +363,27 @@ class SurfaceCommonNoun(SurfaceArgument):
             r.tokens.append(POSSESSIVE_MARK)
 
         return r
+
+    # --------------------------------------------------------------------------
+    # Static.
+
+    @staticmethod
+    def from_d(d, recursion):
+        possessor = recursion.from_d(d['possessor'])
+        correlative = SurfaceCorrelative.from_str[d['correlative']]
+        gram_number = N3.from_str[d['gram_number']]
+        gram_of_number = N5.from_str[d['gram_of_number']]
+        explicit_number = recursion.from_d(d['explicit_number'])
+        attributes = map(lambda recursion.from_d, d['attributes'])
+        noun = d['noun']
+        say_noun = d['say_noun']
+
+        preps_nargs = []
+        for prep, arg in d['preps_nargs']:
+            if arg:
+                arg = recursion.from_d(arg)
+            preps_nargs.append((prep, arg))
+
+        return SurfaceCommonNoun(
+            possessor, correlative, gram_number, gram_of_number,
+            explicit_number, attributes, noun, say_noun)

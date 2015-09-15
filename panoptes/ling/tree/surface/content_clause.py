@@ -14,7 +14,7 @@ COMPLEMENTIZER2WORD = {
 }
 
 
-class ContentClause(SurfaceArgument):
+class SurfaceContentClause(SurfaceArgument):
     def __init__(self, ctzr, verb, preps_vargs, vmain_index):
         # Complementizer.
         #
@@ -49,7 +49,6 @@ class ContentClause(SurfaceArgument):
         # have that purpose.  So vmain_index works in all cases.
         self.vmain_index = vmain_index  # Int.
 
-    def check(self):
         assert Complementizer.is_valid(self.ctzr)
 
         assert isinstance(self.verb, SurfaceVerb)
@@ -65,6 +64,26 @@ class ContentClause(SurfaceArgument):
 
         assert isinstance(self.vmain_index, int)
         assert 0 <= self.vmain_index <= len(self.preps_vargs)
+
+    # --------------------------------------------------------------------------
+    # From base.
+
+    def to_d(self):
+        preps_vargs = []
+        for prep, aarg in self.preps_vargs:
+            if arg:
+                arg = arg.to_d()
+            preps_vargs.append((prep, arg))
+
+        return {
+            'ctzr': Complementizer.to_str[self.ctzr],
+            'verb': self.verb.to_d(),
+            'preps_vargs': preps_vargs,
+            'vmain_index': self.vmain_index,
+        }
+
+    # --------------------------------------------------------------------------
+    # From surface.
 
     def decide_conjugation(self, state):
         return Conjugation.S3
@@ -101,3 +120,21 @@ class ContentClause(SurfaceArgument):
         conj = Conjugation.S3
 
         return SayResult(tokens=ss, conjugation=conj, eat_prep=False)
+
+    # --------------------------------------------------------------------------
+    # Static.
+
+    @staticmethod
+    def from_d(d, recursion):
+        ctzr = Complementizer.from_str[d['ctzr']]
+        verb = SurfaceVerb.to_d(d['verb'])
+
+        preps_vargs = []
+        for prep, arg in d['preps_vargs']:
+            if arg:
+                arg = recursion.from_d(arg)
+            preps_vargs.append((prep, arg))
+
+        vmain_index = d['vmain_index']
+
+        return SurfaceContentClause(ctzr, verb, preps_vargs, vmain_index)
