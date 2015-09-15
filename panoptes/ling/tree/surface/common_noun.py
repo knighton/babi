@@ -120,7 +120,7 @@ class SurfaceCommonNoun(SurfaceArgument):
         for prep, arg in self.preps_nargs:
             if arg:
                 arg = arg.dump()
-            preps_nargs.append((prep, arg))
+            preps_nargs.append([prep, arg])
 
         return {
             'type': 'SurfaceCommonNoun',

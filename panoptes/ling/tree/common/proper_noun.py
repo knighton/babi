@@ -11,7 +11,8 @@ class ProperNoun(CommonArgument):
     """
 
     def __init__(self, name, is_plur):
-        self.name = tuple(name)
+        self.name = name
+        assert isinstance(self.name, tuple)
         for s in self.name:
             assert isinstance(s, basestring)
 
@@ -24,7 +25,7 @@ class ProperNoun(CommonArgument):
     def dump(self):
         return {
             'type': 'ProperNoun',
-            'name': self.name,
+            'name': list(self.name),
             'is_plur': self.is_plur,
         }
 
@@ -57,4 +58,4 @@ class ProperNoun(CommonArgument):
 
     @staticmethod
     def load(d, loader):
-        return ProperNoun(d['name'], d['is_plur'])
+        return ProperNoun(tuple(d['name']), d['is_plur'])

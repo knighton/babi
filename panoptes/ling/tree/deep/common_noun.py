@@ -117,7 +117,7 @@ class DeepCommonNoun(DeepArgument):
             arg_type = arg.relation_arg_type()
             prep = state.relation_mgr.get(rel).decide_prep(arg_type)
             narg = arg.to_surface(idiolect)
-            preps_nargs.append((prep, narg))
+            preps_nargs.append([prep, narg])
 
         return SurfaceCommonNoun(
             possessor, self.correlative, self.gram_number, self.gram_of_number,

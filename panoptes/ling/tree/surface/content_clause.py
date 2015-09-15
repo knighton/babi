@@ -76,7 +76,7 @@ class SurfaceContentClause(SurfaceArgument):
         for prep, aarg in self.preps_vargs:
             if arg:
                 arg = arg.dump()
-            preps_vargs.append((prep, arg))
+            preps_vargs.append([prep, arg])
 
         return {
             'type': 'SurfaceContentClause',

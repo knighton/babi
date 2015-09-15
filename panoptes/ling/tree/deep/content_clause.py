@@ -166,7 +166,7 @@ class DeepContentClause(DeepArgument):
         for rel, arg in self.rels_vargs:
             rel = Relation.to_str[rel]
             arg = arg.dump()
-            rels_vargs.append((rel, arg))
+            rels_vargs.append([rel, arg])
 
         return {
             'type': 'DeepContentClause',

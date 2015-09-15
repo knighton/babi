@@ -13,7 +13,8 @@ def main():
         text = e['text']
         structure = e['structure']
         dsen = DeepSentence.load(structure, loader)
-        print json.dumps(dsen.dump(), indent=4)
+        recreate_structure = dsen.dump()
+        assert structure == recreate_structure
 
 
 if __name__ == '__main__':
