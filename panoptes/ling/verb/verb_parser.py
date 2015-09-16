@@ -93,7 +93,6 @@ def save_lookup_tables(be, pro, deverbed, f):
     pro_verb_s2nn = to_ints(pro, options_per_field, zz)
     deverbed_s2nn = to_ints(deverbed, options_per_field, zz)
     d = {
-        'options_per_field': options_per_field,
         'be': be_s2nn,
         'pro-verb': pro_verb_s2nn,
         'deverbed': deverbed_s2nn,
@@ -118,9 +117,10 @@ def load_lookup_tables(f):
     """
     f -> be, pro, deverbed
     """
-    d = json.load(open(f))
-    options_per_field = d['options_per_field']
+    verbs_used = ['be', 'see', MAGIC_INTS_LEMMA]
+    options_per_field = SurfaceVerb.all_options(verbs_used, [False, True])
     zz = map(len, options_per_field)
+    d = json.load(open(f))
     be = from_ints(d['be'], options_per_field, zz)
     pro = from_ints(d['pro-verb'], options_per_field, zz)
     deverbed = from_ints(d['deverbed'], options_per_field, zz)
