@@ -3,7 +3,7 @@ from panoptes.ling.glue.purpose import PurposeManager
 from panoptes.ling.glue.relation import RelationManager
 from panoptes.ling.morph.plural import PluralManager
 from panoptes.ling.parse.parser import Parser as TextToParse
-from panoptes.ling.tree.deep.base import DeepState
+from panoptes.ling.tree.deep.base import TransformState
 from panoptes.ling.tree.common.personal_pronoun import PersonalManager
 from panoptes.ling.tree.surface.base import SayContext, SayState
 from panoptes.ling.tree.surface.recog import ParseToSurface
@@ -49,7 +49,7 @@ class English(object):
         purpose_mgr = PurposeManager()
         relation_mgr = RelationManager()
         self.transform_state = \
-            DeepState(arbitrary_say_context, purpose_mgr, relation_mgr)
+            TransformState(arbitrary_say_context, purpose_mgr, relation_mgr)
 
         # Text -> surface structure -> deep structure.
         self.text_to_parse = TextToParse()
