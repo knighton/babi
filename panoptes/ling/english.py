@@ -40,7 +40,7 @@ class English(object):
 
         self.say_state = SayState(
             correlative_mgr, inflection_mgr, personal_mgr, plural_mgr,
-            shortcut_mgr)
+            shortcut_mgr, verb_mgr)
 
         # The SayContext is needed for conjugation.  None of its fields affect
         # conjugation for any object.
@@ -66,6 +66,7 @@ class English(object):
         if False:
             yield 7  # TODO: hack to yield nothing until this is implemented.
 
-    def text_from_dsen(self, dsen):
-        ssen = dsen.to_surface(self.transform_state, self.say_state, idiolect)
+    def text_from_dsen(self, dsen, idiolect):
+        ssen = dsen.to_surface(
+            self.transform_state, self.say_state, idiolect)
         return ssen.say(self.say_state, idiolect)

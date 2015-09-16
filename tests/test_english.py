@@ -1,11 +1,15 @@
 import json
 import yaml
 
-from panoptes.ling.tree.deep.sentence import DeepSentence
+from panoptes.ling.glue.idiolect import Idiolect
 from panoptes.ling.tree.arg_loader import ArgLoader
+from panoptes.ling.tree.deep.sentence import DeepSentence
+from panoptes.ling.english import English
 
 
 def main():
+    english = English()
+    idiolect = Idiolect()
     loader = ArgLoader()
     fn = 'tests/english.yaml'
     ee = yaml.load(open(fn))
@@ -13,8 +17,11 @@ def main():
         text = e['text']
         structure = e['structure']
         dsen = DeepSentence.load(structure, loader)
-        recreate_structure = dsen.dump()
-        assert structure == recreate_structure
+
+        new_structure = dsen.dump()
+        assert structure == new_structure
+
+        new_text = english.text_from_dsen(dsen, idiolect)
 
 
 if __name__ == '__main__':

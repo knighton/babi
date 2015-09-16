@@ -9,12 +9,13 @@ class SayState(object):
     """
 
     def __init__(self, correlative_mgr, inflection_mgr, personal_mgr,
-                 plural_mgr, shortcut_mgr):
+                 plural_mgr, shortcut_mgr, verb_mgr):
         self.correlative_mgr = correlative_mgr  # CorrelativeManager.
         self.inflection_mgr = inflection_mgr    # InflectionManager.
         self.personal_mgr = personal_mgr        # PersonalManager.
         self.plural_mgr = plural_mgr            # PluralManager.
         self.shortcut_mgr = shortcut_mgr        # ShortcutManager.
+        self.verb_mgr = verb_mgr                # VerbManager.
 
 
 class SayContext(object):

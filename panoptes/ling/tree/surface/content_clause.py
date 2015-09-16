@@ -1,6 +1,6 @@
 from panoptes.etc.enum import enum
 from panoptes.ling.glue.inflection import Conjugation
-from panoptes.ling.tree.surface.base import SurfaceArgument
+from panoptes.ling.tree.surface.base import SayContext, SurfaceArgument
 from panoptes.ling.verb.verb import SurfaceVerb
 
 
@@ -89,16 +89,16 @@ class SurfaceContentClause(SurfaceArgument):
     # --------------------------------------------------------------------------
     # From surface.
 
-    def decide_conjugation(self, state):
+    def decide_conjugation(self, state, idiolect, context):
         return Conjugation.S3
 
-    def say(self, state, context):
+    def say(self, state, idiolect, context):
         ss = []
 
         # Get the complementizer, if any.
-        s = COMPLEMENTIZER2WORD[self.complementizer]
-        if s:
-            ss.append(s)
+        ctzr = COMPLEMENTIZER2WORD[self.complementizer]
+        if ctzr:
+            ss.append(ctzr)
 
         # Say the verb.
         #
@@ -115,8 +115,33 @@ class SurfaceContentClause(SurfaceArgument):
                 ss += verb_main_tokens
 
             if varg:
-                r = varg.say(state, sub_context)
+                if context.has_left:
+                    left = True
+                elif ctzr:
+                    left = True
+                else:
+                    left = 0 < i
+
+                if context.has_right:
+                    right = True
+                elif i < len(self.preps_vargs) - 1:
+                    right = True
+                elif self.vmain_index == len(self.preps_vargs):
+                    right = True
+                else:
+                    right = False
+
+                sub_context = SayContext(
+                    prep=prep, has_left=left, has_right=right,
+                    is_possessive=False)
+
+                r = varg.say(state, idiolect, sub_context)
+                if prep and not r.eat_prep:
+                    ss += prep
                 ss += r.tokens
+            else:
+                if prep:
+                    ss += prep
         if self.vmain_index == len(self.preps_vargs):
             ss += verb_main_tokens
 

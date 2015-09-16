@@ -15,7 +15,7 @@ class DeepSentence(object):
 
     def to_surface(self, transform_state, say_state, idiolect):
         surf_root = self.root.to_surface(transform_state, say_state, idiolect)
-        end_punct = self.root.decide_end_punct()
+        end_punct = self.root.decide_end_punct(transform_state.purpose_mgr)
         return SurfaceSentence(surf_root, end_punct)
 
     @staticmethod

@@ -3,8 +3,10 @@ from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
 from panoptes.ling.tree.base import ArgPosRestriction
 from panoptes.ling.tree.deep.base import DeepArgument
-from panoptes.ling.tree.surface.content_clause import Complementizer
-from panoptes.ling.verb.verb import DeepVerb, ModalFlavor
+from panoptes.ling.tree.surface.content_clause import Complementizer, \
+    SurfaceContentClause
+from panoptes.ling.verb.verb import DeepVerb, ModalFlavor, \
+    RelativeContainment, SubjunctiveHandling, SurfaceVerb, Voice
 
 
 # The truth value of the clause.
@@ -79,7 +81,7 @@ def transform(orig_preps_vargs, subj_index, is_imperative, argx_to_front,
     rr = []
 
     # Pre-args.
-    for prep, arg in orig_preps_args[:subj_index]:
+    for prep, arg in orig_preps_vargs[:subj_index]:
         rr.append((pre, arg))
 
     # Fronted arg.
@@ -157,6 +159,15 @@ class DeepContentClause(DeepArgument):
             assert res != cant_be
 
         # TODO: crosscheck purpose and wh-arg count.
+
+    def decide_end_punct(self, purpose_mgr):
+        """
+        PurposeManager -> .?!
+
+        If we are the root clase, return the sentence-ending punctuation.
+        """
+        info = purpose_mgr.get(self.purpose)
+        return info.decide_end_punct(self.is_intense)
 
     # --------------------------------------------------------------------------
     # From base.
@@ -237,7 +248,8 @@ class DeepContentClause(DeepArgument):
         rels_types = []
         for rel, arg in self.rels_vargs:
             rels_types.append((rel, arg.relation_arg_type()))
-        preps = transform_state.relation_mgr.decide_preps(rels_types)
+        preps = transform_state.relation_mgr.decide_preps(
+            rels_types, self.subj_index)
 
         # Build list of properly prepositioned surface arguments (without
         # fronting or imperative subject omission).
