@@ -199,7 +199,11 @@ class ShortcutManager(object):
                 ss, is_archaic = self.cor_sh2ss_archaic[(cor, shortcut_col)]
                 if is_archaic and not use_archaic:
                     continue
-                eat_prep = False  # TODO: swallow preposition correctly.
+
+                # TODO: swallow preposition correctly.
+                eat_prep = shortcut_col in \
+                    (ShortcutColumn.PLACE, ShortcutColumn.TIME)
+
                 return SayResult(tokens=list(ss), conjugation=conj,
                                  eat_prep=eat_prep)
 
