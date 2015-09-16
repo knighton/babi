@@ -1,6 +1,7 @@
 from panoptes.etc.enum import enum
 from panoptes.ling.glue.inflection import Conjugation
-from panoptes.ling.tree.surface.base import SayContext, SurfaceArgument
+from panoptes.ling.tree.surface.base import SayContext, SayResult, \
+    SurfaceArgument
 from panoptes.ling.verb.verb import SurfaceVerb
 
 

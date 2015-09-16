@@ -5,6 +5,7 @@ from panoptes.ling.glue.magic_token import POSSESSIVE_MARK
 from panoptes.ling.glue.relation import RelationArgType
 from panoptes.ling.tree.base import ArgPosRestriction
 from panoptes.ling.tree.common.base import CommonArgument
+from panoptes.ling.tree.surface.base import SayResult
 
 
 PersonalPronounCase = enum('PersonalPronounCase = SUBJECT OBJECT REFLEXIVE')
@@ -166,7 +167,7 @@ class PersonalKnowledge(object):
         if use_whom:
             return self.whom.say(dec, pc)
         else:
-            return self.who.say(dec_pc)
+            return self.who.say(dec, pc)
 
     def parse(self, ss):
         return sorted(set(self.who.parse(ss) + self.whom.parse(ss)))
@@ -219,7 +220,7 @@ class PersonalManager(object):
         """
         pc = self.ppcase2pc[p.ppcase]
         ss = self.tables.say(p.declension, pc, use_whom)
-        conj = self.personal_pronoun_decide_conjugation(p)
+        conj = self.perspro_decide_conjugation(p)
         return SayResult(tokens=ss, conjugation=conj, eat_prep=False)
 
     def pospro_parse(self, ss):

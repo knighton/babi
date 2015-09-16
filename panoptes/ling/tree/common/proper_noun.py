@@ -45,12 +45,10 @@ class ProperNoun(CommonArgument):
             return Conjugation.S2
 
     def say(self, state, idiolect, context):
-        ss = list(name)
+        ss = list(self.name)
         if context.is_possessive:
             ss.append(POSSESSIVE_MARK)
-
         conj = self.decide_conjugation(state, idiolect, context)
-
         return SayResult(tokens=ss, conjugation=conj, eat_prep=False)
 
     # --------------------------------------------------------------------------

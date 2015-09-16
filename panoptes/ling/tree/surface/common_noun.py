@@ -353,7 +353,7 @@ class SurfaceCommonNoun(SurfaceArgument):
         sub_context = SayContext(
             prep=context.prep, has_left=context.has_left, has_right=right,
             is_possessive=context.is_possessive)
-        r = self.say_head(state, sub_context)
+        r = self.say_head(state, idiolect, sub_context)
 
         sub_context = SayContext(
             prep=None, has_left=True, has_right=context.has_right,
