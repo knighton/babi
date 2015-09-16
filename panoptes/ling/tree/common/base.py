@@ -7,7 +7,7 @@ class CommonArgument(DeepArgument, SurfaceArgument):
     An argument that can pass as both surface and deep structure.
     """
 
-    def to_surface(self, deep_state, surface_state, idiolect):
+    def to_surface(self, transform_state, say_state, idiolect):
         """
         -> SurfaceArgument
 

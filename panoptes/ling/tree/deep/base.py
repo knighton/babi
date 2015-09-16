@@ -1,7 +1,7 @@
 from panoptes.ling.tree.base import BaseArgument
 
 
-class DeepState(object):
+class TransformState(object):
     def __init__(self, arbitrary_say_context, purpose_mgr, relation_mgr):
         self.arbitrary_say_context = arbitrary_say_context  # SayContext
         self.relation_mgr = relation_mgr  # RelationManager
@@ -22,9 +22,9 @@ class DeepArgument(BaseArgument):
         """
         raise NotImplementedError
 
-    def to_surface(self, deep_state, surface_state, idiolect):
+    def to_surface(self, transform_state, say_state, idiolect):
         """
-        DeepState, SayState, Idiolect -> SurfaceArgument
+        TransformState, SayState, Idiolect -> SurfaceArgument
 
         Generate my corresponding surface structure, after applying
         transformations like fronting.

@@ -194,11 +194,11 @@ class DeepContentClause(DeepArgument):
         else:
             return Voice.PASSIVE
 
-    def decide_conjugation(self, deep_state, surface_state, idiolect):
+    def decide_conjugation(self, transform_state, say_state, idiolect):
         subject = self.rels_vargs[self.subj_index][1]
-        surface_arg = subject.to_surface(deep_state, surface_state, idiolect)
+        surface_arg = subject.to_surface(transform_state, say_state, idiolect)
         conj = surface_arg.decide_conjugation(
-            surface_state, idiolect, deep_state.arbitrary_say_context)
+            say_state, idiolect, transform_state.arbitrary_say_context)
         if conj is not None:
             return conj
 
@@ -206,21 +206,21 @@ class DeepContentClause(DeepArgument):
             return None
 
         obj = self.rels_vargs[self.subj_index + 1][1]
-        surface_arg = obj.to_surface(deep_state, surface_state, idiolect)
+        surface_arg = obj.to_surface(transform_state, say_state, idiolect)
         return surface_arg.decide_conjugation(
-            surface_state, idiolect, deep_state.arbitrary_say_context)
+            say_state, idiolect, transform_state.arbitrary_say_context)
 
-    def to_surface(self, deep_state, surface_state, idiolect):
+    def to_surface(self, transform_state, say_state, idiolect):
         argx_to_front = decide_arg_to_front(
             self.rels_vargs, self.purpose, self.subj_index)
 
         # Verb context.
         voice = self.decide_voice()
-        conj = self.decide_conjugation(deep_state, surface_state, idiolect)
+        conj = self.decide_conjugation(transform_state, say_state, idiolect)
         assert conj
         is_fronting = argx_to_front is not None
-        is_split = deep_state.purpose_mgr.purpose2info[self.purpose].split_verb(
-            is_fronting)
+        info = transform_state.purpose_mgr.get(self.purpose)
+        is_split = info.split_verb(is_fronting)
         relative_cont = RelativeContainment.NOT_REL
         contract_not = idiolect.contractions
         split_inf = idiolect.split_infinitive
@@ -237,13 +237,13 @@ class DeepContentClause(DeepArgument):
         rels_types = []
         for rel, arg in self.rels_vargs:
             rels_types.append((rel, arg.relation_arg_type()))
-        preps = deep_state.relation_mgr.decide_preps(rels_types)
+        preps = transform_state.relation_mgr.decide_preps(rels_types)
 
         # Build list of properly prepositioned surface arguments (without
         # fronting or imperative subject omission).
         orig_preps_surfs = []
         for (rel, arg), prep in zip(self.rels_vargs, preps):
-            surface = arg.to_surface(deep_state, surface_state, idiolect)
+            surface = arg.to_surface(transform_state, say_state, idiolect)
             orig_preps_surfs.append((prep, surface))
 
         # If imperative, we disappear the subject ("do this" vs "you do this").

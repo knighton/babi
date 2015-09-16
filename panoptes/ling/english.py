@@ -38,7 +38,7 @@ class English(object):
         plural_mgr = PluralManager.from_files(
             cat_f, rule_f, nonsuffixable_f, cap_f)
 
-        say_state = SayState(
+        self.say_state = SayState(
             correlative_mgr, inflection_mgr, personal_mgr, plural_mgr,
             shortcut_mgr)
 
@@ -48,12 +48,13 @@ class English(object):
             prep=None, has_left=False, has_right=False, is_possessive=False)
         purpose_mgr = PurposeManager()
         relation_mgr = RelationManager()
-        deep_state = DeepState(arbitrary_say_context, purpose_mgr, relation_mgr)
+        self.transform_state = \
+            DeepState(arbitrary_say_context, purpose_mgr, relation_mgr)
 
         # Text -> surface structure -> deep structure.
         self.text_to_parse = TextToParse()
         self.parse_to_surface = ParseToSurface(
-            correlative_mgr, personal_mgr, plural_mgr, say_state, verb_mgr)
+            correlative_mgr, personal_mgr, plural_mgr, self.say_state, verb_mgr)
         self.surface_to_deep = SurfaceToDeep()
 
     def each_dsen_from_text(self, text):
@@ -66,5 +67,5 @@ class English(object):
             yield 7  # TODO: hack to yield nothing until this is implemented.
 
     def text_from_dsen(self, dsen):
-        ssen = dsen.to_surface(self.deep_state, self.surface_state, idiolect)
-        return ssen.say(self.surface_state, idiolect)
+        ssen = dsen.to_surface(self.transform_state, self.say_state, idiolect)
+        return ssen.say(self.say_state, idiolect)
