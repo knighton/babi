@@ -2,7 +2,6 @@ from collections import defaultdict
 from itertools import chain
 import json
 import os
-import sys
 
 from panoptes.etc.combinatorics import each_choose_one_from_each, \
     collapse_int_tuples_to_wildcards
@@ -56,8 +55,11 @@ def unpack_verb_words(s):
 
 
 def to_ints(sss2vv, options_per_field, num_options_per_field):
+    print 'Collapsing:'
     s2nn = {}
-    for sss, vv in sss2vv.iteritems():
+    for sss in sorted(sss2vv):
+        vv = sss2vv[sss]
+
         s = pack_verb_words(sss)
 
         nnn = []
@@ -65,12 +67,11 @@ def to_ints(sss2vv, options_per_field, num_options_per_field):
             nn = v.to_int_tuple(options_per_field)
             nnn.append(nn)
 
-        print 'Collapsing', s, 'from', len(nnn),
-        sys.stdout.flush()
-
+        pre_len = len(nnn)
         nnn = collapse_int_tuples_to_wildcards(nnn, num_options_per_field)
 
-        print 'to', len(nnn)
+        print '%6d -> %2d: %s' % (
+            pre_len, len(nnn), s.replace('|', '...'))
 
         ints = []
         for nn in nnn:
