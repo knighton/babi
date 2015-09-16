@@ -40,9 +40,9 @@ class ProperNoun(CommonArgument):
 
     def decide_conjugation(self, state, idiolect, context):
         if self.is_plur:
-            return Conjugation.P2
+            return Conjugation.P3
         else:
-            return Conjugation.S2
+            return Conjugation.S3
 
     def say(self, state, idiolect, context):
         ss = list(self.name)
