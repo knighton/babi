@@ -59,7 +59,10 @@ class PersonalPronoun(CommonArgument):
         return state.personal_mgr.perspro_decide_conjugation(self)
 
     def say(self, state, idiolect, context):
-        return state.personal_mgr.perspro_say(self, idiolect.whom)
+        if context.is_possessive:
+            return state.personal_mgr.posdet_say(self.declension, idiolect.whom)
+        else:
+            return state.personal_mgr.perspro_say(self, idiolect.whom)
 
     # --------------------------------------------------------------------------
     # Static.
@@ -256,4 +259,5 @@ class PersonalManager(object):
         """
         Declension, who/whom -> tokens
         """
-        return self.tables.say(dec, PersonalColumn.POS_DET, use_whom)
+        ss = self.tables.say(dec, PersonalColumn.POS_DET, use_whom)
+        return SayResult(tokens=ss, conjugation=None, eat_prep=False)

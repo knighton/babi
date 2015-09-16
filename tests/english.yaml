@@ -196,7 +196,7 @@
                     say_noun: true
                     rels_nargs: []
             subj_index: 0
-  - text: Your books might be there now.
+  - text: Your books should be there now.
     structure:
         root:
             type: DeepContentClause
@@ -204,7 +204,7 @@
             purpose: INFO
             is_intense: false
             verb:
-                lemma: is
+                lemma: be
                 polarity:
                     tf: true
                     is_contrary: false
@@ -213,8 +213,8 @@
                     is_perf: false
                     is_prog: false
                 modality:
-                    flavor: ABILITY
-                    is_cond: true
+                    flavor: PROBABLE
+                    is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
             rels_vargs:
