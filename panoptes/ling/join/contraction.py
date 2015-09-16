@@ -1,3 +1,4 @@
+from panoptes.etc.enum import enum
 from panoptes.ling.verb.annotation import annotate_as_aux
 
 
@@ -41,12 +42,72 @@ class ContractionTableParser(object):
                     rr.add((row, col))
         return rr
 
+    def parse_dict(self, text):
+        r = {}
+        sss = map(lambda line: line.split(), text.strip().split('\n'))
+        for ss in sss:
+            key, value = map(self.fix, ss)
+            r[key] = value
+        return r
+
+
+Contract = enum('Contract = IF_NOT_S_SOUND ALWAYS')
+
 
 class BigramContractionManager(object):
-    def __init__(self):
+    def __init__(self, bigram2exception, bigrams_to_contract, last2contract,
+                 last2contraction):
+        # Exceptions (maps bigrams to their weird contractions).
+        self.bigram2exception = bigram2exception
+
+        # Set of bigrams to contract.
+        self.bigrams_to_contract = bigrams_to_contract
+
+        # Contraction behavior given last word in a bigram.
+        self.last2contract = last2contract
+
+        # How to contract the last word of a bigram.
+        self.last2contraction = last2contraction
+
+        for _, last in self.bigrams_to_contract:
+            assert last in self.last2contraction
+
+    def normal_contraction(self, first, second):
+        return remove_verb_annotations(first) + self.last2contraction[last]
+
+    def contract(self, first, last, use_contractions):
+        bigram = (first, last)
+
+        # Exceptions (its, won't).
+        r = self.bigram2exception.get(bigram)
+        if r:
+            return r
+
+        # Common cases (it's, you're, should've, didn't).
+        if bigram in self.bigrams_to_contract:
+            return self.normal_contraction(first, last)
+
+        # Verbs that are said like suffixes (has, is, will, would).
+        behavior = self.last2contract.get(last)
+        if behavior:
+            if behavior == Contract.IF_NOT_S_SOUND:
+                if self.s_detector.ends_with_s_sound(first):
+                    return self.normal_contraction(first, last)
+            elif behavior == Contract.ALWAYS:
+                return self.normal_contraction(first, last)
+            else:
+                assert False
+
+        # Don't contract it.
+        return None
+
+    @staticmethod
+    def default():
         p = ContractionTableParser()
 
-        pers_be = p.parse_table("""
+        pairs = set()
+
+        pairs.update(p.parse_table("""
                  am are is
             I    x  -   -
             you  -  x   -
@@ -55,9 +116,9 @@ class BigramContractionManager(object):
             it   -  -   x
             we   -  x   -
             they -  x   -
-        """) 
+        """))
 
-        pers_have = p.parse_table("""
+        pairs.update(p.parse_table("""
                  AUX_HAVE AUX_HAS AUX_HAD
             I    x        -       x
             you  x        -       x
@@ -66,9 +127,9 @@ class BigramContractionManager(object):
             it   -        x       x
             we   x        -       x
             they x        -       x
-        """)
+        """))
 
-        pers_modal = p.parse_table("""
+        pairs.update(p.parse_table("""
                  will would
             I    x    x
             you  x    x
@@ -77,9 +138,9 @@ class BigramContractionManager(object):
             it   x    x
             we   x    x
             they x    x
-        """)
+        """))
 
-        shortcut = p.parse_table("""
+        pairs.update(p.parse_table("""
                   is AUX_HAVE did
             this  -  -        -
             that  x  -        -
@@ -90,9 +151,9 @@ class BigramContractionManager(object):
             when  x  -        -
             why   x  -        x
             how   x  x        x
-        """)
+        """))
 
-        verb_not = p.parse_table("""
+        pairs.update(p.parse_table("""
                      not
             am       -
             are      x
@@ -105,9 +166,9 @@ class BigramContractionManager(object):
             do       x
             does     x
             did      x
-        """)
+        """))
 
-        modal = p.parse_table("""
+        pairs.update(p.parse_table("""
                    AUX_HAVE not
             can    -        x
             could  x        x
@@ -117,12 +178,43 @@ class BigramContractionManager(object):
             should x        x
             would  x        x
             will   -        !
+        """))
+
+        bigrams_to_contract = pairs
+
+        bigram2exception = {
+            ('will', 'not'): "won't",
+            ('it', POSSESSIVE_MARK): 'its',
+        }
+
+        last2contract = {
+            annotate_as_aux('has'): Contract.IF_NOT_S_SOUND,
+            'is': Contract.IF_NOT_S_SOUND,
+            'will': Contract.ALWAYS,
+            'would': Contract.ALWAYS,
+        }
+
+        last2contraction = p.parse_dict("""
+            am       'm
+            are      're
+            is       's
+            AUX_HAVE 've
+            AUX_HAS  's
+            AUX_HAD  'd
+            did      'd
+            not      n't
+            will     'll
+            would    'd
         """)
+
+        return BigramContractionManager(
+            bigram2exception, bigrams_to_contract, last2contract,
+            last2contraction)
 
 
 class ContractionManager(object):
     def __init__(self):
-        self.bigrams = BigramContractionManager()
+        self.bigram_mgr = BigramContractionManager.default()
 
     def contract(self, tokens, use_contractions):
         XXX
