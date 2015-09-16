@@ -37,6 +37,16 @@ class SayContext(object):
         # Whether it needs to be said in its possessive form.
         self.is_possessive = is_possessive
 
+    def check(self):
+        if self.prep is not None:
+            assert self.prep
+            assert isinstance(self.prep, list)
+
+        assert isinstance(self.has_left, bool)
+        assert isinstance(self.has_right, bool)
+
+        assert isinstance(self.is_possessive, bool)
+
 
 class SayResult(object):
     """
