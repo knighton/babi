@@ -112,7 +112,7 @@ PersonalColumn = enum('PersonalColumn = SUBJ OBJ REFL POS_PRO POS_DET')
 def make_table(use_whom):
     text = """
                  SUBJ    OBJ      REFL       POS_PRO   POS_DET
-        I        i       me       myself     mine      my
+        I        I       me       myself     mine      my
         YOU      you     you      yourself   yours     your
         HE       he      him      himself    his       his
         SHE      she     her      herself    hers      her
