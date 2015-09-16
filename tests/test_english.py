@@ -22,6 +22,9 @@ def main():
         assert structure == new_structure
 
         new_text = english.text_from_dsen(dsen, idiolect)
+        print text
+        print new_text
+        print
 
 
 if __name__ == '__main__':

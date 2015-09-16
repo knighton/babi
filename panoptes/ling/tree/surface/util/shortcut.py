@@ -200,7 +200,8 @@ class ShortcutManager(object):
                 if is_archaic and not use_archaic:
                     continue
                 eat_prep = False  # TODO: swallow preposition correctly.
-                return SayResult(tokens=ss, conjugation=conj, eat_prep=eat_prep)
+                return SayResult(tokens=list(ss), conjugation=conj,
+                                 eat_prep=eat_prep)
 
         return None
 

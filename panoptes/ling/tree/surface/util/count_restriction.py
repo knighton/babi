@@ -31,7 +31,7 @@ class CountRestrictionChecker(object):
             for b in bb:
                 if self.enum2f[count_restriction](a, b):
                     return True
-        assert False
+        return False
 
     def get_grammatical_number(self, n, of_n, override_gram_number):
         """

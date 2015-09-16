@@ -1,7 +1,8 @@
 from collections import defaultdict
 
 from panoptes.ling.glue.correlative import SurfaceCorrelative
-from panoptes.ling.glue.grammatical_number import N3, N5, nx_le_nx_is_possible
+from panoptes.ling.glue.grammatical_number import N2, N3, N5, \
+    nx_le_nx_is_possible, nx_to_nx
 from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.glue.magic_token import POSSESSIVE_MARK
 from panoptes.ling.tree.surface.base import SayContext, SurfaceArgument
@@ -30,7 +31,7 @@ class SurfaceCommonNoun(SurfaceArgument):
                  explicit_number, attributes, noun, say_noun, preps_nargs):
         # Possessor.
         #
-        # If it has a possessor, correlative must be DEFINITE (eg, "[Tim's] cat"
+        # If it has a possessor, correlative must be definite (eg, "[Tim's] cat"
         # means "[the] cat of Tim").
         #
         # Examples:
@@ -40,7 +41,7 @@ class SurfaceCommonNoun(SurfaceArgument):
         self.possessor = possessor
         if self.possessor:
             assert isinstance(self.possessor, SurfaceArgument)
-            assert correlative == SurfaceCorrelative.DEFINITE
+            assert correlative == SurfaceCorrelative.DEF
 
         # Grammatical clues about the number (eg, "that cat", "those cats",
         # "every cat", "all cats").  They have to jive with each other.
@@ -338,7 +339,11 @@ class SurfaceCommonNoun(SurfaceArgument):
         # Crash if the wrong correlative was chosen for its grammatical counts,
         # etc.  Could not happen during parsing.  If this crashes, structure
         # generation code is wrong.
-        assert r
+        try:
+            assert r
+        except:
+            print self.dump()
+            raise
 
         return r
 
@@ -358,7 +363,7 @@ class SurfaceCommonNoun(SurfaceArgument):
         sub_context = SayContext(
             prep=None, has_left=True, has_right=context.has_right,
             is_possessive=False)
-        r.tokens += self.say_tail(state, sub_context)
+        r.tokens += self.say_tail(state, idiolect, sub_context)
 
         if context.is_possessive:
             r.tokens.append(POSSESSIVE_MARK)

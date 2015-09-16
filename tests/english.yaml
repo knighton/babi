@@ -97,7 +97,7 @@
                     possessor:
                     correlative: DEF
                     gram_number: SING
-                    gram_of_number: MANY
+                    gram_of_number: SING
                     explicit_number:
                     attributes: []
                     noun: boat 
@@ -239,7 +239,7 @@
                     possessor:
                     correlative: DIST
                     gram_number: SING
-                    gram_of_number: MANY
+                    gram_of_number: SING
                     explicit_number:
                     attributes: []
                     noun: place
@@ -251,7 +251,7 @@
                     possessor:
                     correlative: PROX
                     gram_number: SING
-                    gram_of_number: MANY
+                    gram_of_number: SING
                     explicit_number:
                     attributes: []
                     noun: time

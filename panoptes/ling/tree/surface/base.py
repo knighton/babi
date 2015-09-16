@@ -1,3 +1,4 @@
+from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.tree.base import BaseArgument
 
 
