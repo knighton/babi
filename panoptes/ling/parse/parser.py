@@ -9,9 +9,9 @@ def truecase(tokens):
     ss = []
     for t in tokens:
         s = t.orth_
-        if t.tag == 'NNP':
+        if t.tag_ == 'NNP':
             pass
-        elif t.tag == 'PRP' and s == 'I':
+        elif t.tag_ == 'PRP' and s == 'I':
             pass
         else:
             s = s.lower()
