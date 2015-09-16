@@ -7,4 +7,4 @@ def annotate_as_aux(s):
 
 
 def remove_verb_annotations(s):
-    return a.replace('[PV]', '').replace('[AUX]', '')
+    return s.replace('[PV]', '').replace('[AUX]', '')

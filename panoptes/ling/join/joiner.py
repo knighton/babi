@@ -1,7 +1,7 @@
 from panoptes.ling.glue.magic_token import A_OR_AN, POSSESSIVE_MARK
-from panoptes.ling.tokens.a_or_an import AOrAnClassifier
-from panoptes.ling.tokens.contraction import ContractionManager
-from panoptes.ling.tokens.joiner import Joiner
+from panoptes.ling.join.a_or_an import AOrAnClassifier
+from panoptes.ling.join.apos_or_apos_s import AposOrAposSClassifier
+from panoptes.ling.join.contraction import ContractionManager
 from panoptes.ling.verb.annotation import remove_verb_annotations
 
 
@@ -15,19 +15,11 @@ class Joiner(object):
 
     def __init__(self):
         self.a_or_an_clf = AOrAnClassifier()
+        self.apos_or_apos_s_clf = AposOrAposSClassifier()
         self.contraction_mgr = ContractionManager()
-        self.joiner = Joiner()
 
     def handle_apos_or_apos_s(self, tokens):
         rr = []
-
-        if tokens:
-            s = tokens[0]
-            if s == POSSESSIVE_MARK:
-                r = "'s"  # Guess.
-            else:
-                r = s
-            rr.append(r)
 
         i = 1
         while i < len(tokens):
@@ -40,6 +32,9 @@ class Joiner(object):
                 i += 2
             else:
                 i += 1
+
+        if i == len(tokens) and tokens:
+            rr.append(tokens[-1])
 
         return rr
 
@@ -93,4 +88,5 @@ class Joiner(object):
         tokens = map(remove_verb_annotations, tokens)
         tokens = self.handle_apos_or_apos_s(tokens)
         tokens = self.handle_a_or_an(tokens)
-        return self.do_join(tokens)
+        text = self.do_join(tokens)
+        return text[0].upper() + text[1:]

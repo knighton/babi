@@ -1,4 +1,7 @@
+import re
+
 from panoptes.etc.enum import enum
+from panoptes.ling.glue.magic_token import POSSESSIVE_MARK
 from panoptes.ling.verb.annotation import annotate_as_aux
 
 
@@ -24,7 +27,7 @@ class ContractionTableParser(object):
         for ss in sss[1:]:
             assert len(ss) == n + 1
 
-        rows = map(self.fix, map(lambda ss: s[0], sss[1:]))
+        rows = map(self.fix, map(lambda ss: ss[0], sss[1:]))
         cols = map(self.fix, sss[0])
 
         rr = set()
@@ -241,4 +244,4 @@ class ContractionManager(object):
         self.bigram_mgr = BigramContractionManager.default()
 
     def contract(self, tokens, use_contractions):
-        XXX
+        return tokens  # TODO

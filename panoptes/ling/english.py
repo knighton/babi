@@ -1,6 +1,7 @@
 from panoptes.ling.glue.inflection import InflectionManager
 from panoptes.ling.glue.purpose import PurposeManager
 from panoptes.ling.glue.relation import RelationManager
+from panoptes.ling.join.joiner import Joiner
 from panoptes.ling.morph.plural import PluralManager
 from panoptes.ling.parse.parser import Parser as TextToParse
 from panoptes.ling.tree.deep.base import TransformState
@@ -57,6 +58,8 @@ class English(object):
             correlative_mgr, personal_mgr, plural_mgr, self.say_state, verb_mgr)
         self.surface_to_deep = SurfaceToDeep()
 
+        self.joiner = Joiner()
+
     def each_dsen_from_text(self, text):
         print '--Agent.put--'
         for parse in self.text_to_parse.parse(text):
@@ -69,4 +72,5 @@ class English(object):
     def text_from_dsen(self, dsen, idiolect):
         ssen = dsen.to_surface(
             self.transform_state, self.say_state, idiolect)
-        return ssen.say(self.say_state, idiolect)
+        tokens = ssen.say(self.say_state, idiolect)
+        return self.joiner.join(tokens, idiolect.contractions)
