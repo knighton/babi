@@ -99,7 +99,7 @@ class DeepCommonNoun(DeepArgument):
     def relation_arg_type(self):
         return RelationArgType.INERT
 
-    def to_surface(self, state, idiolect):
+    def to_surface(self, deep_state, surface_state, idiolect):
         if self.possessor:
             possessor = self.possessor.to_surface(idiolect)
         else:
@@ -115,7 +115,7 @@ class DeepCommonNoun(DeepArgument):
         preps_nargs = []
         for rel, arg in self.rels_nargs:
             arg_type = arg.relation_arg_type()
-            prep = state.relation_mgr.get(rel).decide_prep(arg_type)
+            prep = deep_state.relation_mgr.get(rel).decide_prep(arg_type)
             narg = arg.to_surface(idiolect)
             preps_nargs.append([prep, narg])
 
