@@ -51,6 +51,27 @@ class ContractionTableParser(object):
         return r
 
 
+class EndsWithSSoundDetector(object):
+    """
+    Detects whether a token ends in something vaguely resembling an "s" sound.
+    """
+
+    def __init__(self):
+        self.regexes = map(re.compile, [
+            '[sxz]$',
+            '[cszt]h$',
+            '[iy][sz]ed?$',
+            '[aeiourl][cs]e$',
+            '[aeiourl]the$'
+        ])
+
+    def detect(self, s):
+        for r in self.regexes:
+            if r.search(s):
+                return True
+        return False
+
+
 Contract = enum('Contract = IF_NOT_S_SOUND ALWAYS')
 
 
@@ -72,6 +93,9 @@ class BigramContractionManager(object):
         for _, last in self.bigrams_to_contract:
             assert last in self.last2contraction
 
+        # Whether a word vaguely ends with an "s" sound.
+        self.ends_with_s_sound = EndsWithSSoundDetector()
+
     def normal_contraction(self, first, second):
         return remove_verb_annotations(first) + self.last2contraction[last]
 
@@ -91,7 +115,7 @@ class BigramContractionManager(object):
         behavior = self.last2contract.get(last)
         if behavior:
             if behavior == Contract.IF_NOT_S_SOUND:
-                if self.s_detector.ends_with_s_sound(first):
+                if self.ends_with_s_sound.detect(first):
                     return self.normal_contraction(first, last)
             elif behavior == Contract.ALWAYS:
                 return self.normal_contraction(first, last)
