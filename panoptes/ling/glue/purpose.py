@@ -8,6 +8,7 @@
 
 from collections import defaultdict
 
+from panoptes.etc.combinatorics import each_choose_one_from_each
 from panoptes.etc.enum import enum
 
 
@@ -80,7 +81,7 @@ class PurposeManager(object):
             override_split = True if override_split == 'T' else False
             ind_only = True if ind_only == 'T' else False
             info = PurposeInfo(purpose, has_q_args, override_split, punct,
-                               stressed_end_punct, ind_only)
+                               stressed_punct, ind_only)
             self.purpose2info[purpose] = info
 
         # End punct -> purpose.
@@ -99,7 +100,7 @@ class PurposeManager(object):
             bools,  # is_fronting
             bools,  # is_ind_cond
         ]
-        for args in combos_one_from_each(options):
+        for args in each_choose_one_from_each(options):
             has_q_args, is_split, is_fronting, is_ind_cond = args
             for info in self.purpose2info.itervalues():
                 if has_q_args != info.has_q_args:
