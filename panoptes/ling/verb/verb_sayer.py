@@ -360,7 +360,7 @@ def make_modal2indtense2mstr_perf():
 
         modal2indtense2mstr_perf[modal] = {
             EphemeralTense.PAST: (past_modal, have),
-            EphemeralTense.NONPAST: (nonpast_modal, have),
+            EphemeralTense.NONPAST: (nonpast_modal, None),
         }
 
     return modal2indtense2mstr_perf
