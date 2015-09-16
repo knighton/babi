@@ -11,7 +11,7 @@ from panoptes.ling.tree.surface.base import SayResult
 from panoptes.ling.tree.surface.util.count_restriction import CountRestriction
 
 
-def parse_correlative_entry(s):
+def parse_correlative_entry(s, of):
     x = s.find('/')
     if x == -1:
         det, pro = s, s
@@ -37,6 +37,12 @@ def parse_correlative_entry(s):
     for is_pro, is_plur, s in zip(is_pros, is_plurs, ss):
         if s == '-':
             continue
+
+        # Plural vs singular doesn't make any sense for the SING column.
+        if of == N5.SING:
+            if is_plur:
+                continue
+
         yield is_pro, is_plur, s
 
 
@@ -84,7 +90,7 @@ def make_correlative_table():
             cor = SurfaceCorrelative.from_str[cor]
             of = sss[0][col_index]
             of = N5.from_str[of]
-            for is_pro, is_plur, s in parse_correlative_entry(s):
+            for is_pro, is_plur, s in parse_correlative_entry(s, of):
                 cor_pro_plur_of2s[(cor, is_pro, is_plur, of)] = s
     return cor_pro_plur_of2s
 
@@ -145,13 +151,18 @@ class CorrelativeManager(object):
         if not gram_num:
             return None
 
-        conj = N2_TO_CONJ[gram_num]
         is_plur = gram_num == N2.PLUR
+        if is_plur and of_n in (N5.ZERO, N5.SING):
+            return None
 
-        s = self.cor_pro_plur_of2s[(cor, is_pro, is_plur, of_n)]
+        s = self.cor_pro_plur_of2s.get((cor, is_pro, is_plur, of_n))
+        if not s:
+            return None
+
+        conj = N2_TO_CONJ[gram_num]
         return SayResult(tokens=[s], conjugation=conj, eat_prep=False)
 
-    def parse(self, s):
+    def parse(self, s, want_is_pro):
         """
         word -> list of (Correlative, n, of_n)
 
@@ -159,8 +170,20 @@ class CorrelativeManager(object):
         """
         rr = []
         for cor, is_pro, is_plur, of_n in self.s2cors_pros_plurs_ofs[s]:
+            if is_pro != want_is_pro:
+                continue
+            restriction, override_gram_num = self.cor2counts[cor]
             n2 = N2.PLUR if is_plur else N2.SING
             for n in nx_to_nxs(n2, N3):
+                if not self.count_restriction_checker.is_possible(
+                        restriction, n, of_n):
+                    continue
                 r = (cor, n, of_n)
                 rr.append(r)
         return rr
+
+    def parse_det(self, s):
+        return self.parse(s, False)
+
+    def parse_pro(self, s):
+        return self.parse(s, True)

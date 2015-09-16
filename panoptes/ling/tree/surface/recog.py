@@ -137,7 +137,7 @@ class ParseToSurface(object):
 
         s = child.text
         nn = []
-        for cor, n, of_n in self.correlative_mgr.parse(s):
+        for cor, n, of_n in self.correlative_mgr.parse_det(s):
             if not nx_eq_nx_is_possible(n, n2):
                 continue
             possessor = None
