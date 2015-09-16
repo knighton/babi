@@ -149,7 +149,8 @@ class PersonalTable(object):
         """
         Declension, PersonalColumn -> tokens
         """
-        return self.dec_pc2ss[(dec, pc)]
+        ss = self.dec_pc2ss[(dec, pc)]
+        return list(ss)
 
     def parse(self, ss):
         """
