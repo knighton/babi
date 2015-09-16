@@ -278,7 +278,7 @@ class SurfaceCommonNoun(SurfaceArgument):
 
             # Get pluralness from grammatical number.
             n2 = nx_to_nx(self.gram_number, N2)
-            is_plur = N2 == N2.PLUR
+            is_plur = n2 == N2.PLUR
         else:
             # Get the determiner words.
             is_pro = False
