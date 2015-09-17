@@ -218,7 +218,7 @@ class RelationManager(object):
                 self.prep_rat2relations[(prep, arg_type)].append(relation)
 
         # (is active voice, prepless arg count) -> Relation per prepless arg.
-        self.isactive_numprepless2relations = {
+        self.isactive_numprepless2positions = {
             (True, 1): [
                 RelationPosition.NOMINATIVE,
             ],
@@ -239,6 +239,11 @@ class RelationManager(object):
                 RelationPosition.ACCUSATIVE,
             ],
         }
+
+        # RelationPosition -> list of possible Relations.
+        self.core2relations = defaultdict(list)
+        for relation, info in self.relation2info.iteritems():
+            self.core2relations[info.core].append(relation)
 
     def decide_preps(self, rels_rats, subject_index):
         """
@@ -301,9 +306,15 @@ class RelationManager(object):
     def decode_prep_type(self, prep, arg_type):
         return self.prep_rat2relations[(prep, arg_type)]
 
-    def get_relations_for_prepless_vargs(self, num_prepless, is_active_voice):
+    def relations_per_prepless_varg(self, num_prepless, is_active_voice):
+        """
+        number prepless args, active -> Relation options per prepless arg
+        """
         key = (is_active_voice, num_prepless)
-        return self.isactive_numprepless2relations.get(key, None)
+        cores = self.isactive_numprepless2positions.get(key, None)
+        if not cores:
+            return None
+        return map(lambda core: self.core2relations[core], cores)
 
     def decide_relation_options(self, preps_rats, is_active_voice):
         """
@@ -323,13 +334,13 @@ class RelationManager(object):
         if not prepless:
             return options_per_arg
 
-        prepless_relations = self.get_relations_for_prepless_vargs(
+        relations_per_prepless = self.relations_per_prepless_varg(
             len(prepless), is_active_voice)
-        if not prepless_relations:
+        if not relations_per_prepless:
             return None
 
-        for x, relation in zip(prepless, prepless_relations):
-            options_per_arg[x] = [relation]
+        for x, relations in zip(prepless, relations_per_prepless):
+            options_per_arg[x] = relations
 
         return options_per_arg
 
