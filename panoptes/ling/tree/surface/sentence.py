@@ -10,6 +10,12 @@ class SurfaceSentence(object):
         self.end_punct = end_punct
         assert isinstance(self.end_punct, str)
 
+    def dump(self):
+        return {
+            'root': self.root.dump(),
+            'end_punct': self.end_punct,
+        }
+
     def say(self, state, idiolect):
         context = SayContext(prep=None, has_left=False, has_right=False,
                              is_possessive=False)
