@@ -1,3 +1,4 @@
+from collections import defaultdict
 import yaml
 
 from panoptes.etc.enum import enum
@@ -210,9 +211,40 @@ class RelationManager(object):
             RelationPosition.ACCUSATIVE,
         ]
 
+        # (prep, arg type) -> possible Relations.
+        self.prep_rat2relations = defaultdict(list)
+        for relation, info in self.relation2info.iteritems():
+            for prep, arg_type in info.preps_types:
+                self.prep_rat2relations[(prep, arg_type)].append(relation)
+
+        # (is active voice, prepless arg count) -> Relation per prepless arg.
+        self.isactive_numprepless2relations = {
+            (True, 1): [
+                RelationPosition.NOMINATIVE,
+            ],
+            (True, 2): [
+                RelationPosition.NOMINATIVE,
+                RelationPosition.ACCUSATIVE,
+            ],
+            (True, 3): [
+                RelationPosition.NOMINATIVE,
+                RelationPosition.DATIVE,
+                RelationPosition.ACCUSATIVE,
+            ],
+            (False, 1): [
+                RelationPosition.ACCUSATIVE,
+            ],
+            (False, 2): [
+                RelationPosition.DATIVE,
+                RelationPosition.ACCUSATIVE,
+            ],
+        }
+
     def decide_preps(self, rels_rats, subject_index):
         """
         list of (Relation, RelationArgType) -> list of (prep tuple or None).
+
+        Used in deep structure -> surface structure.
         """
         # Verify that all rels are unique.
         rels = map(lambda (rel, rat): rel, rels_rats)
@@ -265,6 +297,41 @@ class RelationManager(object):
 
             preps.append(prep)
         return preps
+
+    def decode_prep_type(self, prep, arg_type):
+        return self.prep_rat2relations[(prep, arg_type)]
+
+    def get_relations_for_prepless_vargs(self, num_prepless, is_active_voice):
+        key = (is_active_voice, num_prepless)
+        return self.isactive_numprepless2relations.get(key, None)
+
+    def decide_relation_options(self, preps_rats, is_active_voice):
+        """
+        list of (prep tuple, RelationArgType) -> Relation options per arg
+
+        Used in surface structure -> deep structure.
+        """
+        options_per_arg = [None] * len(preps_rats)
+
+        prepless = []
+        for i, (prep, arg_type) in enumerate(preps_rats):
+            if prep:
+                options_per_arg[x] = self.decode_prep_type(prep, arg_type)
+            else:
+                prepless.append(i)
+
+        if not prepless:
+            return options_per_arg
+
+        prepless_relations = self.get_relations_for_prepless_vargs(
+            len(prepless), is_active_voice)
+        if not prepless_relations:
+            return None
+
+        for x, relation in zip(prepless, prepless_relations):
+            options_per_arg[x] = [relation]
+
+        return options_per_arg
 
     def get(self, relation):
         return self.relation2info[relation]
