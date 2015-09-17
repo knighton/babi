@@ -158,7 +158,13 @@ class DeepContentClause(DeepArgument):
                 cant_be = ArgPosRestriction.NOT_SUBJECT
             else:
                 cant_be = ArgPosRestriction.SUBJECT
-            assert res != cant_be
+
+            try:
+                assert res != cant_be
+            except:
+                import json
+                print json.dumps(self.dump(), indent=4, sort_keys=True)
+                raise
 
         # TODO: crosscheck purpose and wh-arg count.
 
