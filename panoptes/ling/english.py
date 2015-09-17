@@ -5,6 +5,7 @@ from panoptes.ling.join.joiner import Joiner
 from panoptes.ling.morph.plural import PluralManager
 from panoptes.ling.parse.parser import Parser as TextToParse
 from panoptes.ling.tree.deep.base import TransformState
+from panoptes.ling.tree.deep.recog import SurfaceToDeep
 from panoptes.ling.tree.common.personal_pronoun import PersonalManager
 from panoptes.ling.tree.surface.base import SayContext, SayState
 from panoptes.ling.tree.surface.recog import ParseToSurface
@@ -13,10 +14,6 @@ from panoptes.ling.tree.surface.util.count_restriction import \
     CountRestrictionChecker
 from panoptes.ling.tree.surface.util.shortcut import ShortcutManager
 from panoptes.ling.verb.verb_manager import VerbManager
-
-
-class SurfaceToDeep(object):
-    pass
 
 
 class English(object):
@@ -56,21 +53,18 @@ class English(object):
         self.text_to_parse = TextToParse()
         self.parse_to_surface = ParseToSurface(
             correlative_mgr, personal_mgr, plural_mgr, self.say_state, verb_mgr)
-        self.surface_to_deep = SurfaceToDeep()
+        self.surface_to_deep = SurfaceToDeep(purpose_mgr, relation_mgr)
 
         self.joiner = Joiner()
 
     def each_dsen_from_text(self, text):
-        print '--Agent.put--'
         for parse in self.text_to_parse.parse(text):
-            print '>', parse.dump()
-            for surf in self.parse_to_surface.recog(parse):
-                print '>>', surf
-        if False:
-            yield 7  # TODO: hack to yield nothing until this is implemented.
+            for ssen in self.parse_to_surface.recog(parse):
+                for dsen in self.surface_to_deep.recog(ssen):
+                    yield dsen
 
     def text_from_dsen(self, dsen, idiolect):
-        ssen = dsen.to_surface(
-            self.transform_state, self.say_state, idiolect)
+        ssen = dsen.to_surface(self.transform_state, self.say_state, idiolect)
         tokens = ssen.say(self.say_state, idiolect)
-        return self.joiner.join(tokens, idiolect.contractions)
+        text = self.joiner.join(tokens, idiolect.contractions)
+        return text

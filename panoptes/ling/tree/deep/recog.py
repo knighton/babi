@@ -1,0 +1,152 @@
+from panoptes.etc.combinatorics import each_choose_one_from_each
+from panoptes.ling.glue.purpose import PurposeManager
+from panoptes.ling.glue.relation import RelationManager
+from panoptes.ling.tree.common.proper_noun import ProperNoun
+from panoptes.ling.tree.deep.content_clause import DeepContentClause, Status
+from panoptes.ling.tree.deep.sentence import DeepSentence
+from panoptes.ling.tree.surface.sentence import SurfaceSentence
+from panoptes.ling.verb.verb import ModalFlavor, Voice
+
+
+class RecogContext(object):
+    def __init__(self, is_root_clause, is_inside_an_if):
+        self.is_root_clause = is_root_clause
+        self.is_inside_an_if = is_inside_an_if
+
+
+class SurfaceToDeep(object):
+    """
+    Object that converts surface structure to deep structure.
+    """
+
+    def __init__(self, purpose_mgr, relation_mgr):
+        self.purpose_mgr = purpose_mgr
+        assert isinstance(self.purpose_mgr, PurposeManager)
+
+        self.relation_mgr = relation_mgr
+        assert isinstance(self.relation_mgr, RelationManager)
+
+        self.type2do = {
+            'ProperNoun': self.recog_proper_noun,
+        }
+
+    def recog_proper_noun(self, n):
+        return [n]
+
+    def decide_prep(self, fronted_prep, stranded_prep):
+        """
+        One or the other or neither must exist, but not both.
+        """
+        if fronted_prep:
+            if stranded_prep:
+                assert False
+            else:
+                prep = fronted_prep
+        else:
+            if stranded_prep:
+                prep = stranded_prep
+            else:
+                prep = None
+        return prep
+
+    def unfront(self, hallu_preps_vargs, front_argx, subj_argx):
+        """
+        preps_vargs, indexes -> new preps_vargs, new subject argx
+
+        Undo fronting.
+        """
+        assert 0 <= subj_argx < len(hallu_preps_vargs)
+        if front_argx:
+            assert front_argx + 1 == subj_argx
+
+        if not front_argx:
+            return hallu_preps_vargs, subj_argx
+
+        fronted_prep, fronted_arg = hallu_preps_vargs[front_argx]
+
+        rr = hallu_preps_vargs[:front_argx]
+        rr.append(hallu_preps_vargs[subj_argx])
+        found = False
+        for i in xrange(subj_argx + 1, len(hallu_preps_vargs)):
+            prep, arg = hallu_preps_vargs[i]
+            if arg:
+                rr.append([prep, arg])
+                continue
+
+            arg = fronted_arg
+            stranded_prep = prep
+            prep = self.decide_prep(fronted_prep, stranded_prep)
+            rr.append([prep, arg])
+            found = True
+
+        if not found:
+            rr.append([fronted_prep, fronted_arg])
+
+        return rr, subj_argx - 1
+
+    def decide_possible_relations(self, unfronted_preps_vargs, voice):
+        preps_types = map(lambda (p, n): (p, n.relation_arg_type()),
+                          unfronted_preps_vargs)
+        return self.relation_mgr.decide_relation_options(
+            preps_types, voice == Voice.ACTIVE)
+
+    def recog_arg(self, arg):
+        key = arg.__class__.__name__
+        return self.type2do[key](arg)
+
+    def recog_content_clause(self, c, context):
+        """
+        SurfaceContentClause -> list of DeepContentClause
+        """
+        if c.is_subjunctive() and not context.is_inside_an_if:
+            return []
+
+        front_argx = c.get_fronted_argx()
+
+        has_q_args = False
+        for p, n in c.preps_vargs:
+            if n and n.is_interrogative():
+                has_q_args = True
+                break
+        is_verb_split = c.verb.is_split
+        is_fronting = front_argx is not None
+        is_ind_or_cond = c.is_ind_or_cond()
+        purposes = self.purpose_mgr.decide_possible_purposes(
+            has_q_args, is_verb_split, is_fronting, is_ind_or_cond)
+
+        status = Status.ACTUAL
+        is_intense = False
+
+        rr = []
+        for hallu_preps_vargs, subj_argx in c.hallucinate_preps_vargs():
+            unfronted_preps_vargs, subj_argx = \
+                self.unfront(hallu_preps_vargs, front_argx, subj_argx)
+
+            relation_options_per_arg = self.decide_possible_relations(
+                unfronted_preps_vargs, c.verb.voice)
+            if not relation_options_per_arg:
+                return []
+
+            deep_options_per_arg = \
+                map(self.recog_arg,
+                    map(lambda (p, n): n, unfronted_preps_vargs))
+
+            for purpose in purposes:
+                for rels in each_choose_one_from_each(relation_options_per_arg):
+                    for deeps in each_choose_one_from_each(
+                            deep_options_per_arg):
+                        rels_vargs = zip(rels, deeps)
+                        r = DeepContentClause(
+                            status, purpose, is_intense, c.verb.intrinsics,
+                            rels_vargs, subj_argx)
+                        rr.append(r)
+        return rr
+
+    def recog(self, ssen):
+        assert isinstance(ssen, SurfaceSentence)
+        context = RecogContext(is_root_clause=True, is_inside_an_if=False)
+        rr = []
+        for root in self.recog_content_clause(ssen.root, context):
+            r = DeepSentence(root)
+            rr.append(r)
+        return rr
