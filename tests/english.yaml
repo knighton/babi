@@ -1,10 +1,10 @@
-  - text: I love you!
+  - text: I love you.
     structure:
         root:
             type: DeepContentClause
             status: ACTUAL
             purpose: INFO
-            is_intense: true
+            is_intense: false
             verb:
                 lemma: love
                 polarity:
@@ -29,6 +29,39 @@
                   - TARGET
                   - type: PersonalPronoun
                     declension: YOU
+                    ppcase: OBJECT
+            subj_index: 0
+  - text: Watch it!
+    structure:
+        root:
+            type: DeepContentClause
+            status: ACTUAL
+            purpose: INFO
+            is_intense: true
+            verb:
+                lemma: watch
+                polarity:
+                    tf: true
+                    is_contrary: false
+                tense: PRESENT
+                aspect:
+                    is_perf: false
+                    is_prog: false
+                modality:
+                    flavor: IMPERATIVE
+                    is_cond: false
+                verb_form: FINITE
+                is_pro_verb: false
+            rels_vargs:
+              -
+                  - AGENT
+                  - type: PersonalPronoun
+                    declension: YOU
+                    ppcase: SUBJECT
+              -
+                  - TARGET
+                  - type: PersonalPronoun
+                    declension: IT
                     ppcase: OBJECT
             subj_index: 0
   - text: You were spotted by me.
@@ -258,3 +291,36 @@
                     say_noun: true
                     rels_nargs: []
             subj_index: 0
+  - text: Who are you??
+    structure:
+        root:
+            type: DeepContentClause
+            status: ACTUAL
+            purpose: WH_Q
+            is_intense: true
+            verb:
+                lemma: be
+                polarity:
+                    tf: true
+                    is_contrary: false
+                tense: PRESENT
+                aspect:
+                    is_perf: false
+                    is_prog: false
+                modality:
+                    flavor: INDICATIVE
+                    is_cond: false
+                verb_form: FINITE
+                is_pro_verb: false
+            rels_vargs:
+              -
+                  - AGENT
+                  - type: PersonalPronoun
+                    declension: YOU
+                    ppcase: SUBJECT
+              -
+                  - TARGET
+                  - type: PersonalPronoun
+                    declension: WHO1
+                    ppcase: OBJECT
+            subj_index: 1
