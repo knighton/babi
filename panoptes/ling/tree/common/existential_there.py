@@ -1,4 +1,5 @@
 from panoptes.ling.glue.relation import RelationArgType
+from panoptes.ling.tree.base import ArgPosRestriction
 from panoptes.ling.tree.common.base import CommonArgument
 from panoptes.ling.tree.surface.base import SayResult
 
@@ -19,7 +20,7 @@ class ExistentialThere(CommonArgument):
         }
 
     def arg_position_restriction(self):
-        return ArgPositionRestriction.SUBJECT
+        return ArgPosRestriction.SUBJECT
 
     # --------------------------------------------------------------------------
     # From deep.
@@ -30,12 +31,12 @@ class ExistentialThere(CommonArgument):
     # --------------------------------------------------------------------------
     # From surface.
 
-    def decide_conjugation(self, state):
+    def decide_conjugation(self, state, idiolect, context):
         # Returning None instead of a Conjugation means that it will take the
         # conjugation of the verb's object instead.
         return None
 
-    def say(self, state, context):
+    def say(self, state, idiolect, context):
         return SayResult(tokens=['there'], conjugation=None, eat_prep=False)
 
     # --------------------------------------------------------------------------
