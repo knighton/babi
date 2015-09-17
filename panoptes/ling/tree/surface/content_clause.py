@@ -5,7 +5,7 @@ from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun, \
     PersonalPronounCase
 from panoptes.ling.tree.surface.base import SayContext, SayResult, \
     SurfaceArgument
-from panoptes.ling.verb.verb import ModalFlavor, SurfaceVerb
+from panoptes.ling.verb.verb import SurfaceVerb
 
 
 Complementizer = enum('Complementizer = ZERO THAT WHETHER IF')
@@ -106,11 +106,10 @@ class SurfaceContentClause(SurfaceArgument):
         return None
 
     def is_subjunctive(self):
-        return self.verb.intrinsics.modality.flavor in \
-            (ModalFlavor.SUBJUNCTIVE_CF, ModalFlavor.SUBJUNCTIVE_IMP)
+        return self.verb.is_subjunctive()
 
     def is_imperative(self):
-        return self.verb.intrinsics.modality.flavor == ModalFlavor.IMPERATIVE
+        return self.verb.is_imperative()
 
     def hallucinate_preps_vargs(self):
         """

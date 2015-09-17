@@ -123,8 +123,15 @@ class Modality(object):
             'is_cond': self.is_cond,
         }
 
+    def is_imperative(self):
+        return self.flavor == ModalFlavor.IMPERATIVE
+
     def is_indicative(self):
         return self.flavor == ModalFlavor.INDICATIVE and not self.is_cond
+
+    def is_subjunctive(self):
+        return self.flavor in \
+            (ModalFlavor.SUBJUNCTIVE_CF, ModalFlavor.SUBJUNCTIVE_IMP)
 
     @staticmethod
     def load(d):
@@ -178,6 +185,12 @@ class DeepVerb(object):
 
     def is_finite(self):
         return self.verb_form == VerbForm.FINITE
+
+    def is_imperative(self):
+        return self.modality.is_imperative()
+
+    def is_subjunctive(self):
+        return self.modality.is_subjunctive()
 
     def dump(self):
         if self.tense:
@@ -321,6 +334,12 @@ class SurfaceVerb(object):
 
     def is_finite(self):
         return self.intrinsics.is_finite()
+
+    def is_imperative(self):
+        return self.intrinsics.is_imperative()
+
+    def is_subjunctive(self):
+        return self.intrinsics.is_subjunctive()
 
     def dump(self):
         if self.conj:
