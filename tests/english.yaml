@@ -364,3 +364,53 @@
                     say_noun: false
                     rels_nargs: []
             subj_index: 0
+  - text: Whose cat is this?
+    structure:
+        root:
+            type: DeepContentClause
+            status: ACTUAL
+            purpose: WH_Q
+            is_intense: false
+            verb:
+                lemma: be
+                polarity:
+                    tf: true
+                    is_contrary: false
+                tense: PRESENT
+                aspect:
+                    is_perf: false
+                    is_prog: false
+                modality:
+                    flavor: INDICATIVE
+                    is_cond: false
+                verb_form: FINITE
+                is_pro_verb: false
+            rels_vargs:
+              -
+                  - AGENT
+                  - type: DeepCommonNoun
+                    possessor:
+                    correlative: PROX
+                    gram_number: SING
+                    gram_of_number: SING
+                    explicit_number:
+                    attributes: []
+                    noun: cat
+                    say_noun: false
+                    rels_nargs: []
+              -
+                  - TARGET
+                  - type: DeepCommonNoun
+                    possessor:
+                        type: PersonalPronoun
+                        declension: WHO1
+                        ppcase: OBJECT
+                    correlative: DEF
+                    gram_number: SING
+                    gram_of_number: SING
+                    explicit_number:
+                    attributes: []
+                    noun: cat
+                    say_noun: true
+                    rels_nargs: []
+            subj_index: 0
