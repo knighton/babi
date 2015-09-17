@@ -141,7 +141,11 @@ class SurfaceContentClause(SurfaceArgument):
         # empty.
         verb_pre_tokens, verb_main_tokens = state.verb_mgr.say(self.verb)
 
+        fronted_argx = self.get_fronted_argx()
+        stranded_argx = self.get_stranded_argx()
+
         # Say each verb argument.
+        ate_stranded_prep = False
         for i, (prep, varg) in enumerate(self.preps_vargs):
             if i == self.vmain_index - 1:
                 ss += verb_pre_tokens
@@ -165,6 +169,12 @@ class SurfaceContentClause(SurfaceArgument):
                 else:
                     right = False
 
+                used_stranded_prep = False
+                if i == fronted_argx and not prep:
+                    if stranded_argx:
+                        used_stranded_prep = True
+                        prep = self.preps_vargs[stranded_argx][0]
+
                 sub_context = SayContext(
                     prep=prep, has_left=left, has_right=right,
                     is_possessive=False)
@@ -173,8 +183,11 @@ class SurfaceContentClause(SurfaceArgument):
                 if prep and not r.eat_prep:
                     ss += prep
                 ss += r.tokens
+
+                if used_stranded_prep and r.eat_prep:
+                    ate_stranded_prep = True
             else:
-                if prep:
+                if i != stranded_argx or not ate_stranded_prep:
                     ss += prep
         if self.vmain_index == len(self.preps_vargs):
             ss += verb_main_tokens
