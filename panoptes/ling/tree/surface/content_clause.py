@@ -69,6 +69,39 @@ class SurfaceContentClause(SurfaceArgument):
         assert isinstance(self.vmain_index, int)
         assert 0 <= self.vmain_index <= len(self.preps_vargs)
 
+    def get_fronted_argx(self):
+        """
+        -> index or None
+
+        Get the index of the fronted argument, if any.
+
+        We will consider any interrogative argument right before the subject to
+        have been fronted.
+        """
+        x = self.vmain_index - 2
+        if not (0 <= x < len(self.preps_vargs)):
+            return None
+
+        n = self.preps_vargs[x][1]
+        if not n.is_interrogative():
+            return None
+
+        return x
+
+    def get_stranded_argx(self):
+        """
+        -> index or None
+
+        Get the stranded index, if any.  The stranded index is where the fronted
+        argument originally was, and still contains its preposition (due to
+        preposition stranding) and a None for its argument.
+        """
+        for i in xrange(self.vmain_index, len(self.preps_vargs)):
+            p, n = self.preps_vargs[i]
+            if not n:
+                return i
+        return None
+
     # --------------------------------------------------------------------------
     # From base.
 
