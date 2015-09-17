@@ -1,7 +1,9 @@
 from panoptes.etc.enum import enum
+from panoptes.ling.glue.inflection import Declension
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
 from panoptes.ling.tree.base import ArgPosRestriction
+from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun
 from panoptes.ling.tree.deep.base import DeepArgument
 from panoptes.ling.tree.surface.content_clause import Complementizer, \
     SurfaceContentClause
@@ -82,7 +84,7 @@ def transform(orig_preps_vargs, subj_index, is_imperative, argx_to_front,
 
     # Pre-args.
     for prep, arg in orig_preps_vargs[:subj_index]:
-        rr.append((pre, arg))
+        rr.append((prep, arg))
 
     # Fronted arg.
     stranded_prep = None
