@@ -115,6 +115,21 @@ class EphemeralVerb(object):
         self.use_were_sbj = use_were_sbj
         assert isinstance(self.use_were_sbj, bool)
 
+    def dump(self):
+        return {
+            'lemma': self.lemma,
+            'whether': Whether.to_str[self.whether],
+            'modal': self.modal,
+            'voice': Voice.to_str[self.voice],
+            'tense': EphemeralTense.to_str[self.tense],
+            'aspect': self.aspect.dump(),
+            'mood': Mood.to_str[self.mood],
+            'conj': Conjugation.to_str[self.conj],
+            'verb_form': EphemeralVerbForm.to_str[self.verb_form],
+            'split_inf': self.split_inf,
+            'use_were_sbj': self.use_were_sbj,
+        }
+
 
 def make_flavor_cond2modals_moods(known_modals):
     text = """
@@ -475,7 +490,7 @@ class EphemeralSayer(object):
                     already_has_an_aux = \
                         actual_modal or use_perf or v.aspect.is_prog
                     can_use_do = \
-                        to_verb.has_do_support and v.voice == Voice.ACTIVE
+                        to_verb.has_do_support() and v.voice == Voice.ACTIVE
                     if mood_ok and not already_has_an_aux and can_use_do:
                         rr = [self.to_do] + rr
 
