@@ -90,8 +90,7 @@ class PurposeManager(object):
             self.punct2purposes[info.unstressed_end_punct].append(info.purpose)
             self.punct2purposes[info.stressed_end_punct].append(info.purpose)
 
-        # (has_q_args, is_split, is_fronting, is_ind_cond) ->
-        #   list of possible Purposes.
+        # (has_q_args, is_split, is_fronting, is_ind_cond) -> possible Purposes.
         self.args2purposes = defaultdict(list)
         bools = [False, True]
         options = [
@@ -123,6 +122,11 @@ class PurposeManager(object):
 
     def get(self, purpose):
         return self.purpose2info[purpose]
+
+    def decide_possible_purposes(self, has_q_args, is_verb_split, is_fronting,
+                                 is_ind_or_cond):
+        key = (has_q_args, is_verb_split, is_fronting, is_ind_or_cond)
+        return self.args2purposes[key]
 
 
 class EndPunctClassifier(object):
