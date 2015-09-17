@@ -6,91 +6,91 @@ from panoptes.ling.glue.magic_token import PLACE_PREP, TIME_PREP
 
 RELATION_TEXT = """
   - relation: IF
-    position: OBLIQUE
+    core: OBLIQUE
     order: -100
     preps:
       - if FINITE_CLAUSE
 
   - relation: WHEN
-    position: OBLIQUE
+    core: OBLIQUE
     order: -100
     preps:
       - when FINITE_CLAUSE
 
   - relation: AGENT
-    position: SUBJECT
+    core: NOMINATIVE
     order: 0
     preps:
       - by INERT
 
-  - relation: TARGET
-    position: DIRECT_OBJECT
-    order: 3
-    preps:
-      - X INERT
-
   - relation: TO_RECIPIENT
-    position: INDIRECT_OBJECT
+    core: DATIVE
     order: 1
     preps:
       - to INERT
 
   - relation: FOR_RECIPIENT
-    position: INDIRECT_OBJECT
+    core: DATIVE
     order: 1
     preps:
       - for INERT
 
+  - relation: TARGET
+    core: ACCUSATIVE
+    order: 3
+    preps:
+      - X INERT
+
   - relation: BENEFICIARY
-    position: OBLIQUE
+    core: OBLIQUE
     order: 5
     preps:
       - for INERT
 
   - relation: TO_LOCATION
-    position: OBLIQUE
+    core: OBLIQUE
     order: 5
     preps:
       - to INERT
 
   - relation: PLACE
-    position: OBLIQUE
+    core: OBLIQUE
     order: 5
     preps:
       - <PLACE_PREP> INERT
 
   - relation: TIME
-    position: OBLIQUE
+    core: OBLIQUE
     order: 10
     preps:
       - <TIME_PREP> INERT
 
   - relation: OF
-    position: OBLIQUE
+    core: OBLIQUE
     order: 10
     preps:
       - of INERT
 
   - relation: ABOUT
-    position: OBLIQUE
+    core: OBLIQUE
     order: 10
     preps:
       - about INERT
 
   - relation: AT
-    position: OBLIQUE
+    core: OBLIQUE
     order: 30
     preps:
       - at INERT
 
   - relation: "ON"
-    position: OBLIQUE
+    core: OBLIQUE
     order: 30
     preps:
       - on INERT
 
   - relation: DURING
-    position: OBLIQUE
+    core: OBLIQUE
     order: 50
     preps:
       - while FINITE_CLAUSE
@@ -98,7 +98,7 @@ RELATION_TEXT = """
       - during INERT
 
   - relation: BECAUSE
-    position: OBLIQUE
+    core: OBLIQUE
     order: 100
     preps:
       - because of INERT
@@ -118,7 +118,7 @@ Relation = make_relation_enum(RELATION_TEXT)
 
 
 RelationPosition = enum("""
-    RelationPosition = SUBJECT DIRECT_OBJECT INDIRECT_OBJECT OBLIQUE""")
+    RelationPosition = NOMINATIVE DATIVE ACCUSATIVE OBLIQUE""")
 
 
 def is_core_position(pos):
@@ -131,12 +131,12 @@ RelationArgType = enum('RelationArgType = INERT FINITE_CLAUSE PREPLESS_GERUND')
 
 
 class RelationInfo(object):
-    def __init__(self, relation, position, order, preps_types):
+    def __init__(self, relation, core, order, preps_types):
         self.relation = relation
         assert Relation.is_valid(self.relation)
 
-        self.position = position
-        assert RelationPosition.is_valid(self.position)
+        self.core = core
+        assert RelationPosition.is_valid(self.core)
 
         self.order = order
         assert isinstance(self.order, int)
@@ -161,8 +161,8 @@ class RelationInfo(object):
         s = d['relation']
         relation = Relation.from_str[s]
 
-        s = d['position']
-        position = RelationPosition.from_str[s]
+        s = d['core']
+        core = RelationPosition.from_str[s]
 
         order = d['order']
 
@@ -175,7 +175,7 @@ class RelationInfo(object):
             rat = RelationArgType.from_str[ss[-1]]
             preps_types.append((prep, rat))
 
-        return RelationInfo(relation, position, order, preps_types)
+        return RelationInfo(relation, core, order, preps_types)
 
 
 class RelationManager(object):
@@ -190,23 +190,24 @@ class RelationManager(object):
         self.relation2info = \
             dict(zip(map(lambda info: info.relation, infos), infos))
 
-        # The natural order of the core semantic roles when using active voice.
+        # The natural order of the core (non-oblique -- without a preposition)
+        # semantic roles when using active voice.
         #
         #   "I baked you a cake"
         #
         # If you deviate from this order, you must use a preposition.
         self.active_prepless_order = [
-            RelationPosition.SUBJECT,
-            RelationPosition.INDIRECT_OBJECT,
-            RelationPosition.DIRECT_OBJECT,
+            RelationPosition.NOMINATIVE,
+            RelationPosition.DATIVE,
+            RelationPosition.ACCUSATIVE,
         ]
 
-        # Natural core order when in passive voice.
+        # Natural core argument order when in passive voice.
         #
         #   "You were baked a cake"
         self.passive_prepless_order = [
-            RelationPosition.INDIRECT_OBJECT,
-            RelationPosition.DIRECT_OBJECT,
+            RelationPosition.DATIVE,
+            RelationPosition.ACCUSATIVE,
         ]
 
     def decide_preps(self, rels_rats, subject_index):
@@ -221,7 +222,7 @@ class RelationManager(object):
         # error if this fails).
         core_positions = []
         for rel in rels:
-            pos = self.relation2info[rel].position
+            pos = self.relation2info[rel].core
             if is_core_position(pos):
                 core_positions.append(pos)
         assert len(core_positions) == len(set(core_positions))
@@ -237,7 +238,7 @@ class RelationManager(object):
         index = 0
         for rel, arg_type in rels_rats:
             info = self.relation2info[rel]
-            if not is_core_position(info.position):
+            if not is_core_position(info.core):
                 use_prep = True
             else:
                 while True:
@@ -245,7 +246,7 @@ class RelationManager(object):
                         use_prep = True
                         break
 
-                    if info.position == preferred_core_order[index]:
+                    if info.core == preferred_core_order[index]:
                         use_prep = False
                         break
 
