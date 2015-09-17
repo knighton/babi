@@ -105,11 +105,14 @@ class SurfaceContentClause(SurfaceArgument):
                 return i
         return None
 
-    def is_subjunctive(self):
-        return self.verb.is_subjunctive()
-
     def is_imperative(self):
         return self.verb.is_imperative()
+
+    def is_ind_or_cond(self):
+        return self.verb.is_ind_or_cond()
+
+    def is_subjunctive(self):
+        return self.verb.is_subjunctive()
 
     def hallucinate_preps_vargs(self):
         """

@@ -126,8 +126,8 @@ class Modality(object):
     def is_imperative(self):
         return self.flavor == ModalFlavor.IMPERATIVE
 
-    def is_indicative(self):
-        return self.flavor == ModalFlavor.INDICATIVE and not self.is_cond
+    def is_ind_or_cond(self)
+        return self.flavor == ModalFlavor.INDICATIVE
 
     def is_subjunctive(self):
         return self.flavor in \
@@ -188,6 +188,9 @@ class DeepVerb(object):
 
     def is_imperative(self):
         return self.modality.is_imperative()
+
+    def is_ind_or_cond(self):
+        return self.modality.is_ind_or_cond()
 
     def is_subjunctive(self):
         return self.modality.is_subjunctive()
@@ -337,6 +340,9 @@ class SurfaceVerb(object):
 
     def is_imperative(self):
         return self.intrinsics.is_imperative()
+
+    def is_ind_or_cond(self):
+        return self.intrinsics.modality.is_ind_or_cond()
 
     def is_subjunctive(self):
         return self.intrinsics.is_subjunctive()
