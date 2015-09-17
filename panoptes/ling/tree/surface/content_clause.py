@@ -1,9 +1,11 @@
 from panoptes.etc.enum import enum
 from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.glue.relation import RelationArgType
+from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun, \
+    PersonalPronounCase
 from panoptes.ling.tree.surface.base import SayContext, SayResult, \
     SurfaceArgument
-from panoptes.ling.verb.verb import SurfaceVerb
+from panoptes.ling.verb.verb import ModalFlavor, SurfaceVerb
 
 
 Complementizer = enum('Complementizer = ZERO THAT WHETHER IF')
@@ -102,6 +104,34 @@ class SurfaceContentClause(SurfaceArgument):
             if not n:
                 return i
         return None
+
+    def is_subjunctive(self):
+        return self.verb.intrinsics.modality.flavor in \
+            (ModalFlavor.SUBJUNCTIVE_CF, ModalFlavor.SUBJUNCTIVE_IMP)
+
+    def is_imperative(self):
+        return self.verb.intrinsics.modality.flavor == ModalFlavor.IMPERATIVE
+
+    def hallucinate_preps_vargs(self):
+        """
+        -> yields (preps_vargs, subject index)
+
+        Return versions of prep_vargs where we hallucinate the subject if it's
+        missing (ie, imperatives), which is used for recog to deep structure.
+        """
+        if not self.is_imperative():
+            subj_index = self.vmain_index - 1
+            yield (self.preps_vargs, subj_index)
+            return
+
+        you_sing = PersonalPronoun(Declension.YOU, PersonalPronounCase.SUBJECT)
+        you_plur = PersonalPronoun(Declension.YALL, PersonalPronounCase.SUBJECT)
+        for you in [you_sing, you_plur]:
+            pre = self.preps_vargs[:self.vmain_index]
+            subject = [None, you]
+            post = self.preps_vargs[self.vmain_index:]
+            pp_nn = pre + [subject] + post
+            yield pp_nn, self.vmain_index
 
     # --------------------------------------------------------------------------
     # From base.
