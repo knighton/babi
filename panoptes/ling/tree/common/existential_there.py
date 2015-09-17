@@ -1,4 +1,3 @@
-from panoptes.ling.glue.relation import RelationArgType
 from panoptes.ling.tree.base import ArgPosRestriction
 from panoptes.ling.tree.common.base import CommonArgument
 from panoptes.ling.tree.surface.base import SayResult
@@ -24,9 +23,6 @@ class ExistentialThere(CommonArgument):
 
     # --------------------------------------------------------------------------
     # From deep.
-
-    def relation_arg_type(self):
-        return RelationArgType.INERT
 
     # --------------------------------------------------------------------------
     # From surface.

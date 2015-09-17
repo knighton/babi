@@ -1,5 +1,6 @@
 from panoptes.etc.enum import enum
 from panoptes.ling.glue.inflection import Conjugation
+from panoptes.ling.glue.relation import RelationArgType
 from panoptes.ling.tree.surface.base import SayContext, SayResult, \
     SurfaceArgument
 from panoptes.ling.verb.verb import SurfaceVerb
@@ -119,6 +120,12 @@ class SurfaceContentClause(SurfaceArgument):
             'preps_vargs': preps_vargs,
             'vmain_index': self.vmain_index,
         }
+
+    def relation_arg_type(self):
+        if self.verb.is_finite():
+            return RelationArgType.FINITE_CLAUSE
+        else:
+            return RelationArgType.INERT
 
     # --------------------------------------------------------------------------
     # From surface.

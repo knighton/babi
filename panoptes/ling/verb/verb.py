@@ -176,6 +176,9 @@ class DeepVerb(object):
         assert VerbForm.is_valid(self.verb_form)
         assert isinstance(self.is_pro_verb, bool)
 
+    def is_finite(self):
+        return self.verb_form == VerbForm.FINITE
+
     def dump(self):
         if self.tense:
             tense = Tense.to_str[self.tense]
@@ -315,6 +318,9 @@ class SurfaceVerb(object):
             return False
 
         return True
+
+    def is_finite(self):
+        return self.intrinsics.is_finite()
 
     def dump(self):
         if self.conj:

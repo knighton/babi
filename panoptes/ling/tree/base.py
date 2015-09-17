@@ -1,4 +1,5 @@
 from panoptes.etc.enum import enum
+from panoptes.ling.glue.relation import RelationArgType
 
 
 ArgPosRestriction = enum('ArgPosRestriction = SUBJECT NOT_SUBJECT ANYWHERE')
@@ -75,3 +76,12 @@ class BaseArgument(object):
         subject ("me"), could be ("you"), etc.
         """
         return ArgPosRestriction.ANYWHERE
+
+    def relation_arg_type(self):
+        """
+        -> RelationArgType
+
+        What type of argument are we, as far as relations/prepositions are
+        concerned (inert, finite clause, etc.).
+        """
+        return RelationArgType.INERT

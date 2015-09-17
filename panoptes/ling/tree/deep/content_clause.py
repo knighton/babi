@@ -191,14 +191,14 @@ class DeepContentClause(DeepArgument):
             'subj_index': self.subj_index,
         }
 
-    # --------------------------------------------------------------------------
-    # From deep.
-
     def relation_arg_type(self):
-        if self.verb.verb_form == VerbForm.FINITE:
+        if self.verb.is_finite():
             return RelationArgType.FINITE_CLAUSE
         else:
             return RelationArgType.INERT
+
+    # --------------------------------------------------------------------------
+    # From deep.
 
     def decide_voice(self):
         subj_rel = self.rels_vargs[self.subj_index][0]

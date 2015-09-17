@@ -3,7 +3,6 @@ from panoptes.etc.enum import enum
 from panoptes.ling.glue.inflection import Conjugation, Declension, \
     DECLENSION2IS_INTERROGATIVE
 from panoptes.ling.glue.magic_token import POSSESSIVE_MARK
-from panoptes.ling.glue.relation import RelationArgType
 from panoptes.ling.tree.base import ArgPosRestriction
 from panoptes.ling.tree.common.base import CommonArgument
 from panoptes.ling.tree.surface.base import SayResult
@@ -52,9 +51,6 @@ class PersonalPronoun(CommonArgument):
 
     # --------------------------------------------------------------------------
     # From deep.
-
-    def relation_arg_type(self):
-        return RelationArgType.INERT
 
     # --------------------------------------------------------------------------
     # From surface.

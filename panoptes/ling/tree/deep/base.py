@@ -2,6 +2,10 @@ from panoptes.ling.tree.base import BaseArgument
 
 
 class TransformState(object):
+    """
+    State required for args to implement to_surface().
+    """
+
     def __init__(self, arbitrary_say_context, purpose_mgr, relation_mgr):
         self.arbitrary_say_context = arbitrary_say_context  # SayContext
         self.relation_mgr = relation_mgr  # RelationManager
@@ -12,15 +16,6 @@ class DeepArgument(BaseArgument):
     """
     An argument in deep structure.
     """
-
-    def relation_arg_type(self):
-        """
-        -> RelationArgType
-
-        What type of argument are we, as far as relations/prepositions are
-        concerned (inert, finite clause, etc.).
-        """
-        raise NotImplementedError
 
     def to_surface(self, transform_state, say_state, idiolect):
         """
