@@ -126,7 +126,7 @@ class Modality(object):
     def is_imperative(self):
         return self.flavor == ModalFlavor.IMPERATIVE
 
-    def is_ind_or_cond(self)
+    def is_ind_or_cond(self):
         return self.flavor == ModalFlavor.INDICATIVE
 
     def is_subjunctive(self):
