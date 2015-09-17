@@ -58,10 +58,10 @@ class VerbExtractor(object):
                 spans.append((begin, end))
                 begin = x
                 end = x
-                word_tuples.append(word_tuple)
+                word_tuples.append(tuple(word_tuple))
                 word_tuple = [token.text]
         spans.append((begin, end))
-        word_tuples.append(word_tuple)
+        word_tuples.append(tuple(word_tuple))
 
         # Parse given spans.
         if len(spans) == 1:
@@ -102,7 +102,7 @@ class VerbExtractor(object):
 
 class ParseToSurface(object):
     """
-    Objects that converts parses to surface structure.
+    Object that converts parses to surface structure.
     """
 
     def __init__(self, correlative_mgr, perspro_mgr, plural_mgr, say_state,
