@@ -1,6 +1,8 @@
 from panoptes.etc.combinatorics import each_choose_one_from_each
 from panoptes.ling.glue.purpose import PurposeManager
 from panoptes.ling.glue.relation import RelationManager
+from panoptes.ling.tree.base import ArgPosRestriction
+from panoptes.ling.tree.common.base import CommonArgument
 from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.deep.content_clause import DeepContentClause, Status
 from panoptes.ling.tree.deep.sentence import DeepSentence
@@ -9,8 +11,13 @@ from panoptes.ling.verb.verb import ModalFlavor, Voice
 
 
 class RecogContext(object):
-    def __init__(self, is_root_clause, is_inside_an_if):
-        self.is_root_clause = is_root_clause
+    def __init__(self, end_punct, is_inside_an_if):
+        # Ending punctuation token.  Matters for Purpose.
+        #
+        # Will be None if not the root clause of the sentence.
+        self.end_punct = end_punct
+
+        # Modality restrictions ("if I [were] a cat, I [would be] a cat").
         self.is_inside_an_if = is_inside_an_if
 
 
@@ -27,11 +34,11 @@ class SurfaceToDeep(object):
         assert isinstance(self.relation_mgr, RelationManager)
 
         self.type2do = {
-            'ProperNoun': self.recog_proper_noun,
+            'SurfaceCommonNoun': self.recog_common_noun,
         }
 
-    def recog_proper_noun(self, n):
-        return [n]
+    def recog_common_noun(self, n):
+        assert False  # XXX
 
     def decide_prep(self, fronted_prep, stranded_prep):
         """
@@ -91,6 +98,9 @@ class SurfaceToDeep(object):
             preps_types, voice == Voice.ACTIVE)
 
     def recog_arg(self, arg):
+        if isinstance(arg, CommonArgument):
+            return [arg]
+
         key = arg.__class__.__name__
         return self.type2do[key](arg)
 
@@ -132,9 +142,29 @@ class SurfaceToDeep(object):
                     map(lambda (p, n): n, unfronted_preps_vargs))
 
             for purpose in purposes:
-                for rels in each_choose_one_from_each(relation_options_per_arg):
-                    for deeps in each_choose_one_from_each(
-                            deep_options_per_arg):
+                for deeps in each_choose_one_from_each(
+                        deep_options_per_arg):
+                    ok = True
+                    for i, deep in enumerate(deeps):
+                        res = deep.arg_position_restriction()
+                        if res == ArgPosRestriction.SUBJECT:
+                            if i == subj_argx:
+                                ok = False
+                                break
+                        elif res == ArgPosRestriction.NOT_SUBJECT:
+                            if i != subj_argx:
+                                ok = False
+                                break
+                        elif res == ArgPosRestriction.ANYWHERE:
+                            pass
+                        else:
+                            assert False
+
+                    if not ok:
+                        continue
+
+                    for rels in each_choose_one_from_each(
+                            relation_options_per_arg):
                         rels_vargs = zip(rels, deeps)
                         r = DeepContentClause(
                             status, purpose, is_intense, c.verb.intrinsics,
@@ -144,7 +174,7 @@ class SurfaceToDeep(object):
 
     def recog(self, ssen):
         assert isinstance(ssen, SurfaceSentence)
-        context = RecogContext(is_root_clause=True, is_inside_an_if=False)
+        context = RecogContext(end_punct=ssen.end_punct, is_inside_an_if=False)
         rr = []
         for root in self.recog_content_clause(ssen.root, context):
             r = DeepSentence(root)
