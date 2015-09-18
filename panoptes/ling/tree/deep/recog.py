@@ -148,11 +148,11 @@ class SurfaceToDeep(object):
                     for i, deep in enumerate(deeps):
                         res = deep.arg_position_restriction()
                         if res == ArgPosRestriction.SUBJECT:
-                            if i == subj_argx:
+                            if i != subj_argx:
                                 ok = False
                                 break
                         elif res == ArgPosRestriction.NOT_SUBJECT:
-                            if i != subj_argx:
+                            if i == subj_argx:
                                 ok = False
                                 break
                         elif res == ArgPosRestriction.ANYWHERE:
