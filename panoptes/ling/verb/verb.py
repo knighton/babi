@@ -27,6 +27,9 @@ class Polarity(object):
         else:
             assert isinstance(self.is_contrary, bool)
 
+    def wildcarded(self):
+        return Polarity(self.tf, None)
+
     def dump(self):
         return {
             'tf': self.tf,
@@ -59,6 +62,9 @@ class Aspect(object):
         else:
             assert isinstance(self.is_perf, bool)
             assert isinstance(self.is_prog, bool)
+
+    def wildcarded(self):
+        return Aspect(None, None)
 
     def dump(self):
         return {
@@ -116,6 +122,9 @@ class Modality(object):
             assert self.is_cond in (None, False, True)
         else:
             assert isinstance(self.is_cond, bool)
+
+    def wildcarded(self):
+        return Modality(self.flavor, None)
 
     def dump(self):
         return {
@@ -194,6 +203,11 @@ class DeepVerb(object):
 
     def is_subjunctive(self):
         return self.modality.is_subjunctive()
+
+    def wildcarded(self):
+        return DeepVerb(self.lemma, self.polarity.wildcarded(), None,
+                        self.aspect.wildcarded(), self.modality.wildcarded(),
+                        self.verb_form, self.is_pro_verb)
 
     def dump(self):
         if self.tense:
@@ -317,6 +331,11 @@ class SurfaceVerb(object):
             nn.append(options.index(a))
         return nn
 
+    def wildcarded(self):
+        return SurfaceVerb(
+            self.intrinsics.wildcarded(), self.voice, None, self.is_split,
+            self.relative_cont, None, None, None)
+
     def can_be_in_root_clause(self):
         # Most non-indicative moods are banned.
         #
@@ -346,6 +365,9 @@ class SurfaceVerb(object):
 
     def is_subjunctive(self):
         return self.intrinsics.is_subjunctive()
+
+    def may_match(self, v):
+        return self.wildcarded().dump() == v.wildcarded().dump()
 
     def dump(self):
         if self.conj:
