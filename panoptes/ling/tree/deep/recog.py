@@ -121,11 +121,11 @@ class SurfaceToDeep(object):
         is_verb_split = c.verb.is_split
         is_fronting = front_argx is not None
         is_ind_or_cond = c.is_ind_or_cond()
-        purposes = self.purpose_mgr.decide_possible_purposes(
-            has_q_args, is_verb_split, is_fronting, is_ind_or_cond)
+        purposes_isstresseds = self.purpose_mgr.decode(
+            has_q_args, is_verb_split, is_fronting, is_ind_or_cond,
+            context.end_punct)
 
         status = Status.ACTUAL
-        is_intense = False
 
         rr = []
         for hallu_preps_vargs, subj_argx in c.hallucinate_preps_vargs():
@@ -141,7 +141,7 @@ class SurfaceToDeep(object):
                 map(self.recog_arg,
                     map(lambda (p, n): n, unfronted_preps_vargs))
 
-            for purpose in purposes:
+            for purpose, is_intense in purposes_isstresseds:
                 for deeps in each_choose_one_from_each(
                         deep_options_per_arg):
                     ok = True

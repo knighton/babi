@@ -61,6 +61,14 @@ class PurposeInfo(object):
 
         return is_fronting
 
+    def decode_end_punct(self, end_punct):
+        rr = []
+        if end_punct == self.stressed_end_punct:
+            rr.append((self.purpose, True))
+        if end_punct == self.unstressed_end_punct:
+            rr.append((self.purpose, False))
+        return rr
+
 
 class PurposeManager(object):
     def __init__(self):
@@ -123,10 +131,22 @@ class PurposeManager(object):
     def get(self, purpose):
         return self.purpose2info[purpose]
 
-    def decide_possible_purposes(self, has_q_args, is_verb_split, is_fronting,
-                                 is_ind_or_cond):
+    def decode(self, has_q_args, is_verb_split, is_fronting, is_ind_or_cond,
+               end_punct):
+        """
+        args -> list of (Purpose, is_stressed)
+        """
         key = (has_q_args, is_verb_split, is_fronting, is_ind_or_cond)
-        return self.args2purposes[key]
+        purposes = self.args2purposes[key]
+
+        if end_punct:
+            rr = []
+            for purpose in purposes:
+                rr += self.get(purpose).decode_end_punct(end_punct)
+        else:
+            purposes = filter(lambda p: p == Purpose.INFO, purposes)
+            rr = map(lambda p: (p, False), purposes)
+        return rr
 
 
 class EndPunctClassifier(object):
