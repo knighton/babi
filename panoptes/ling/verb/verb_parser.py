@@ -4,7 +4,7 @@ import json
 import os
 
 from panoptes.etc.combinatorics import each_choose_one_from_each, \
-    collapse_int_tuples_to_wildcards
+    collapse_int_tuples_to_wildcards, expand_int_tuples_from_wildcards
 from panoptes.ling.verb.conjugation import Conjugator, MAGIC_INTS_LEMMA
 from panoptes.ling.verb.verb import SurfaceVerb
 
@@ -54,7 +54,7 @@ def unpack_verb_words(s):
     return tuple(ss[:x]), tuple(ss[x + 1:])
 
 
-def to_ints(sss2vv, options_per_field, num_options_per_field):
+def to_ints(sss2vv, options_per_field, num_options_per_field, verify=False):
     print 'Collapsing:'
     s2nn = {}
     for sss in sorted(sss2vv):
@@ -67,14 +67,19 @@ def to_ints(sss2vv, options_per_field, num_options_per_field):
             nn = v.to_int_tuple(options_per_field)
             nnn.append(nn)
 
-        pre_len = len(nnn)
-        nnn = collapse_int_tuples_to_wildcards(nnn, num_options_per_field)
+        collapsed = collapse_int_tuples_to_wildcards(
+            nnn, num_options_per_field)
 
         print '%6d -> %2d: %s' % (
-            pre_len, len(nnn), s.replace('|', '...'))
+            len(nnn), len(collapsed), s.replace('|', '...'))
+
+        if verify:
+            nnn2 = sorted(expand_int_tuples_from_wildcards(
+                collapsed, num_options_per_field))
+            assert sorted(nnn) == nnn2
 
         ints = []
-        for nn in nnn:
+        for nn in collapsed:
             n = int_from_wildcardy_int_tuple(nn, num_options_per_field)
             ints.append(n)
 
