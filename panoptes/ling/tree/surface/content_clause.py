@@ -1,5 +1,5 @@
 from panoptes.etc.enum import enum
-from panoptes.ling.glue.inflection import Conjugation
+from panoptes.ling.glue.inflection import Conjugation, Declension
 from panoptes.ling.glue.relation import RelationArgType
 from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun, \
     PersonalPronounCase
