@@ -97,7 +97,11 @@ def save_lookup_tables(be, pro, deverbed, f):
         'pro-verb': pro_verb_s2nn,
         'deverbed': deverbed_s2nn,
     }
-    os.makedirs(os.path.dirname(f))
+
+    dir_name = os.path.dirname(f)
+    if not os.path.exists(dir_name):
+        os.makedirs(dir_name)
+
     json.dump(d, open(f, 'wb'))
 
 
