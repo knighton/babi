@@ -24,13 +24,22 @@ class VerbManager(object):
         return VerbManager(sayer, parser)
 
     def say(self, v):
+        """
+        SurfaceVerb -> (string tuple, string tuple)
+        """
         assert isinstance(v, SurfaceVerb)
         return self.sayer.say(v)
 
     def get_all_say_options(self, v):
+        """
+        SurfaceVerb -> list of (string tuple, string tuple)
+        """
         assert isinstance(v, SurfaceVerb)
         for sss in self.sayer.get_all_say_options(v):
             yield sss
 
     def parse(self, sss):
+        """
+        (string tuple, string tuple) -> list of SurfaceVerb
+        """
         return self.parser.parse(sss)

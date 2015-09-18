@@ -30,57 +30,70 @@ def each_choose_one_from_each(sss):
 
 def collapse_int_tuples_to_wildcards(tuples, num_options_per_field):
     """
-    int tuples, num options per field -> tuples with "wildcards"
+    int tuples, num options per field -> tuples with wildcards
     """
-    # Keep greedily shrinking tuples until we can't anymore.
     while True:
         best_new_tuples = tuples
         give_up = True
 
-        # For each field to collapse on,
         for field_index, num_options in enumerate(num_options_per_field):
-            # For each tuple,
+            already_collapsed = []
             wildcarded2options_present = defaultdict(set)
-            for aa in tuples:
-                option = aa[field_index]
-
-                # If we've already collapsed on this field, skip it.
+            for nn in tuples:
+                option = nn[field_index]
                 if option == num_options:
+                    already_collapsed.append(nn)
                     continue
-
-                # Create the tuple's lookup key with wildcard.
-                wildcarded = list(aa)
+                wildcarded = list(nn)
                 wildcarded[field_index] = num_options
                 wildcarded = tuple(wildcarded)
-
-                # Set the present bit for this option.
                 wildcarded2options_present[wildcarded].add(option)
 
-            # For each key,
-            tmp_new_tuples = []
+            collapsed_or_not = []
             for wildcarded, options_present in \
                     wildcarded2options_present.iteritems():
-                # Unpack the tuple's wildcarded lookup key.
-                aa = list(wildcarded)
-
-                # If all options are present, collapse it, else, don't.
+                nn = list(wildcarded)
                 if len(options_present) == num_options:
-                    aa[field_index] = num_options
-                    tmp_new_tuples.append(aa)
+                    nn[field_index] = num_options
+                    collapsed_or_not.append(nn)
                 else:
                     for option in options_present:
-                        aa[field_index] = option
-                        tmp_new_tuples.append(aa)
+                        nn[field_index] = option
+                        collapsed_or_not.append(list(nn))
 
-            # If we did a better job than the existing, keep it.
-            if tmp_new_tuples and len(tmp_new_tuples) < len(best_new_tuples):
-                best_new_tuples = tmp_new_tuples
+            new_tuples = already_collapsed + collapsed_or_not
+            if len(new_tuples) < len(best_new_tuples):
+                best_new_tuples = new_tuples
                 give_up = False
 
-        # If none of the fields were able to collapse anything, give up.
         if give_up:
             break
 
         tuples = best_new_tuples
-
     return tuples
+
+
+def expand_helper(nn, num_options_per_field, index):
+    if index == len(num_options_per_field):
+        yield []
+        return
+
+    num_options = num_options_per_field[index]
+    if nn[index] < num_options:
+        for tail in expand_helper(nn, num_options_per_field, index + 1):
+            yield [nn[index]] + tail
+    else:
+        for n in xrange(num_options):
+            for tail in expand_helper(nn, num_options_per_field, index + 1):
+                yield [n] + tail
+
+
+def expand_int_tuples_from_wildcards(tuples, num_options_per_field):
+    """
+    int tuples, num options per field -> tuples without wildcards
+    """
+    rr = []
+    for nn in tuples:
+        for r in expand_helper(nn, num_options_per_field, 0):
+            rr.append(r)
+    return rr
