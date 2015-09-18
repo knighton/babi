@@ -219,8 +219,15 @@ class ParseToSurface(object):
         varg_root_indexes = []
         ppp_nnn = []
         for rel, t in root_token.downs:
-            if rel not in ('nsubj', 'dobj'):
+            if rel not in ('nsubj', 'nsubjpass', 'agent', 'dobj'):
                 continue
+
+            if rel == 'agent':
+                assert len(t.downs) == 1
+                rel, down = t.downs[0]
+                assert rel == 'pobj'
+                t = down
+
             varg_root_indexes.append(t.index)
             pp = [None]
             nn = self.recognize_verb_arg(t)
@@ -228,8 +235,10 @@ class ParseToSurface(object):
             for p, n in each_choose_one_from_each([pp, nn]):
                 pp_nn.append((p, n))
             ppp_nnn.append(pp_nn)
+
         subj_argx, vmain_index = \
             self.find_subject(verb_span_pair, varg_root_indexes)
+
         return subj_argx, vmain_index, ppp_nnn
 
     def conjs_from_verb(self, v):
@@ -295,6 +304,8 @@ class ParseToSurface(object):
 
             if subj_argx is None:
                 vv = filter(lambda v: v.is_imperative(), vv)
+            else:
+                assert 0 <= subj_argx < len(ppp_nnn)
 
             for v in vv:
                 for pp_nn in each_choose_one_from_each(ppp_nnn):
