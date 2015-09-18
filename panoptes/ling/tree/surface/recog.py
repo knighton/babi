@@ -292,6 +292,10 @@ class ParseToSurface(object):
                 self.verb_extractor.extract(root_token, is_root_clause):
             subj_argx, vmain_index, ppp_nnn = self.extract_verb_args(
                 root_token, verb_span_pair)
+
+            if subj_argx is None:
+                vv = filter(lambda v: v.is_imperative(), vv)
+
             for v in vv:
                 for pp_nn in each_choose_one_from_each(ppp_nnn):
                     for conj in self.possible_conjugations(v, pp_nn, subj_argx):
