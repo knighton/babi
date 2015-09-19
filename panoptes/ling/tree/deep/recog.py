@@ -4,6 +4,7 @@ from panoptes.ling.glue.relation import RelationManager
 from panoptes.ling.tree.base import ArgPosRestriction
 from panoptes.ling.tree.common.base import CommonArgument
 from panoptes.ling.tree.common.proper_noun import ProperNoun
+from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
 from panoptes.ling.tree.deep.content_clause import DeepContentClause, Status
 from panoptes.ling.tree.deep.sentence import DeepSentence
 from panoptes.ling.tree.surface.sentence import SurfaceSentence
@@ -38,7 +39,21 @@ class SurfaceToDeep(object):
         }
 
     def recog_common_noun(self, n):
-        assert False  # XXX
+        if n.possessor:
+            poss = self.recog_arg(n.possessor)
+        else:
+            poss = [None]
+
+        rr = []
+        for pos in poss:
+            assert not n.explicit_number
+            assert not n.attributes
+            assert not n.preps_nargs
+            d = DeepCommonNoun(
+                pos, n.correlative, n.gram_number, n.gram_of_number, None, [],
+                n.noun, n.say_noun, [])
+            rr.append(d)
+        return rr
 
     def decide_prep(self, fronted_prep, stranded_prep):
         """
@@ -159,7 +174,6 @@ class SurfaceToDeep(object):
                             pass
                         else:
                             assert False
-
                     if not ok:
                         continue
 
