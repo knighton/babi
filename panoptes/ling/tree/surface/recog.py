@@ -219,7 +219,7 @@ class ParseToSurface(object):
         varg_root_indexes = []
         ppp_nnn = []
         for rel, t in root_token.downs:
-            if rel not in ('nsubj', 'nsubjpass', 'agent', 'dobj'):
+            if rel not in ('nsubj', 'nsubjpass', 'agent', 'dobj', 'dative'):
                 continue
 
             if rel == 'agent':
