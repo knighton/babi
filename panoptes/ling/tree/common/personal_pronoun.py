@@ -215,7 +215,7 @@ class PersonalManager(object):
         """
         PersonalPronoun -> Conjugation
         """
-        info = self.inflection_mgr.get_declension(p.declension)
+        info = self.inflection_mgr.get(p.declension)
         return info.decide_conjugation(True)
 
     def perspro_say(self, p, use_whom):
