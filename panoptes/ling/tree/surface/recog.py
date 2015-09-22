@@ -4,6 +4,7 @@ from panoptes.etc.combinatorics import each_choose_one_from_each
 from panoptes.ling.glue.grammatical_number import N2, nx_eq_nx_is_possible
 from panoptes.ling.glue.idiolect import Idiolect
 from panoptes.ling.glue.inflection import Conjugation
+from panoptes.ling.glue.magic_token import A_OR_AN
 from panoptes.ling.glue.purpose import EndPunctClassifier
 from panoptes.ling.parse.parse import Parse
 from panoptes.ling.tree.common.proper_noun import ProperNoun
@@ -146,6 +147,9 @@ class ParseToSurface(object):
             return []
 
         s = child.text
+
+        if s in ['a', 'an']:
+            s = A_OR_AN
 
         nn = []
         for cor, n, of_n in self.correlative_mgr.parse_det(s):
