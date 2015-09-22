@@ -1,12 +1,16 @@
 from copy import deepcopy
 
 from panoptes.etc.combinatorics import each_choose_one_from_each
-from panoptes.ling.glue.grammatical_number import N2, nx_eq_nx_is_possible
+from panoptes.ling.glue.correlative import SurfaceCorrelative
+from panoptes.ling.glue.grammatical_number import N2, N3, N5, \
+    nx_eq_nx_is_possible, nx_to_nxs
 from panoptes.ling.glue.idiolect import Idiolect
 from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.glue.magic_token import A_OR_AN
 from panoptes.ling.glue.purpose import EndPunctClassifier
 from panoptes.ling.parse.parse import Parse
+from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun, \
+    PersonalPronounCase
 from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.surface.base import SayContext, SayState
 from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
@@ -116,7 +120,7 @@ class ParseToSurface(object):
     Object that converts parses to surface structure.
     """
 
-    def __init__(self, correlative_mgr, perspro_mgr, plural_mgr, say_state,
+    def __init__(self, correlative_mgr, personal_mgr, plural_mgr, say_state,
                  verb_mgr):
         # For extracting the correct verb conjugation from subjects.
         self.arbitrary_idiolect = Idiolect()
@@ -128,7 +132,7 @@ class ParseToSurface(object):
         self.verb_extractor = VerbExtractor(verb_mgr)
 
         self.correlative_mgr = correlative_mgr
-        self.perspro_mgr = perspro_mgr
+        self.personal_mgr = personal_mgr
         self.plural_mgr = plural_mgr
 
         self.tag2recognize = {
@@ -138,7 +142,7 @@ class ParseToSurface(object):
             'PRP': self.recog_prp,
         }
 
-    def recog_common_noun(self, root_token, noun, n2):
+    def recog_det_noun(self, root_token, noun, n2):
         if not len(root_token.downs) == 1:
             return []
 
@@ -166,6 +170,34 @@ class ParseToSurface(object):
             nn.append(n)
         return nn
 
+    def recog_posdet_noun(self, root_token, noun, n2):
+        if not len(root_token.downs) == 1:
+            return []
+
+        dep, child = root_token.downs[0]
+        if dep != 'poss':
+            return []
+
+        rr = []
+        for declension in self.personal_mgr.posdet_parse((child.text,)):
+            possessor = PersonalPronoun(declension, PersonalPronounCase.OBJECT)
+            cor = SurfaceCorrelative.DEF
+            if n2 == N2.SING:
+                n = N3.SING
+            else:
+                n = N3.PLUR
+            for of_n in nx_to_nxs(n, N5):
+                r = SurfaceCommonNoun(
+                    possessor, cor, n, of_n, explicit_number=None,
+                    attributes=[], noun=noun, say_noun=True, preps_nargs=[])
+                rr.append(r)
+        return rr
+
+    def recog_common_noun(self, root_token, noun, n2):
+        rr = self.recog_det_noun(root_token, noun, n2)
+        rr += self.recog_posdet_noun(root_token, noun, n2)
+        return rr
+
     def recog_nn(self, root_token):
         sing = root_token.text
         return self.recog_common_noun(root_token, sing, N2.SING)
@@ -183,7 +215,7 @@ class ParseToSurface(object):
 
     def recog_prp(self, root_token):
         ss = root_token.text,
-        return self.perspro_mgr.perspro_parse(ss)
+        return self.personal_mgr.perspro_parse(ss)
 
     def recognize_verb_arg(self, root_token):
         return self.tag2recognize[root_token.tag](root_token)
