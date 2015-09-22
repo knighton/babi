@@ -12,6 +12,7 @@ from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
 from panoptes.ling.tree.surface.content_clause import Complementizer, \
     SurfaceContentClause
 from panoptes.ling.tree.surface.sentence import SurfaceSentence
+from panoptes.ling.verb.annotation import annotate_as_aux
 from panoptes.ling.verb.verb import ModalFlavor
 
 
@@ -23,6 +24,12 @@ class VerbExtractor(object):
     def __init__(self, verb_mgr):
         self.verb_mgr = verb_mgr
 
+    def maybe_annotate_as_aux(self, s):
+        if s in ['have', 'has', 'had']:
+            return annotate_as_aux(s)
+        else:
+            return s
+
     def extract_all(self, root_token):
         """
         subtree -> yields (verb span pair, SurfaceVerbs)
@@ -33,7 +40,10 @@ class VerbExtractor(object):
         # Find all words that make up the verb.
         tt = [root_token]
         for rel, t in root_token.downs:
-            if rel in ('aux', 'auxpass', 'neg'):
+            if rel in ['neg']:
+                tt.append(t)
+            elif rel in ['aux', 'auxpass']:
+                t.text = self.maybe_annotate_as_aux(t.text)
                 tt.append(t)
 
         # Put them in order.
@@ -136,6 +146,7 @@ class ParseToSurface(object):
             return []
 
         s = child.text
+
         nn = []
         for cor, n, of_n in self.correlative_mgr.parse_det(s):
             if not nx_eq_nx_is_possible(n, n2):
