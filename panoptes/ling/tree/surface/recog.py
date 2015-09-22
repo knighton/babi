@@ -322,7 +322,7 @@ class ParseToSurface(object):
         if not conj:
             x = subj_argx + 1
             if not (0 <= x < len(pp_nn)):
-                return []  # Ex-there but no object = can't parse it.
+                return set([])  # Ex-there but no object = can't parse it.
             conj = pp_nn[x][1].decide_conjugation(
                 self.say_state, self.arbitrary_idiolect,
                 self.subject_say_context)
