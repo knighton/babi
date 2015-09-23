@@ -291,13 +291,13 @@
                     say_noun: true
                     rels_nargs: []
             subj_index: 0
-  - text: Who are you??
+  - text: Who are you?
     structure:
         root:
             type: DeepContentClause
             status: ACTUAL
             purpose: WH_Q
-            is_intense: true
+            is_intense: false
             verb:
                 lemma: be
                 polarity:
