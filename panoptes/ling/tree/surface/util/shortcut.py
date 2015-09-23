@@ -5,6 +5,7 @@ from panoptes.etc.enum import enum
 from panoptes.ling.glue.correlative import SurfaceCorrelative
 from panoptes.ling.glue.grammatical_number import N2, nx_to_nx
 from panoptes.ling.glue.inflection import N2_TO_CONJ
+from panoptes.ling.glue.magic_token import PLACE_PREP, TIME_PREP
 from panoptes.ling.tree.surface.base import SayResult
 from panoptes.ling.tree.surface.util.count_restriction import CountRestriction
 
@@ -135,9 +136,9 @@ class ShortcutManager(object):
         # Tokens, is_archaic -> SurfaceCorrelative, ShortcutColumn.
         self.ss_archaic2cors_shs = v2kk_from_k2v(self.cor_sh2ss_archaic)
 
-        # thing -> shortcut columns.
+        # noun -> shortcut columns.
         C = ShortcutColumn
-        self.thing2shortcut_cols = defaultdict(list, {
+        self.noun2shortcut_cols = defaultdict(list, {
             'person': [C.ONE, C.BODY],
             'thing': [C.THING],
             'place': [C.PLACE],
@@ -148,8 +149,13 @@ class ShortcutManager(object):
             'reason': [C.REASON, C.REASON_FORE, C.REASON_LATIN],
         })
 
-        # shortcut column -> thing.
-        self.shortcut_col2thing = v2k_from_k2vv(self.thing2shortcut_cols)
+        self.noun2hallucinate_prep = {
+            'place': PLACE_PREP,
+            'time': TIME_PREP,
+        }
+
+        # shortcut column -> noun.
+        self.shortcut_col2noun = v2k_from_k2vv(self.noun2shortcut_cols)
 
         # Correlative -> count restriction, grammatical number override.
         C = SurfaceCorrelative
@@ -169,7 +175,7 @@ class ShortcutManager(object):
             C.ALT: (R.ONE_OF_PLURAL, None),
         }
 
-    def say(self, prep, n, of_n, cor, thing, allow_archaic):
+    def say(self, prep, n, of_n, cor, noun, allow_archaic):
         """
         args -> SayResult or None
 
@@ -195,7 +201,7 @@ class ShortcutManager(object):
             use_archaics = [False]
 
         for use_archaic in use_archaics:
-            for shortcut_col in self.thing2shortcut_cols[thing]:
+            for shortcut_col in self.noun2shortcut_cols[noun]:
                 ss, is_archaic = self.cor_sh2ss_archaic[(cor, shortcut_col)]
                 if is_archaic and not use_archaic:
                     continue
@@ -211,13 +217,14 @@ class ShortcutManager(object):
 
     def parse(self, ss):
         """
-        tokens -> list of (preposition, Correlative, thing, gram num override)
+        tokens -> list of (preposition, Correlative, noun, gram num override)
         """
         rr = []
         for is_archaic in [False, True]:
             for cor, shortcut_col in self.ss_archaic2cors_shs[(ss, is_archaic)]:
-                thing = self.shortcut_col2thing[shortcut_col]
+                noun = self.shortcut_col2noun[shortcut_col]
                 gram_num_override = self.cor2counts[cor][1]
-                r = (None, cor, thing, gram_num_override)
+                noun = self.noun2hallucinate_prep.get(noun)
+                r = (prep, cor, noun, gram_num_override)
                 rr.append(r)
         return rr
