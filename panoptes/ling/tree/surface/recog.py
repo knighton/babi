@@ -136,6 +136,7 @@ class ParseToSurface(object):
         self.plural_mgr = plural_mgr
 
         self.tag2recognize = {
+            'DT': self.recog_dt,
             'NN': self.recog_nn,
             'NNS': self.recog_nns,
             'NNP': self.recog_nnp,
@@ -143,7 +144,18 @@ class ParseToSurface(object):
             'WP': self.recog_wp,
         }
 
-    def recog_det_noun(self, root_token, noun, n2):
+    def recog_dt(self, root_token):
+        s = root_token.text
+        rr = []
+        for cor, n, of_n in self.correlative_mgr.parse_pro(s):
+            possessor = None
+            r = SurfaceCommonNoun(
+                possessor, cor, n, of_n, explicit_number=None, attributes=[],
+                noun=None, say_noun=False, preps_nargs=[])
+            rr.append(r)
+        return rr
+
+    def recog_dt_nn(self, root_token, noun, n2):
         if not len(root_token.downs) == 1:
             return []
 
@@ -167,7 +179,11 @@ class ParseToSurface(object):
             nn.append(n)
         return nn
 
-    def recog_posdet_noun(self, root_token, noun, n2):
+    def recog_posdet_nn(self, root_token, noun, n2):
+        """
+        * PRP$ NN(S)
+        * WP$ NN(S)
+        """
         if not len(root_token.downs) == 1:
             return []
 
@@ -191,8 +207,8 @@ class ParseToSurface(object):
         return rr
 
     def recog_common_noun(self, root_token, noun, n2):
-        rr = self.recog_det_noun(root_token, noun, n2)
-        rr += self.recog_posdet_noun(root_token, noun, n2)
+        rr = self.recog_dt_nn(root_token, noun, n2)
+        rr += self.recog_posdet_nn(root_token, noun, n2)
         return rr
 
     def recog_nn(self, root_token):
@@ -217,7 +233,7 @@ class ParseToSurface(object):
     def recog_wp(self, root_token):
         s = root_token.text
         rr = []
-        for cor, n, of_n in self.correlative_mgr.parse(s, True):
+        for cor, n, of_n in self.correlative_mgr.parse_pro(s):
             possessor = None
             r = SurfaceCommonNoun(
                 possessor, cor, n, of_n, explicit_number=None, attributes=[],
