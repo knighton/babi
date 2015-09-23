@@ -3,7 +3,7 @@ from collections import defaultdict
 from panoptes.ling.glue.correlative import SurfaceCorrelative
 from panoptes.ling.glue.grammatical_number import N2, N3, N5, \
     nx_le_nx_is_possible, nx_to_nx
-from panoptes.ling.glue.inflection import Conjugation
+from panoptes.ling.glue.inflection import Conjugation, N2_TO_CONJ
 from panoptes.ling.glue.magic_token import POSSESSIVE_MARK
 from panoptes.ling.tree.surface.base import SayContext, SurfaceArgument
 
@@ -279,6 +279,9 @@ class SurfaceCommonNoun(SurfaceArgument):
             # Get pluralness from grammatical number.
             n2 = nx_to_nx(self.gram_number, N2)
             is_plur = n2 == N2.PLUR
+
+            # Its possessor doesn't affect its conjugation, just its number.
+            r.conjugation = N2_TO_CONJ[n2]
         else:
             # Get the determiner words.
             is_pro = False
