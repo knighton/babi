@@ -140,6 +140,7 @@ class ParseToSurface(object):
             'NNS': self.recog_nns,
             'NNP': self.recog_nnp,
             'PRP': self.recog_prp,
+            'WP': self.recog_wp,
         }
 
     def recog_det_noun(self, root_token, noun, n2):
@@ -160,13 +161,9 @@ class ParseToSurface(object):
             if not nx_eq_nx_is_possible(n, n2):
                 continue
             possessor = None
-            explicit_number = None
-            attributes = []
-            say_noun = True
-            preps_nargs = []
             n = SurfaceCommonNoun(
-                possessor, cor, n, of_n, explicit_number, attributes, noun,
-                say_noun, preps_nargs)
+                possessor, cor, n, of_n, explicit_number=None, attributes=[],
+                noun=noun, say_noun=True, preps_nargs=[])
             nn.append(n)
         return nn
 
@@ -216,6 +213,17 @@ class ParseToSurface(object):
     def recog_prp(self, root_token):
         ss = root_token.text,
         return self.personal_mgr.perspro_parse(ss)
+
+    def recog_wp(self, root_token):
+        s = root_token.text
+        rr = []
+        for cor, n, of_n in self.correlative_mgr.parse(s, True):
+            possessor = None
+            r = SurfaceCommonNoun(
+                possessor, cor, n, of_n, explicit_number=None, attributes=[],
+                noun=None, say_noun=False, preps_nargs=[])
+            rr.append(r)
+        return rr
 
     def recognize_verb_arg(self, root_token):
         return self.tag2recognize[root_token.tag](root_token)
