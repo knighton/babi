@@ -236,14 +236,21 @@ class ParseToSurface(object):
         return self.personal_mgr.perspro_parse(ss)
 
     def recog_wp(self, root_token):
-        s = root_token.text
         rr = []
+
+        # For WP like "what".
+        s = root_token.text
         for cor, n, of_n in self.correlative_mgr.parse_pro(s):
             possessor = None
             r = SurfaceCommonNoun(
                 possessor, cor, n, of_n, explicit_number=None, attributes=[],
                 noun=None, say_noun=False, preps_nargs=[])
             rr.append(r)
+
+        # For WP like "who".
+        ss = root_token.text,
+        rr += self.personal_mgr.perspro_parse(ss)
+
         return rr
 
     def recognize_verb_arg(self, root_token):
