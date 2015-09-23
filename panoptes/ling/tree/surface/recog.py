@@ -9,6 +9,7 @@ from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.glue.magic_token import A_OR_AN
 from panoptes.ling.glue.purpose import EndPunctClassifier
 from panoptes.ling.parse.parse import Parse
+from panoptes.ling.tree.common.existential_there import ExistentialThere
 from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun, \
     PersonalPronounCase
 from panoptes.ling.tree.common.proper_noun import ProperNoun
@@ -137,6 +138,7 @@ class ParseToSurface(object):
 
         self.tag2recognize = {
             'DT': self.recog_dt,
+            'EX': self.recog_ex,
             'NN': self.recog_nn,
             'NNS': self.recog_nns,
             'NNP': self.recog_nnp,
@@ -154,6 +156,9 @@ class ParseToSurface(object):
                 noun=None, say_noun=False, preps_nargs=[])
             rr.append(r)
         return rr
+
+    def recog_ex(self, root_token):
+        return [ExistentialThere()]
 
     def recog_dt_nn(self, root_token, noun, n2):
         if not len(root_token.downs) == 1:
@@ -290,7 +295,8 @@ class ParseToSurface(object):
         varg_root_indexes = []
         ppp_nnn = []
         for rel, t in root_token.downs:
-            if rel not in ('nsubj', 'nsubjpass', 'agent', 'dobj', 'dative'):
+            if rel not in ('nsubj', 'nsubjpass', 'agent', 'dobj', 'dative',
+                           'expl', 'attr'):
                 continue
 
             if rel == 'agent':
