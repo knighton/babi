@@ -196,5 +196,5 @@ class InflectionManager(object):
                 r = Declension.THEY2
         return r
 
-    def get_declension(self, declension):
+    def get(self, declension):
         return self.declension2info[declension]
