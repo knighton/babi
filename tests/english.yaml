@@ -752,3 +752,55 @@
                     say_noun: true
                     rels_nargs: []
             subj_index: 0
+  - text: Be here now.
+    structure:
+        root:
+            type: DeepContentClause
+            status: ACTUAL
+            purpose: INFO
+            is_intense: false
+            verb:
+                lemma: be
+                polarity:
+                    tf: true
+                    is_contrary: false
+                tense: PRESENT
+                aspect:
+                    is_perf: false
+                    is_prog: false
+                modality:
+                    flavor: IMPERATIVE
+                    is_cond: false
+                verb_form: FINITE
+                is_pro_verb: false
+            rels_vargs:
+              -
+                  - AGENT
+                  - type: PersonalPronoun
+                    declension: YALL
+                    ppcase: SUBJECT
+              -
+                  - PLACE
+                  - type: DeepCommonNoun
+                    possessor:
+                    correlative: PROX
+                    gram_number: SING
+                    gram_of_number: SING
+                    explicit_number:
+                    attributes: []
+                    noun: place
+                    say_noun: true
+                    rels_nargs: []
+              -
+                  - TIME
+                  - type: DeepCommonNoun
+                    possessor:
+                    correlative: PROX
+                    gram_number: SING
+                    gram_of_number: SING
+                    explicit_number:
+                    attributes: []
+                    noun: time
+                    say_noun: true
+                    rels_nargs: []
+            subj_index: 0

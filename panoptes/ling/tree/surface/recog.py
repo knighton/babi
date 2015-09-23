@@ -260,7 +260,12 @@ class ParseToSurface(object):
             for i, arg in enumerate(varg_root_indexes):
                 if a[1] < arg < b[0]:
                     return i, i + 1
+
+            assert False
         elif a:
+            # We must have args.
+            assert varg_root_indexes
+
             # Just the pre span ("would you?"): find the argument directly
             # after the verb words.
             for i, arg in enumerate(varg_root_indexes):
@@ -268,6 +273,10 @@ class ParseToSurface(object):
                     return i, i + 1
         elif b:
             # Just the main span ("you would", "go!").
+
+            # If no args, we're done.
+            if not varg_root_indexes:
+                return None, 0
 
             # Find the argument preceding the one directly after the verb words,
             # or subject index = None if no subject (imperative).
@@ -376,6 +385,12 @@ class ParseToSurface(object):
         cc = []
         for verb_span_pair, vv in \
                 self.verb_extractor.extract(root_token, is_root_clause):
+            # Hack to compensate for a bug in imperative verb saying.
+            if verb_span_pair[0] and not verb_span_pair[1]:
+                vv = filter(lambda v: not v.is_imperative(), vv)
+            if not vv:
+                continue
+
             subj_argx, vmain_index, ppp_nnn = self.extract_verb_args(
                 root_token, verb_span_pair)
 
