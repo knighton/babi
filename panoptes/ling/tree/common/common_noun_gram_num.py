@@ -34,6 +34,7 @@ class CommonNounGrammaticalNumber(object):
     Examples:
 
     * "the black cat" -> DEF one out of one
+    * "the black cats" -> DEF plural out of plural
     * "both black cats" -> UNIV_ALL dual out of dual
     * "any black cat" -> ELECT_ANY one out of plural
     * "no black cats" -> NEG zero of plural
@@ -64,6 +65,9 @@ class CommonNounGrammaticalNumber(object):
             'of_n_min': N5.to_str[self.n_min],
             'of_n_max': N5.to_str[self.n_min],
         }
+
+    def is_interrogative(self):
+        return self.selector == Selector.INTR
 
     @staticmethod
     def load(d, loader):
