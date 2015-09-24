@@ -2,10 +2,10 @@ from collections import defaultdict
 
 from panoptes.etc.dicts import v2k_from_k2vv, v2kk_from_k2v
 from panoptes.etc.enum import enum
-from panoptes.ling.glue.correlative import SurfaceCorrelative
 from panoptes.ling.glue.grammatical_number import N2, nx_to_nx
 from panoptes.ling.glue.inflection import N2_TO_CONJ
 from panoptes.ling.glue.magic_token import PLACE_PREP, TIME_PREP
+from panoptes.ling.tree.common.util.selector import Melange
 from panoptes.ling.tree.surface.base import SayResult
 from panoptes.ling.tree.surface.util.count_restriction import CountRestriction
 
@@ -25,16 +25,16 @@ def parse_partial(text):
 
     rows = []
     for s in map(lambda ss: ss[0], sss[1:]):
-        row = SurfaceCorrelative.from_str[s]
+        row = Melange.from_str[s]
         rows.append(row)
-    assert set(rows) == SurfaceCorrelative.values
+    assert set(rows) == Melange.values
 
     cols = []
     for s in sss[0]:
         col = ShortcutColumn.from_str[s]
         cols.append(col)
 
-    cor_sh2ss_archaic = {}
+    mel_sh2ss_archaic = {}
     for row_index in xrange(len(sss) - 1):
         for col_index in xrange(n):
             s = sss[row_index + 1][col_index + 1]
@@ -48,8 +48,8 @@ def parse_partial(text):
             ss = tuple(s.split('_'))
             row = rows[row_index]
             col = cols[col_index]
-            cor_sh2ss_archaic[(row, col)] = ss, is_archaic
-    return cor_sh2ss_archaic
+            mel_sh2ss_archaic[(row, col)] = ss, is_archaic
+    return mel_sh2ss_archaic
 
 
 def make_shortcut_table():
@@ -114,7 +114,7 @@ ALT        -         -           -
         r[k] = v
 
     shs = set()
-    for (cor, sh), (ss, is_archaic) in r.iteritems():
+    for (melange, sh), (ss, is_archaic) in r.iteritems():
         shs.add(sh)
     assert shs == ShortcutColumn.values
 
@@ -130,11 +130,11 @@ class ShortcutManager(object):
         # CountRestrictionChecker.
         self.count_restriction_checker = count_restriction_checker
 
-        # SurfaceCorrelative, ShortcutColumn -> tokens, is_archaic.
-        self.cor_sh2ss_archaic = make_shortcut_table()
+        # Melange, ShortcutColumn -> tokens, is_archaic.
+        self.mel_sh2ss_archaic = make_shortcut_table()
 
-        # Tokens, is_archaic -> SurfaceCorrelative, ShortcutColumn.
-        self.ss_archaic2cors_shs = v2kk_from_k2v(self.cor_sh2ss_archaic)
+        # Tokens, is_archaic -> list of (Melange, ShortcutColumn).
+        self.ss_archaic2mels_shs = v2kk_from_k2v(self.mel_sh2ss_archaic)
 
         # noun -> shortcut columns.
         C = ShortcutColumn
@@ -158,24 +158,24 @@ class ShortcutManager(object):
         self.shortcut_col2noun = v2k_from_k2vv(self.noun2shortcut_cols)
 
         # Correlative -> count restriction, grammatical number override.
-        C = SurfaceCorrelative
+        M = Melange
         R = CountRestriction
-        self.cor2counts = {
-            C.INDEF: (None, None),
-            C.DEF: (None, None),
-            C.INTR: (R.ALL_ONE, None),
-            C.PROX: (R.ALL_ONE, None),
-            C.DIST: (R.ALL_ONE, None),
-            C.EXIST: (R.ONE_OF_PLURAL, None),
-            C.ELECT_ANY: (R.ONE_OF_PLURAL, None),
-            C.ELECT_EVER: (R.ALL_ONE, None),
-            C.UNIV_EVERY: (R.ALL, N2.SING),
-            C.UNIV_ALL: (R.ALL, N2.SING),
-            C.NEG: (R.NONE, N2.SING),
-            C.ALT: (R.ONE_OF_PLURAL, None),
+        self.melange2res_ogn = {
+            M.INDEF:      (None,            None),
+            M.DEF:        (None,            None),
+            M.INTR:       (R.ALL_ONE,       None),
+            M.PROX:       (R.ALL_ONE,       None),
+            M.DIST:       (R.ALL_ONE,       None),
+            M.EXIST:      (R.ONE_OF_PLURAL, None),
+            M.ELECT_ANY:  (R.ONE_OF_PLURAL, None),
+            M.ELECT_EVER: (R.ALL_ONE,       None),
+            M.UNIV_EVERY: (R.ALL,           N2.SING),
+            M.UNIV_ALL:   (R.ALL,           N2.SING),
+            M.NEG:        (R.NONE,          N2.SING),
+            M.ALT:        (R.ONE_OF_PLURAL, None),
         }
 
-    def say(self, prep, n, of_n, cor, noun, allow_archaic):
+    def say(self, prep, n, of_n, melange, noun, allow_archaic):
         """
         args -> SayResult or None
 
@@ -183,7 +183,7 @@ class ShortcutManager(object):
         """
         # TODO: require and swallow prepositions correctly.
 
-        restriction, override_gram_num = self.cor2counts[cor]
+        restriction, override_gram_num = self.melange2res_ogn[melange]
         if not restriction:
             return None
         if not self.count_restriction_checker.is_possible(restriction, n, of_n):
@@ -202,7 +202,7 @@ class ShortcutManager(object):
 
         for use_archaic in use_archaics:
             for shortcut_col in self.noun2shortcut_cols[noun]:
-                ss, is_archaic = self.cor_sh2ss_archaic[(cor, shortcut_col)]
+                ss, is_archaic = self.mel_sh2ss_archaic[(melange, shortcut_col)]
                 if is_archaic and not use_archaic:
                     continue
 
@@ -221,10 +221,11 @@ class ShortcutManager(object):
         """
         rr = []
         for is_archaic in [False, True]:
-            for cor, shortcut_col in self.ss_archaic2cors_shs[(ss, is_archaic)]:
+            for melange, shortcut_col in \
+                    self.ss_archaic2mels_shs[(ss, is_archaic)]:
                 noun = self.shortcut_col2noun[shortcut_col]
-                gram_num_override = self.cor2counts[cor][1]
+                _, gram_num_override = self.melange2res_ogn[melange]
                 noun = self.noun2hallucinate_prep.get(noun)
-                r = (prep, cor, noun, gram_num_override)
+                r = (prep, melange, noun, gram_num_override)
                 rr.append(r)
         return rr
