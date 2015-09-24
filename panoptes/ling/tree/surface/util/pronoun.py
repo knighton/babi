@@ -230,14 +230,20 @@ class DetPronounManager(object):
 
         return SayResult(tokens=[s], conjugation=conj, eat_prep=False)
 
-    def parse_det(self, s):
+    def say_determiner(self, selector):
+        return self.say(selector, False)
+
+    def say_pronoun(self, selector):
+        return self.say(selector, True)
+
+    def parse_determiner(self, s):
         """
         word -> list of Selectors
         """
         rr = self.determiner2selectors.get(s)
         return deepcopy(rr)
 
-    def parse_pro(self, s):
+    def parse_pronoun(self, s):
         """
         word -> list of Selectors
         """

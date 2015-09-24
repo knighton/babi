@@ -6,7 +6,11 @@ from panoptes.ling.tree.surface.base import SayResult
 
 
 def say(det_pronoun_mgr, selector, is_pro, expect_r):
-    r = det_pronoun_mgr.say(selector, is_pro)
+    if is_pro:
+        f = det_pronoun_mgr.say_pronoun
+    else:
+        f = det_pronoun_mgr.say_determiner
+    r = f(selector)
     if r == None:
         assert r == expect_r
     else:
@@ -51,11 +55,11 @@ def parse(det_pronoun_mgr, s, expect_selectors):
     ss = s.split()
     if len(ss) == 1:
         s = ss[0]
-        f = det_pronoun_mgr.parse_pro
+        f = det_pronoun_mgr.parse_pronoun
     elif len(ss) == 2:
         s = ss[0]
         assert ss[-1] == '_'
-        f = det_pronoun_mgr.parse_det
+        f = det_pronoun_mgr.parse_determiner
     got_selectors = f(s)
     got = map(lambda sel: sel.dump(), got_selectors)
     expected = map(lambda sel: sel.dump(), expect_selectors)
