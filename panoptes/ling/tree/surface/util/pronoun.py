@@ -6,9 +6,9 @@ from panoptes.ling.glue.grammatical_number import N2, N3, N5, nx_to_nx, \
     nx_to_nxs
 from panoptes.ling.glue.inflection import Conjugation, N2_TO_CONJ
 from panoptes.ling.glue.magic_token import A_OR_AN
-from panoptes.ling.tree.common.util.selector import Correlative
+from panoptes.ling.tree.common.util.selector import Correlative, \
+    CountRestriction, Selector
 from panoptes.ling.tree.surface.base import SayResult
-from panoptes.ling.tree.surface.util.count_restriction import CountRestriction
 
 
 def parse_det_pronoun_entry(s, of):
@@ -89,15 +89,12 @@ def make_det_pronoun_table():
             of = sss[0][col_index]
             of = N5.from_str[of]
 
-            if is_plur and of in (N5.ZERO, N5.SING):
-                continue
-
             for is_pro, is_plur, s in parse_det_pronoun_entry(s, of):
                 cor_pro_plur_of2s[(cor, is_pro, is_plur, of)] = s
     return cor_pro_plur_of2s
 
 
-def combine_entries(aaa):
+def combine_entries(aaa, cor2res_gno):
     """
     list of (Correlative, is pronoun, is plural, out of) -> (Selector, Selector)
     """
@@ -146,20 +143,6 @@ def combine_entries(aaa):
 
 class DetPronounManager(object):
     def __init__(self):
-        # (Correlative, is pronoun, is plural, out of N5) -> word.
-        self.cor_pro_plur_of2s = make_det_pronoun_table()
-
-        # Word -> list of Selectors.
-        self.determiner2selector = {}
-        self.pronoun2selector = {}
-        s2cors_pros_plurs_ofs = v2kk_from_k2v(self.cor_pro_plur_of2s)
-        for s, aaa in s2cors_pros_plurs_ofs:
-            det, pro = combine_entries(aaa)
-            if det:
-                self.determiner2selector[s] = det
-            if pro:
-                self.pronoun2selector[s] = pro
-
         # Correlative -> count restriction, grammatical number override.
         C = Correlative
         R = CountRestriction
@@ -177,6 +160,20 @@ class DetPronounManager(object):
             C.NEG:        (R.NONE,          None),
             C.ALT:        (R.ONE_OF_PLURAL, None),
         }
+
+        # (Correlative, is pronoun, is plural, out of N5) -> word.
+        self.cor_pro_plur_of2s = make_det_pronoun_table()
+
+        # Word -> list of Selectors.
+        self.determiner2selector = {}
+        self.pronoun2selector = {}
+        s2cors_pros_plurs_ofs = v2kk_from_k2v(self.cor_pro_plur_of2s)
+        for s, aaa in s2cors_pros_plurs_ofs.iteritems():
+            det, pro = combine_entries(aaa, self.cor2res_gno)
+            if det:
+                self.determiner2selector[s] = det
+            if pro:
+                self.pronoun2selector[s] = pro
 
     def say(self, selector, is_pro):
         """
