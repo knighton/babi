@@ -108,8 +108,8 @@ class Selector(object):
             'correlative': Correlative.to_str[self.correlative],
             'n_min': N5.to_str[self.n_min],
             'n_max': N5.to_str[self.n_max],
-            'of_n_min': N5.to_str[self.n_min],
-            'of_n_max': N5.to_str[self.n_min],
+            'of_n_min': N5.to_str[self.of_n_min],
+            'of_n_max': N5.to_str[self.of_n_max],
         }
 
     def is_definite(self):
