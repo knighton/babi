@@ -1,4 +1,5 @@
 from collections import defaultdict
+from copy import deepcopy
 
 from panoptes.etc.dicts import v2kk_from_k2v
 from panoptes.etc.enum import enum
@@ -202,5 +203,5 @@ class DetPronounManager(object):
         """
         word -> list of Selectors
         """
-        r = self.pronoun2selectors.get(s)
+        rr = self.pronoun2selectors.get(s)
         return deepcopy(rr)
