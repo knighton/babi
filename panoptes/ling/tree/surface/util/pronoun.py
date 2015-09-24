@@ -96,26 +96,19 @@ def make_det_pronoun_table():
 
 def combine_entries(aaa, cor2res_gno):
     """
-    list of (Correlative, is pronoun, is plural, out of) -> (Selector, Selector)
+    list of (Correlative, is pro, is plur, out of) -> (Selectors, Selectors)
     """
-    # They all have to have the same Correlative.  I am requiring this because
-    # it happens to be true (and this fact will not change), and it allows me to
-    # return just one Selector per determiner or pronoun.
-    assert len(set(map(lambda aa: aa[0], aaa))) == 1
+    # They are all the same Correlative except for "some" (INDEF + EXIST).
+    cor_pro2plurals_ofs = defaultdict(list)
+    for correlative, is_pro, is_plur, of in aaa:
+        cor_pro2plurals_ofs[(correlative, is_pro)].append((is_plur, of))
 
-    rr = []
-    for is_pro in [False, True]:
-        sub_aaa = filter(lambda aa: aa[2] == is_pro, aaa)
-        if not sub_aaa:
-            rr.append(None)
-            continue
-
+    # For each grouping,
+    dets = []
+    pros = []
+    for (correlative, is_pro), plurals_ofs in cor_pro2plurals_ofs.iteritems():
         # Collect the variety of how many/out of there are for this word.
-        plurals = set()
-        ofs = set()
-        for cor, _, is_plural, of_n5 in sub_aaa:
-            plurals.add(is_plural)
-            ofs.add(of_n5)
+        plurals, ofs = map(set, zip(*plurals_ofs))
 
         # Require that each out-of range is contiguous.  This is also because it
         # happens to be true and it allows Selectors to contain ranges instead
@@ -134,16 +127,17 @@ def combine_entries(aaa, cor2res_gno):
         of_n_min = min(ofs)
         of_n_max = max(ofs)
 
-        # We already verified that they're all the same Correlative.
-        correlative = aaa[0][0]
-
         # Create a Selector that covers all of those tuples.
         r = Selector(correlative, n_min, n_max, of_n_min, of_n_max)
         count_restriction, _ = cor2res_gno[correlative]
         r.shrink(count_restriction)
 
-        rr.append(r)
-    return rr
+        if is_pro:
+            pros.append(r)
+        else:
+            dets.append(r)
+
+    return dets, pros
 
 
 class DetPronounManager(object):
@@ -170,15 +164,13 @@ class DetPronounManager(object):
         self.cor_pro_plur_of2s = make_det_pronoun_table()
 
         # Word -> list of Selectors.
-        self.determiner2selector = {}
-        self.pronoun2selector = {}
+        self.determiner2selectors = {}
+        self.pronoun2selectors = {}
         s2cors_pros_plurs_ofs = v2kk_from_k2v(self.cor_pro_plur_of2s)
         for s, aaa in s2cors_pros_plurs_ofs.iteritems():
-            det, pro = combine_entries(aaa, self.cor2res_gno)
-            if det:
-                self.determiner2selector[s] = det
-            if pro:
-                self.pronoun2selector[s] = pro
+            dets, pros = combine_entries(aaa, self.cor2res_gno)
+            self.determiner2selectors[s] = dets
+            self.pronoun2selectors[s] = pros
 
     def say(self, selector, is_pro):
         """
@@ -201,14 +193,14 @@ class DetPronounManager(object):
 
     def parse_det(self, s):
         """
-        word -> Selector or None
+        word -> list of Selectors
         """
-        r = self.determiner2selector.get(s)
-        return deepcopy(r)
+        rr = self.determiner2selectors.get(s)
+        return deepcopy(rr)
 
     def parse_pro(self, s):
         """
-        word -> Selector or None
+        word -> list of Selectors
         """
-        r = self.pronoun2selector.get(s)
-        return deepcopy(r)
+        r = self.pronoun2selectors.get(s)
+        return deepcopy(rr)
