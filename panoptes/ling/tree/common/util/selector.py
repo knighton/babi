@@ -177,12 +177,45 @@ class Selector(object):
 
         return n2
 
-    def shrink(self, count_restriction):
-        aa = COUNT_RESTRICTION2WORST_BOUNDS[count_restriction]
-        self.n_min = max(self.n_min, aa[0])
-        self.n_max = min(self.n_max, aa[1])
-        self.of_n_min = max(self.of_n_min, aa[2])
-        self.of_n_max = min(self.of_n_max, aa[3])
+    def fitted_to_count_restriction(self, count_restriction):
+        """
+        CountRestriction -> Selector or None
+
+        Attempt to shrink our ranges to fit the count restriction.  Returns a
+        new Selector or None if it ruled out everything.
+        """
+        check = COUNT_RESTRICTION2CHECK[count_restriction]
+
+        possible_ns_ofs = []
+        for n5 in xrange(self.n_min, self.n_max + 1):
+            aa = compints_from_nx(n5)
+            for of_n5 in xrange(self.of_n_min, self.of_n_max + 1):
+                bb = compints_from_nx(of_n5)
+                possible = False
+                for a in aa:
+                    for b in bb:
+                        if check(a, b):
+                            possible = True
+                            break
+                if possible:
+                    possible_ns_ofs.append((n5, of_n5))
+
+        if not possible_ns_ofs:
+            return None
+
+        ns, ofs = map(sorted, map(set, zip(*possible_ns_ofs)))
+
+        assert ns == range(ns[0], ns[-1] + 1)
+
+        n_min = ns[0]
+        n_max = ns[-1]
+
+        assert ofs == range(ofs[0], ofs[-1] + 1)
+
+        of_n_min = ofs[0]
+        of_n_max = ofs[-1]
+
+        return Selector(self.correlative, n_min, n_max, of_n_min, of_n_max)
 
     @staticmethod
     def load(d, loader):
