@@ -1,14 +1,52 @@
-from panoptes.ling.glue.correlative import SurfaceCorrelative
-from panoptes.ling.glue.grammatical_number import N3, N5
-from panoptes.ling.tree.surface.util.correlative import CorrelativeManager
-from panoptes.ling.tree.surface.util.count_restriction import \
-    CountRestrictionChecker
+from panoptes.ling.glue.grammatical_number import N5
+from panoptes.ling.tree.common.util.selector import Correlative, Selector
+from panoptes.ling.tree.surface.util.pronoun import DetPronounManager
+
+
+def check(det_pronoun_mgr, s, expect_selectors):
+    ss = s.split()
+    if len(ss) == 1:
+        s = ss[0]
+        f = det_pronoun_mgr.parse_pro
+    elif len(ss) == 2:
+        s = ss[0]
+        assert ss[-1] == '_'
+        f = det_pronoun_mgr.parse_det
+    got_selectors = f(s)
+    got = map(lambda sel: sel.dump(), got_selectors)
+    expected = map(lambda sel: sel.dump(), expect_selectors)
+
+    try:
+        assert got == expected
+    except:
+        import json
+        print
+        print 'ERROR'
+        print
+        print 'Expected:'
+
+        for d in expected:
+            print json.dumps(d, indent=4, sort_keys=True)
+
+        print
+        print 'Got:'
+
+        for d in got:
+            print json.dumps(d, indent=4, sort_keys=True)
+
+        raise
 
 
 def main():
-    counts = CountRestrictionChecker()
-    m = CorrelativeManager(counts)
+    m = DetPronounManager()
 
+    check(m, 'the', [])
+
+    check(m, 'the _', [
+        Selector(Correlative.DEF, N5.SING, N5.MANY, N5.SING, N5.MANY),
+    ])
+
+    """
     r = m.say(SurfaceCorrelative.DEF, N3.SING, N5.SING, False)
     assert r.tokens == ['the']
 
@@ -45,6 +83,7 @@ def main():
     assert set(m.parse_pro('neither')) == set([
         (SurfaceCorrelative.NEG, N3.ZERO, N5.DUAL),
     ])
+    """
 
 
 if __name__ == '__main__':
