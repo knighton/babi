@@ -2,16 +2,16 @@ from collections import defaultdict
 
 from panoptes.etc.dicts import v2kk_from_k2v
 from panoptes.etc.enum import enum
-from panoptes.ling.glue.correlative import SurfaceCorrelative
 from panoptes.ling.glue.grammatical_number import N2, N3, N5, nx_to_nx, \
     nx_to_nxs
 from panoptes.ling.glue.inflection import Conjugation, N2_TO_CONJ
 from panoptes.ling.glue.magic_token import A_OR_AN
+from panoptes.ling.tree.common.util.selector import Correlative
 from panoptes.ling.tree.surface.base import SayResult
 from panoptes.ling.tree.surface.util.count_restriction import CountRestriction
 
 
-def parse_correlative_entry(s, of):
+def parse_det_pronoun_entry(s, of):
     x = s.find('/')
     if x == -1:
         det, pro = s, s
@@ -46,7 +46,7 @@ def parse_correlative_entry(s, of):
         yield is_pro, is_plur, s
 
 
-def make_correlative_table():
+def make_det_pronoun_table():
     text = """
                    SING  DUAL      FEW             MANY
         INDEF      -     a/one     a:some/one:some a:some/one:some
@@ -72,9 +72,9 @@ def make_correlative_table():
     cors = []
     for ss in sss[1:]:
         s = ss[0]
-        cor = SurfaceCorrelative.from_str[s]
+        cor = Correlative.from_str[s]
         cors.append(cor)
-    assert set(cors) == SurfaceCorrelative.values
+    assert set(cors) == Correlative.values
 
     ofs = []
     for s in sss[0]:
@@ -87,21 +87,21 @@ def make_correlative_table():
         for col_index in xrange(n):
             s = sss[row_index + 1][col_index + 1]
             cor = sss[row_index + 1][0]
-            cor = SurfaceCorrelative.from_str[cor]
+            cor = Correlative.from_str[cor]
             of = sss[0][col_index]
             of = N5.from_str[of]
-            for is_pro, is_plur, s in parse_correlative_entry(s, of):
+            for is_pro, is_plur, s in parse_det_pronoun_entry(s, of):
                 cor_pro_plur_of2s[(cor, is_pro, is_plur, of)] = s
     return cor_pro_plur_of2s
 
 
-class CorrelativeManager(object):
+class DetPronounManager(object):
     def __init__(self, count_restriction_checker):
         # CountRestrictionChecker.
         self.count_restriction_checker = count_restriction_checker
 
         # Correlative -> count restriction, grammatical number override.
-        C = SurfaceCorrelative
+        C = Correlative
         R = CountRestriction
         self.cor2counts = {
             C.INDEF: (R.SOME, None),
@@ -118,7 +118,7 @@ class CorrelativeManager(object):
             C.ALT: (R.ONE_OF_PLURAL, None),
         }
 
-        self.cor_pro_plur_of2s = make_correlative_table()
+        self.cor_pro_plur_of2s = make_det_pronoun_table()
 
         self.s2cors_pros_plurs_ofs = v2kk_from_k2v(self.cor_pro_plur_of2s)
 
@@ -126,7 +126,7 @@ class CorrelativeManager(object):
         """
         Correlative, n, of_n -> N2 or None if invalid
         """
-        # Verify counts against its correlative field.
+        # Verify counts against its det-pronoun field.
         restriction, override_gram_num = self.cor2counts[cor]
         if not self.count_restriction_checker.is_possible(restriction, n, of_n):
             return None
@@ -141,7 +141,7 @@ class CorrelativeManager(object):
         """
         args -> SayResult or None
 
-        See if the args can be expressed using a 'correlative'.
+        See if the args can be expressed using a det/pronoun correlative.
         """
         # Can't be selected out of zero.
         if of_n == N5.ZERO:
