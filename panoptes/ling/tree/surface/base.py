@@ -68,6 +68,13 @@ class SayResult(object):
 
         assert isinstance(self.eat_prep, bool)
 
+    def dump(self):
+        return {
+            'tokens': self.tokens,
+            'conjugation': Conjugation.to_str[self.conjugation],
+            'eat_prep': self.eat_prep,
+        }
+
 
 class SurfaceArgument(BaseArgument):
     """
