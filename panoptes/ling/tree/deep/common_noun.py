@@ -1,18 +1,19 @@
 from panoptes.ling.glue.grammatical_number import N3, N5
+from panoptes.ling.tree.common.util.selector import Selector
 from panoptes.ling.tree.deep.base import DeepArgument
 from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
 
 
 class DeepCommonNoun(DeepArgument):
-    def __init__(self, possessor, gram_number, number, attributes, noun,
+    def __init__(self, possessor, selector, number, attributes, noun,
                  say_noun, rels_nargs):
         self.possessor = possessor
         if self.possessor:
             assert isinstance(self.possessor, DeepArgument)
-            assert gram_number.is_definite()
+            assert selector.is_definite()
 
-        self.gram_number = gram_number
-        assert isinstance(self.gram_number, CommonNounGrammaticalNumber)
+        self.selector = selector
+        assert isinstance(self.selector, Selector)
 
         self.number = number
         assert not self.number  # NOTE: not in demo.
@@ -37,14 +38,14 @@ class DeepCommonNoun(DeepArgument):
 
     def dump(self):
         if self.possessor:
-            pos = self.possessor.dump()
+            possessor = self.possessor.dump()
         else:
-            pos = None
+            possessor = None
 
         if self.explicit_number:
-            num = self.explicit_number.dump()
+            number = self.explicit_number.dump()
         else:
-            num = None
+            number = None
 
         rels_nargs = []
         for rel, arg in self.rels_nargs:
@@ -54,9 +55,9 @@ class DeepCommonNoun(DeepArgument):
 
         return {
             'type': 'DeepCommonNoun',
-            'possessor': pos,
-            'gram_number': self.gram_number.dump(),
-            'number': num,
+            'possessor': possessor,
+            'selector': self.selector.dump(),
+            'number': number,
             'attributes': map(lambda a: a.dump(), self.attributes),
             'noun': self.noun,
             'say_noun': self.say_noun,
@@ -64,7 +65,7 @@ class DeepCommonNoun(DeepArgument):
         }
 
     def is_interrogative(self):
-        if self.gram_number.is_interrogative():
+        if self.selector.is_interrogative():
             return True
 
         if self.possessor:
@@ -89,15 +90,16 @@ class DeepCommonNoun(DeepArgument):
 
     def to_surface(self, transform_state, say_state, idiolect):
         if self.possessor:
-            pos = self.possessor.to_surface(transform_state, say_state,
-                                            idiolect)
+            possessor = self.possessor.to_surface(transform_state, say_state,
+                                                  idiolect)
         else:
-            pos = None
+            possessor = None
 
         if self.number:
-            num = self.number.to_surface(transform_state, say_state, idiolect)
+            number = self.number.to_surface(transform_state, say_state,
+                                            idiolect)
         else:
-            num = None
+            number = None
 
         attributes = map(
             lambda a: a.to_surface(transform_state, say_state, idiolect),
@@ -110,7 +112,7 @@ class DeepCommonNoun(DeepArgument):
             narg = arg.to_surface(transform_state, say_state, idiolect)
             preps_nargs.append([prep, narg])
 
-        return SurfaceCommonNoun(pos, self.gram_number, num, attributes,
+        return SurfaceCommonNoun(possessor, self.selector, number, attributes,
                                  self.noun, self.say_noun, preps_nargs)
 
     # --------------------------------------------------------------------------
@@ -118,9 +120,9 @@ class DeepCommonNoun(DeepArgument):
 
     @staticmethod
     def load(d, loader):
-        pos = loader.load(d['possessor'])
-        gram_number = CommonNounGrammaticalNumber.load(d['gram_number'])
-        num = loader.load(d['number'])
+        possessor = loader.load(d['possessor'])
+        selector = Selector.load(d['selector'])
+        number = loader.load(d['number'])
         attributes = map(loader.load, d['attributes'])
         noun = d['noun']
         say_noun = d['say_noun']
@@ -131,5 +133,5 @@ class DeepCommonNoun(DeepArgument):
             arg = loader.load(arg)
             rels_nargs.append((rel, arg))
 
-        return DeepCommonNoun(pos, gram_number, num, attributes, noun, say_noun,
-                              rels_nargs)
+        return DeepCommonNoun(possessor, selector, number, attributes, noun,
+                              say_noun, rels_nargs)
