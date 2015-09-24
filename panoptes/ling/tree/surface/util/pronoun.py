@@ -105,10 +105,15 @@ def combine_entries(aaa, cor2res_gno):
 
     rr = []
     for is_pro in [False, True]:
+        sub_aaa = filter(lambda aa: aa[2] == is_pro, aaa)
+        if not sub_aaa:
+            rr.append(None)
+            continue
+
         # Collect the variety of how many/out of there are for this word.
         plurals = set()
         ofs = set()
-        for cor, _, is_plural, of_n5 in filter(lambda aa: aa[2] == is_pro, aaa):
+        for cor, _, is_plural, of_n5 in sub_aaa:
             plurals.add(is_plural)
             ofs.add(of_n5)
 
