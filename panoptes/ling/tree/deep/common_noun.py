@@ -1,4 +1,3 @@
-from panoptes.ling.glue.correlative import SurfaceCorrelative
 from panoptes.ling.glue.grammatical_number import N3, N5
 from panoptes.ling.tree.deep.base import DeepArgument
 from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
@@ -10,7 +9,7 @@ class DeepCommonNoun(DeepArgument):
         self.possessor = possessor
         if self.possessor:
             assert isinstance(self.possessor, DeepArgument)
-            assert correlative == SurfaceCorrelative.DEF
+            assert gram_number.is_definite()
 
         self.gram_number = gram_number
         assert isinstance(self.gram_number, CommonNounGrammaticalNumber)
@@ -56,7 +55,6 @@ class DeepCommonNoun(DeepArgument):
         return {
             'type': 'DeepCommonNoun',
             'possessor': pos,
-            'correlative': SurfaceCorrelative.to_str[self.correlative],
             'gram_number': self.gram_number.dump(),
             'number': num,
             'attributes': map(lambda a: a.dump(), self.attributes),
