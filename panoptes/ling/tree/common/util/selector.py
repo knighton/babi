@@ -1,5 +1,6 @@
+from panoptes.etc.enum import enum
 from panoptes.ling.glue.grammatical_number import compints_from_nx, N2, N5, \
-    nx_le_nx_is_guaranteed, nx_to_nxs
+    nx_to_nxs
 
 
 # "Correlative" covers articles, interrogatives, demonstratives, and
@@ -93,13 +94,13 @@ class Selector(object):
         self.n_max = n_max
         assert N5.is_valid(self.n_min)
         assert N5.is_valid(self.n_max)
-        assert nx_le_nx_is_guaranteed(self.n_min, self.n_max)
+        assert self.n_min <= self.n_max
 
         self.of_n_min = of_n_min
         self.of_n_max = of_n_max
         assert N5.is_valid(self.of_n_min)
         assert N5.is_valid(self.of_n_max)
-        assert nx_le_nx_is_guaranteed(self.of_n_min, self.of_n_max)
+        assert self.of_n_min <= self.of_n_max
 
     def dump(self):
         return {
