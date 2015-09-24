@@ -51,6 +51,20 @@ COUNT_RESTRICTION2CHECK = {
 }
 
 
+# CountRestriction -> inclusive N5 ranges for (how many, out of).
+COUNT_RESTRICTION2WORST_BOUNDS = {
+    CountRestriction.NONE:          (N5.ZERO, N5.ZERO, N5.ZERO, N5.MANY),
+
+    CountRestriction.ANY:           (N5.ZERO, N5.MANY, N5.ZERO, N5.MANY),
+
+    CountRestriction.ONE_OF_PLURAL: (N5.SING, N5.SING, N5.DUAL, N5.MANY),
+    CountRestriction.SOME:          (N5.SING, N5.MANY, N5.SING, N5.MANY),
+
+    CountRestriction.ALL_ONE:       (N5.SING, N5.SING, N5.SING, N5.SING),
+    CountRestriction.ALL:           (N5.SING, N5.MANY, N5.SING, N5.MANY),
+}
+
+
 class Selector(object):
     """
     Internal field of common nouns.
@@ -163,4 +177,10 @@ class Selector(object):
         n_max = N5.from_str[d['n_max']]
         of_n_min = N5.from_str[d['of_n_min']]
         of_n_max = N5.from_str[d['of_n_max']]
+        return Selector(correlative, n_min, n_max, of_n_min, of_n_max)
+
+    @staticmethod
+    def from_correlative(correlative, count_restriction):
+        n_min, n_max, of_n_min, of_n_max = \
+            COUNT_RESTRICTION2WORST_BOUNDS[count_restriction]
         return Selector(correlative, n_min, n_max, of_n_min, of_n_max)

@@ -5,7 +5,7 @@ from panoptes.etc.enum import enum
 from panoptes.ling.glue.grammatical_number import N2, nx_to_nx
 from panoptes.ling.glue.inflection import N2_TO_CONJ
 from panoptes.ling.glue.magic_token import PLACE_PREP, TIME_PREP
-from panoptes.ling.tree.common.util.selector import Melange
+from panoptes.ling.tree.common.util.selector import Correlative
 from panoptes.ling.tree.surface.base import SayResult
 from panoptes.ling.tree.surface.util.count_restriction import CountRestriction
 
@@ -25,9 +25,9 @@ def parse_partial(text):
 
     rows = []
     for s in map(lambda ss: ss[0], sss[1:]):
-        row = Melange.from_str[s]
+        row = Correlative.from_str[s]
         rows.append(row)
-    assert set(rows) == Melange.values
+    assert set(rows) == Correlative.values
 
     cols = []
     for s in sss[0]:
@@ -113,10 +113,10 @@ ALT        -         -           -
     for k, v in c.iteritems():
         r[k] = v
 
-    shs = set()
-    for (melange, sh), (ss, is_archaic) in r.iteritems():
-        shs.add(sh)
-    assert shs == ShortcutColumn.values
+    shortcut_cols = set()
+    for (cor, sc), (ss, is_archaic) in r.iteritems():
+        shortcut_cols.add(sc)
+    assert shortcut_cols == ShortcutColumn.values
 
     return r
 
@@ -126,106 +126,94 @@ class ShortcutManager(object):
     Saying and parsing of shortcuts.
     """
 
-    def __init__(self, count_restriction_checker):
-        # CountRestrictionChecker.
-        self.count_restriction_checker = count_restriction_checker
+    def __init__(self):
+        # Correlative, ShortcutColumn -> tokens, is_archaic.
+        self.cor_sc2ss_archaic = make_shortcut_table()
 
-        # Melange, ShortcutColumn -> tokens, is_archaic.
-        self.mel_sh2ss_archaic = make_shortcut_table()
+        # Tokens, is_archaic -> list of (Correlative, ShortcutColumn).
+        self.ss_archaic2cors_scs = v2kk_from_k2v(self.cor_sc2ss_archaic)
 
-        # Tokens, is_archaic -> list of (Melange, ShortcutColumn).
-        self.ss_archaic2mels_shs = v2kk_from_k2v(self.mel_sh2ss_archaic)
+        # Noun -> preposition to hallucinate.
+        self.noun2hallucinate_prep = {
+            'place': PLACE_PREP,
+            'time':  TIME_PREP,
+        }
 
-        # noun -> shortcut columns.
+        # Correlative -> (count restriction if possible, grammatical number
+        # override if any).
+        C = Correlative
+        CR = CountRestriction
+        self.cor2res_ogn = {
+            C.INDEF:      (None,             None),
+            C.DEF:        (None,             None),
+            C.INTR:       (CR.ALL_ONE,       None),
+            C.PROX:       (CR.ALL_ONE,       None),
+            C.DIST:       (CR.ALL_ONE,       None),
+            C.EXIST:      (CR.ONE_OF_PLURAL, None),
+            C.ELECT_ANY:  (CR.ONE_OF_PLURAL, None),
+            C.ELECT_EVER: (CR.ALL_ONE,       None),
+            C.UNIV_EVERY: (CR.ALL,           N2.SING),
+            C.UNIV_ALL:   (CR.ALL,           N2.SING),
+            C.NEG:        (CR.NONE,          N2.SING),
+            C.ALT:        (CR.ONE_OF_PLURAL, None),
+        }
+
+        # Noun -> shortcut columns.
         C = ShortcutColumn
         self.noun2shortcut_cols = defaultdict(list, {
             'person': [C.ONE, C.BODY],
-            'thing': [C.THING],
-            'place': [C.PLACE],
+            'thing':  [C.THING],
+            'place':  [C.PLACE],
             'source': [C.SOURCE, C.SOURCE_FROM],
-            'goal': [C.GOAL],
-            'time': [C.TIME],
-            'way': [C.WAY, C.WAY_BY],
+            'goal':   [C.GOAL],
+            'time':   [C.TIME],
+            'way':    [C.WAY, C.WAY_BY],
             'reason': [C.REASON, C.REASON_FORE, C.REASON_LATIN],
         })
 
-        self.noun2hallucinate_prep = {
-            'place': PLACE_PREP,
-            'time': TIME_PREP,
-        }
-
-        # shortcut column -> noun.
+        # Shortcut column -> noun.
         self.shortcut_col2noun = v2k_from_k2vv(self.noun2shortcut_cols)
 
-        # Correlative -> count restriction, grammatical number override.
-        M = Melange
-        R = CountRestriction
-        self.melange2res_ogn = {
-            M.INDEF:      (None,            None),
-            M.DEF:        (None,            None),
-            M.INTR:       (R.ALL_ONE,       None),
-            M.PROX:       (R.ALL_ONE,       None),
-            M.DIST:       (R.ALL_ONE,       None),
-            M.EXIST:      (R.ONE_OF_PLURAL, None),
-            M.ELECT_ANY:  (R.ONE_OF_PLURAL, None),
-            M.ELECT_EVER: (R.ALL_ONE,       None),
-            M.UNIV_EVERY: (R.ALL,           N2.SING),
-            M.UNIV_ALL:   (R.ALL,           N2.SING),
-            M.NEG:        (R.NONE,          N2.SING),
-            M.ALT:        (R.ONE_OF_PLURAL, None),
-        }
-
-    def say(self, prep, n, of_n, melange, noun, allow_archaic):
+    def say(self, prep, selector, noun, allow_archaic):
         """
         args -> SayResult or None
 
-        See if the args can expressed using a 'shortcut'.
+        See if the args can be expressed using a 'shortcut' word.
         """
-        # TODO: require and swallow prepositions correctly.
-
-        restriction, override_gram_num = self.melange2res_ogn[melange]
-        if not restriction:
-            return None
-        if not self.count_restriction_checker.is_possible(restriction, n, of_n):
+        n2 = selector.decide_n2(self.cor2res_gno)
+        if not n2:
             return None
 
-        if override_gram_num:
-            gram_num = override_gram_num
-        else:
-            gram_num = nx_to_nx(n, N2)
-        conj = N2_TO_CONJ[gram_num]
+        conj = N2_TO_CONJ[n2]
 
-        if allow_archaic:
-            use_archaics = [False, True]
-        else:
-            use_archaics = [False]
+        for shortcut_col in self.noun2shortcut_cols[noun]:
+            key = (selector.correlative, shortcut_col)
+            tokens, is_archaic = self.cor_sc2ss_archaic[key]
+            tokens = list(tokens)
 
-        for use_archaic in use_archaics:
-            for shortcut_col in self.noun2shortcut_cols[noun]:
-                ss, is_archaic = self.mel_sh2ss_archaic[(melange, shortcut_col)]
-                if is_archaic and not use_archaic:
-                    continue
+            if is_archaic and not allow_archaic:
+                continue
 
-                # TODO: swallow preposition correctly.
-                eat_prep = shortcut_col in \
-                    (ShortcutColumn.PLACE, ShortcutColumn.TIME)
+            noun = self.shortcut_col2noun[shortcut_col]
+            eat_prep = noun in self.noun2hallucinate_prep
 
-                return SayResult(tokens=list(ss), conjugation=conj,
-                                 eat_prep=eat_prep)
+            return SayResult(tokens=tokens, conjugation=conj, eat_prep=eat_prep)
 
         return None
 
     def parse(self, ss):
         """
-        tokens -> list of (preposition, Correlative, noun, gram num override)
+        tokens -> list of (hallucinated preposition, Selector, noun)
+
+        Try to pull a shortcut out of the given words (typically just one word).
         """
         rr = []
         for is_archaic in [False, True]:
-            for melange, shortcut_col in \
-                    self.ss_archaic2mels_shs[(ss, is_archaic)]:
+            for correlative, shortcut_col in \
+                    self.ss_archaic2cors_scs[(ss, is_archaic)]:
                 noun = self.shortcut_col2noun[shortcut_col]
-                _, gram_num_override = self.melange2res_ogn[melange]
-                noun = self.noun2hallucinate_prep.get(noun)
-                r = (prep, melange, noun, gram_num_override)
-                rr.append(r)
+                prep = self.noun2hallucinate_prep.get(noun)
+                count_res, _ = self.cor2res_ogn[correlative]
+                selector = Selector.from_correlative(correlative, count_res)
+                rr.append(prep, selector, noun)
         return rr
