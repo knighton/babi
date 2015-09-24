@@ -107,7 +107,9 @@ def combine_entries(aaa, cor2res_gno):
     # For each grouping,
     dets = []
     pros = []
-    for (correlative, is_pro), plurals_ofs in cor_pro2plurals_ofs.iteritems():
+    for correlative, is_pro in sorted(cor_pro2plurals_ofs):
+        plurals_ofs = cor_pro2plurals_ofs[(correlative, is_pro)]
+
         # Collect the variety of how many/out of there are for this word.
         plurals, ofs = map(set, zip(*plurals_ofs))
 
