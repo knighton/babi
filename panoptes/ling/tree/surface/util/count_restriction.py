@@ -8,7 +8,7 @@ CountRestriction = enum("""CountRestriction =
 
 class CountRestrictionChecker(object):
     def __init__(self):
-        self.enum2f = {
+        self.cr2f = {
             # Zero.
             CountRestriction.NONE: lambda a, b: 0 == a <= b,
 
@@ -29,7 +29,7 @@ class CountRestrictionChecker(object):
         bb = compints_from_nx(of_n)
         for a in aa:
             for b in bb:
-                if self.enum2f[count_restriction](a, b):
+                if self.cr2f[count_restriction](a, b):
                     return True
         return False
 
