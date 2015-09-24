@@ -1,4 +1,5 @@
-from panoptes.ling.glue.grammatical_number import N5, nx_le_nx_is_guaranteed
+from panoptes.ling.glue.grammatical_number import compints_from_nx, N2, N5, \
+    nx_le_nx_is_guaranteed
 
 
 # "Melange" covers articles, interrogatives, demonstratives, and quantifiers, as
@@ -29,6 +30,28 @@ Melange = enum("""Melange =
     NEG
     ALT
 """)
+
+
+CountRestriction = enum("""CountRestriction =
+    NONE ANY ONE_OF_PLURAL SOME ALL_ONE ALL""")
+
+
+# CountRestriction -> implementation that compares compints.
+COUNT_RESTRICTION2F = {
+    # Negative.
+    CountRestriction.NONE: lambda a, b: 0 == a <= b,
+
+    # Unknown (any).
+    CountRestriction.ANY: lambda a, b: 0 <= a <= b,
+
+    # Indefinite forms: less than all of them.
+    CountRestriction.ONE_OF_PLURAL: lambda a, b: 1 == a < b,
+    CountRestriction.SOME: lambda a, b: 1 <= a < b,
+
+    # Definite forms: all of them.
+    CountRestriction.ALL_ONE: lambda a, b: 1 == a == b,
+    CountRestriction.ALL: lambda a, b: 1 <= a == b,
+}
 
 
 class Selector(object):
@@ -82,6 +105,59 @@ class Selector(object):
 
     def is_interrogative(self):
         return self.melange == Melange.INTR
+
+    def to_compints(self):
+        aa = []
+        for n in xrange(self.n_min, self.n_max + 1):
+            aa += compints_from_nx(n)
+        aa = set(aa)
+
+        bb = []
+        for n in xrange(self.of_n_min, self.of_n_max + 1):
+            bb += compints_from_nx(n)
+        bb = set(bb)
+
+        return aa, bb
+
+    def decide_n2(self, melange2res_gno):
+        """
+        (Melange -> (CountRestriction or None, N2 or None)) -> N2 or None
+
+        Get whether to say the owning common noun as singular or plural, taking
+        exceptions into account.
+
+        Returns None if we are not valid (requires the input table to
+        fully determine).
+        """
+        count_restriction, gram_num_override = melange2res_gno[self.melange]
+
+        # If there is no CountRestriction, it's not possible (eg, DEF is okay
+        # for correlatives ("the"), but there is no such shortcut).
+        if not count_restriction:
+            return None
+
+        # Make sure that the "how many" range, the "out of" range, and the
+        # count restriction jive.
+        aa, bb = self.to_compints()
+        f = COUNT_RESTRICTION2F[count_restriction]
+        possible = False
+        for a in aa:
+            for b in bb:
+                if f(a, b):
+                    possible = True
+        if not possible:
+            return None
+
+        # Determine the correct N2.
+        if gram_num_override:
+            n2 = gram_num_override
+        else:
+            if self.n_min == N5.SING:
+                n2 = N2.SING
+            else:
+                n2 = N2.PLUR
+
+        return n2
 
     @staticmethod
     def load(d, loader):
