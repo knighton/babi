@@ -1,9 +1,53 @@
-from panoptes.ling.glue.grammatical_number import N5
+from panoptes.ling.glue.grammatical_number import N2, N5
+from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.tree.common.util.selector import Correlative, Selector
 from panoptes.ling.tree.surface.util.pronoun import DetPronounManager
+from panoptes.ling.tree.surface.base import SayResult
 
 
-def check(det_pronoun_mgr, s, expect_selectors):
+def say(det_pronoun_mgr, selector, is_pro, expect_r):
+    r = det_pronoun_mgr.say(selector, is_pro)
+    if r == None:
+        assert r == expect_r
+    else:
+        assert r.dump() == expect_r.dump()
+
+
+def test_say(m):
+    selector = Selector(Correlative.DEF, N5.FEW, N5.FEW, N5.FEW, N5.FEW)
+    r = SayResult(tokens=['the'], conjugation=Conjugation.P3, eat_prep=False)
+    say(m, selector, False, r)
+
+    selector = Selector(Correlative.DEF, N5.SING, N5.SING, N5.SING, N5.SING)
+    r = SayResult(tokens=['the'], conjugation=Conjugation.S3, eat_prep=False)
+    say(m, selector, False, r)
+
+    selector = Selector(Correlative.DEF, N5.SING, N5.SING, N5.SING, N5.SING)
+    r = None
+    say(m, selector, True, r)
+
+    selector = Selector(Correlative.NEG, N5.ZERO, N5.ZERO, N5.DUAL, N5.DUAL)
+    r = SayResult(tokens=['neither'], conjugation=Conjugation.P3,
+                  eat_prep=False)
+    say(m, selector, False, r)
+
+    selector = Selector(Correlative.NEG, N5.ZERO, N5.ZERO, N5.DUAL, N5.DUAL)
+    r = SayResult(tokens=['neither'], conjugation=Conjugation.P3,
+                  eat_prep=False)
+    say(m, selector, True, r)
+
+    selector = Selector(Correlative.NEG, N5.ZERO, N5.ZERO, N5.FEW, N5.MANY)
+    r = SayResult(tokens=['no'], conjugation=Conjugation.P3,
+                  eat_prep=False)
+    say(m, selector, False, r)
+
+    selector = Selector(Correlative.NEG, N5.ZERO, N5.ZERO, N5.FEW, N5.MANY)
+    r = SayResult(tokens=['none'], conjugation=Conjugation.P3,
+                  eat_prep=False)
+    say(m, selector, True, r)
+
+
+def parse(det_pronoun_mgr, s, expect_selectors):
     ss = s.split()
     if len(ss) == 1:
         s = ss[0]
@@ -21,7 +65,7 @@ def check(det_pronoun_mgr, s, expect_selectors):
     except:
         import json
         print
-        print 'ERROR'
+        print 'ERROR:', s
         print
         print 'Expected:'
 
@@ -37,53 +81,40 @@ def check(det_pronoun_mgr, s, expect_selectors):
         raise
 
 
-def main():
-    m = DetPronounManager()
+def test_parse(m):
+    parse(m, 'the', [])
 
-    check(m, 'the', [])
-
-    check(m, 'the _', [
+    parse(m, 'the _', [
         Selector(Correlative.DEF, N5.SING, N5.MANY, N5.SING, N5.MANY),
     ])
 
-    """
-    r = m.say(SurfaceCorrelative.DEF, N3.SING, N5.SING, False)
-    assert r.tokens == ['the']
-
-    r = m.say(SurfaceCorrelative.DEF, N3.SING, N5.SING, True)
-    assert not r
-
-    r = m.say(SurfaceCorrelative.DEF, N3.PLUR, N5.SING, False)
-    assert not r
-
-    assert set(m.parse_det('both')) == set([
-        (SurfaceCorrelative.UNIV_ALL, N3.PLUR, N5.DUAL),
+    parse(m, 'this', [
+        Selector(Correlative.PROX, N5.SING, N5.SING, N5.SING, N5.SING),
     ])
 
-    assert set(m.parse_pro('both')) == set([
-        (SurfaceCorrelative.UNIV_ALL, N3.PLUR, N5.DUAL),
+    parse(m, 'both', [
+        Selector(Correlative.UNIV_ALL, N5.DUAL, N5.DUAL, N5.DUAL, N5.DUAL),
     ])
 
-    assert set(m.parse_det('any')) == set([
-        (SurfaceCorrelative.ELECT_ANY, N3.SING, N5.FEW),
-        (SurfaceCorrelative.ELECT_ANY, N3.PLUR, N5.FEW),
-        (SurfaceCorrelative.ELECT_ANY, N3.SING, N5.MANY),
-        (SurfaceCorrelative.ELECT_ANY, N3.PLUR, N5.MANY),
+    parse(m, 'neither', [
+        Selector(Correlative.NEG, N5.ZERO, N5.ZERO, N5.DUAL, N5.DUAL),
     ])
 
-    assert set(m.parse_pro('the')) == set([])
-
-    assert set(m.parse_det('the')) == set([
-        (SurfaceCorrelative.DEF, N3.SING, N5.SING),
-        (SurfaceCorrelative.DEF, N3.PLUR, N5.DUAL),
-        (SurfaceCorrelative.DEF, N3.PLUR, N5.FEW),
-        (SurfaceCorrelative.DEF, N3.PLUR, N5.MANY),
+    parse(m, 'either', [
+        Selector(Correlative.ELECT_ANY, N5.SING, N5.SING, N5.DUAL, N5.DUAL),
     ])
 
-    assert set(m.parse_pro('neither')) == set([
-        (SurfaceCorrelative.NEG, N3.ZERO, N5.DUAL),
+    parse(m, 'any', [
+        Selector(Correlative.ELECT_ANY, N5.SING, N5.MANY, N5.FEW, N5.MANY),
     ])
-    """
+
+
+def main():
+    m = DetPronounManager()
+
+    test_say(m)
+
+    test_parse(m)
 
 
 if __name__ == '__main__':
