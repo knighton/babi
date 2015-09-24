@@ -72,7 +72,7 @@ class Selector(object):
     How common nouns handle grammatical number.
 
     Information is stored as:
-    * a Quantifier (eg, all/some/one/unknown of them)
+    * a Correlative (eg, all/some/one/unknown of them)
     * how many there are, as an N5 range (eg, singular/plural/two/many)
     * out of how many they were selected from, also an N5 range
 
