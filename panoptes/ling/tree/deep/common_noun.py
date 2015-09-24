@@ -5,8 +5,13 @@ from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
 
 
 class DeepCommonNoun(DeepArgument):
-    def __init__(self, possessor, selector, number, attributes, noun,
-                 say_noun, rels_nargs):
+    def __init__(self, possessor=None, selector=None, number=None,
+                 attributes=None, noun=None, say_noun=True, rels_nargs=None):
+        if attributes is None:
+            attributes = []
+        if rels_nargs is None:
+            rels_nargs = []
+
         self.possessor = possessor
         if self.possessor:
             assert isinstance(self.possessor, DeepArgument)
