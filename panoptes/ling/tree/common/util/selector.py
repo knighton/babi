@@ -112,6 +112,9 @@ class Selector(object):
             'of_n_max': N5.to_str[self.of_n_max],
         }
 
+    def is_indefinite(self):
+        return self.correlative == Correlative.INDEF
+
     def is_definite(self):
         return self.correlative == Correlative.DEF
 

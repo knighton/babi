@@ -1,10 +1,10 @@
 from collections import defaultdict
 
-from panoptes.ling.glue.correlative import SurfaceCorrelative
 from panoptes.ling.glue.grammatical_number import N2, N3, N5, \
     nx_le_nx_is_possible, nx_to_nx
 from panoptes.ling.glue.inflection import Conjugation, N2_TO_CONJ
 from panoptes.ling.glue.magic_token import POSSESSIVE_MARK
+from panoptes.ling.tree.common.util.selector import Selector
 from panoptes.ling.tree.surface.base import SayContext, SurfaceArgument
 
 
@@ -27,12 +27,18 @@ class SurfaceCommonNoun(SurfaceArgument):
     * [Every idea of Einstein that dogs bark which I don't believe] is true.
     """
 
-    def __init__(self, possessor, correlative, gram_number, gram_of_number,
-                 explicit_number, attributes, noun, preps_nargs):
+    def __init__(self, possessor=None, selector=None, number=None,
+                 attributes=None, noun=None, preps_nargs=None):
+        # Prevent aliasing hell.
+        if attributes is None:
+            attributes = []
+        if preps_nargs is None:
+            preps_nargs = []
+
         # Possessor.
         #
-        # If it has a possessor, correlative must be definite (eg, "[Tim's] cat"
-        # means "[the] cat of Tim").
+        # If it has a possessor, selector/correlative must be definite (eg,
+        # "[Tim's] cat" means "[the] cat of Tim").
         #
         # Examples:
         # * [Tim's] cat
@@ -41,41 +47,33 @@ class SurfaceCommonNoun(SurfaceArgument):
         self.possessor = possessor
         if self.possessor:
             assert isinstance(self.possessor, SurfaceArgument)
-            assert correlative == SurfaceCorrelative.DEF
+            assert selector.is_definite()
 
         # Grammatical clues about the number (eg, "that cat", "those cats",
         # "every cat", "all cats").  They have to jive with each other.
         #
         # Note that whether the noun is said as plural or singular is derived
         # dynamically, considering exceptions.
-        self.correlative = correlative         # SurfaceCorrelative.
-        self.gram_number = gram_number         # Roughly how many there are.
-        self.gram_of_number = gram_of_number   # Out of roughly how many the
-                                               # complete expression matches.
-        assert SurfaceCorrelative.is_valid(self.correlative)
-        assert N3.is_valid(self.gram_number)
-        assert N5.is_valid(self.gram_of_number)
-        assert nx_le_nx_is_possible(self.gram_number, self.gram_of_number)
-        # TODO: crosscheck correlative against grammatical numbers.
+        self.selector = selector
+        assert isinstance(self.selector, Selector)
 
         # Explicit count or amount that converts to N3.  If present, must match
         # grammatical clues about number above.
-        self.explicit_number = explicit_number
-        if self.explicit_number:
+        self.number = number
+        if self.number:
             assert False  # NOTE: not in demo.
-            # assert isinstance(self.explicit_number, Number)
-            # TODO: crosscheck explicit nubmer against grammatical numbers.
+            assert self.selector.accepts_count_or_amount(self.number)
 
         # List of restrictive or descriptive attributes.
         self.attributes = attributes
         assert isinstance(self.attributes, list)
         for a in self.attributes:
             assert False  # NOTE: not in demo.
-            # assert isinstance(a, Attribute)
 
         # The word(s) for its type, unit, noun, etc.
         #
-        # May not be present (eg, "[that kite] flew" vs "[that] flew").
+        # May not be present (eg, "[that kite] flew" vs "[that] flew").  May be
+        # present as a pro-adverb/pronoun (eg, "everyone", "everywhere").
         #
         # Say the noun when it is non-obvious from context, otherwise it's more
         # parsimonious not to.
@@ -108,8 +106,8 @@ class SurfaceCommonNoun(SurfaceArgument):
         else:
             pos = None
 
-        if self.explicit_number:
-            num = self.explicit_number.dump()
+        if self.number:
+            num = self.number.dump()
         else:
             num = None
 
@@ -122,17 +120,15 @@ class SurfaceCommonNoun(SurfaceArgument):
         return {
             'type': 'SurfaceCommonNoun',
             'possessor': pos,
-            'correlative': SurfaceCorrelative.to_str[self.correlative],
-            'gram_number': N3.to_str[self.gram_number],
-            'gram_of_number': N5.to_str[self.gram_of_number],
-            'explicit_number': num,
+            'selector': self.selector.dump(),
+            'number': num,
             'attributes': map(lambda a: a.dump(), self.attributes),
             'noun': self.noun,
             'preps_nargs': preps_nargs,
         }
 
     def is_interrogative(self):
-        if self.correlative == SurfaceCorrelative.INTR:
+        if self.selector.is_interrogative():
             return True
 
         if self.possessor:
@@ -168,38 +164,36 @@ class SurfaceCommonNoun(SurfaceArgument):
 
         Eg, "the dog [that] saw you" but "the boy [who] saw you"
         """
-        assert self.noun:
+        assert self.noun
         return is_noun_sentient(self.noun)
 
     def decide_conjugation(self, state, idiolect, context):
         return self.say_head(state, idiolect, context).conjugation
 
-    def say_head_as_shortcut(self, state, idiolect, context):
+    def say_head_as_pro_adverb(self, state, idiolect, context):
         """
         Eg, therefore
         """
-        if self.possessor or self.explicit_number or self.attributes:
+        if self.possessor or self.number or self.attributes:
             return None
 
-        return state.shortcut_mgr.say(
-            context.prep, self.gram_number, self.gram_of_number,
-            self.correlative, self.noun, idiolect.archaic_shortcuts)
+        return state.pro_adverb_mgr.say(context.prep, self.selector, self.noun,
+                                        idiolect.archaic_pro_adverbs)
 
-    def say_head_as_correlative(self, state):
+    def say_head_as_impersonal_pronoun(self, state):
         """
         Eg, what
         """
-        if self.possessor or self.explicit_number or self.attributes:
+        if self.possessor or self.number or self.attributes:
             return None
 
-        return state.correlative_mgr.say(
-            self.correlative, self.gram_number, self.gram_of_number, True)
+        return state.det_pronoun_mgr.say_pronoun(self.selector)
 
     def say_head_as_possessive_pronoun(self, state, idiolect, context):
         """
         Eg, yours
         """
-        if self.explicit_number or self.attributes:
+        if self.number or self.attributes:
             return None
 
         if not isinstance(self.possessor, PersonalPronoun):
@@ -207,9 +201,9 @@ class SurfaceCommonNoun(SurfaceArgument):
 
         ss = state.personal_mgr.pospro_say(
             self.possessor.declension, idiolect.whom)
-        conj = nx_to_nx(self.gram_number, N2)
-        eat_prep = False
-        return SayResult(ss, conj, eat_prep)
+        n2 = self.selector.guess_n(N2)
+        conj = N2_TO_CONJ[n2]
+        return SayResult(tokens=ss, conjugation=conj, eat_prep=False)
 
     def say_head_as_number(self, state, idiolect, context):
         """
@@ -225,19 +219,15 @@ class SurfaceCommonNoun(SurfaceArgument):
                 is_possessive=True)
             r = self.possessor.say(state, idiolect, sub_context)
             num_has_left = True
-        elif self.correlative == SurfaceCorrelative.INDEF:
+        elif self.selector.is_indefinite():
             # Eg, "three".
-            tokens = []
-            n2 = nx_to_nx(self.gram_number, N2)
+            n2 = self.selector.guess_n(N2)
             conj = N2_TO_CONJ[n2]
-            eat_prep = False
-            r = SayResult(tokens, conj, eat_prep)
+            r = SayResult(tokens=[], conjugation=conj, eat_prep=False)
             num_has_left = False
         else:
             # Eg, "those three"
-            is_pro = False
-            r = state.correlative_mgr.say(
-                self.correlative, self.gram_number, self.gram_of_number, is_pro)
+            r = state.det_pronoun_mgr.say_determiner(self.selector)
             num_has_left = True
 
         # If saying the possessor or the correlative failed (some kind of
@@ -272,16 +262,14 @@ class SurfaceCommonNoun(SurfaceArgument):
                 return None
 
             # Get pluralness from grammatical number.
-            n2 = nx_to_nx(self.gram_number, N2)
+            n2 = self.selector.guess_n(N2)
             is_plur = n2 == N2.PLUR
 
             # Its possessor doesn't affect its conjugation, just its number.
             r.conjugation = N2_TO_CONJ[n2]
         else:
             # Get the determiner words.
-            is_pro = False
-            r = state.correlative_mgr.say(
-                self.correlative, self.gram_number, self.gram_of_number, is_pro)
+            r = state.det_pronoun_mgr.say_determiner(self.selector)
 
             # If saying failed, bail.
             if not r:
@@ -290,16 +278,15 @@ class SurfaceCommonNoun(SurfaceArgument):
             # If explicit number and indef, don't say the correlative.
             #
             # Eg, "I saw 3 cats"
-            if self.explicit_number and \
-                    self.correlative == SurfaceCorrelative.INDEF:
+            if self.number and self.selector.is_indefinite():
                 r.tokens = []
 
             # Get pluralness from its conjugation.
             is_plur = r.conjugation == Conjugation.P3
 
         # Say the explicit number.
-        if self.explicit_number:
-            r2 = self.explicit_number.say(state, idiolect, None)
+        if self.number:
+            r2 = self.number.say(state, idiolect, None)
             r.tokens += r2.tokens
 
         # Say the attributes.
@@ -318,14 +305,14 @@ class SurfaceCommonNoun(SurfaceArgument):
     def say_head(self, state, idiolect, context):
         # Try various options for rendering it.
         if self.noun:
-            r = self.say_head_as_shortcut(state, idiolect, context)
+            r = self.say_head_as_pro_adverb(state, idiolect, context)
             if not r:
                 r = self.say_head_as_full(state, idiolect, context, self.noun)
         else:
-            r = self.say_head_as_correlative(state)
+            r = self.say_head_as_impersonal_pronoun(state)
             if not r:
-                r = self.say_head_as_possessive_pronoun(
-                    state, idiolect, context)
+                r = self.say_head_as_possessive_pronoun(state, idiolect,
+                                                        context)
             if not r:
                 self.say_head_as_number(state, idiolect, context)
 
@@ -347,7 +334,7 @@ class SurfaceCommonNoun(SurfaceArgument):
 
     def say_tail(self, state, idiolect, context):
         if self.preps_nargs:
-            assert False  # TOOD: not in MVP.
+            assert False  # NOTE: not in demo.
 
         return []
 
@@ -374,10 +361,8 @@ class SurfaceCommonNoun(SurfaceArgument):
     @staticmethod
     def load(d, loader):
         possessor = loader.load(d['possessor'])
-        correlative = SurfaceCorrelative.from_str[d['correlative']]
-        gram_number = N3.from_str[d['gram_number']]
-        gram_of_number = N5.from_str[d['gram_of_number']]
-        explicit_number = loader.load(d['explicit_number'])
+        selector = Selector.load(d['selector'])
+        number = loader.load(d['number'])
         attributes = map(loader.load, d['attributes'])
         noun = d['noun']
 
@@ -387,6 +372,5 @@ class SurfaceCommonNoun(SurfaceArgument):
                 arg = loader.load(arg)
             preps_nargs.append((prep, arg))
 
-        return SurfaceCommonNoun(
-            possessor, correlative, gram_number, gram_of_number,
-            explicit_number, attributes, noun, preps_nargs)
+        return SurfaceCommonNoun(possessor, selector, number, attributes, noun,
+                                 preps_nargs)
