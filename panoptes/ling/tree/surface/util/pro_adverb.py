@@ -143,7 +143,7 @@ class ProAdverbManager(object):
         # override if any).
         C = Correlative
         R = CountRestriction
-        self.cor2res_ogn = {
+        self.cor2res_gno = {
             C.INDEF:      (None,            None),
             C.DEF:        (None,            None),
             C.INTR:       (R.ALL_ONE,       None),
@@ -214,7 +214,7 @@ class ProAdverbManager(object):
                     self.ss_archaic2cors_pacs[(ss, is_archaic)]:
                 noun = self.pro_adverb_col2noun[pro_adverb_col]
                 prep = self.noun2hallucinate_prep.get(noun)
-                count_res, _ = self.cor2res_ogn[correlative]
+                count_res, _ = self.cor2res_gno[correlative]
                 selector = Selector.from_correlative(correlative, count_res)
                 rr.append(prep, selector, noun)
         return rr
