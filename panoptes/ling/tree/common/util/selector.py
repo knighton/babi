@@ -34,7 +34,7 @@ CountRestriction = enum("""CountRestriction =
 
 
 # CountRestriction -> implementation that compares compints.
-COUNT_RESTRICTION2F = {
+COUNT_RESTRICTION2CHECK = {
     # Negative.
     CountRestriction.NONE: lambda a, b: 0 == a <= b,
 
@@ -136,7 +136,7 @@ class Selector(object):
         # Make sure that the "how many" range, the "out of" range, and the
         # count restriction jive.
         aa, bb = self.to_compints()
-        f = COUNT_RESTRICTION2F[count_restriction]
+        f = COUNT_RESTRICTION2CHECK[count_restriction]
         possible = False
         for a in aa:
             for b in bb:
