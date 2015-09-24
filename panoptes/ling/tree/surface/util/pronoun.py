@@ -95,23 +95,52 @@ def make_det_pronoun_table():
     return cor_pro_plur_of2s
 
 
+def split_into_ranges(nn):
+    if not nn:
+        return []
+
+    rr = []
+    begin_n = nn[0]
+    end_n = nn[0]
+    for n in nn[1:]:
+        if end_n + 1 < n:
+            rr.append((begin_n, end_n))
+            begin_n = n
+        end_n = n
+    rr.append((begin_n, end_n))
+    return rr
+
+
+assert split_into_ranges([]) == []
+assert split_into_ranges([0]) == [(0, 0)]
+assert split_into_ranges([1]) == [(1, 1)]
+assert split_into_ranges([0, 1, 2]) == [(0, 2)]
+assert split_into_ranges([0, 2]) == [(0, 0), (2, 2)]
+assert split_into_ranges([0, 2, 4, 5]) == [(0, 0), (2, 2), (4, 5)]
+
+
 def combine_entries(aaa, cor2res_gno):
     """
     list of (Correlative, is pro, is plur, out of) -> (Selectors, Selectors)
     """
     # They are all the same Correlative except for "some" (INDEF + EXIST).
-    cor_pro2plurals_ofs = defaultdict(list)
+    cor_pro2ns_ofs = defaultdict(list)
     for correlative, is_pro, is_plur, of in aaa:
-        cor_pro2plurals_ofs[(correlative, is_pro)].append((is_plur, of))
+        if is_plur:
+            nn = [N5.ZERO, N5.DUAL, N5.FEW, N5.MANY]
+        else:
+            nn = [N5.SING]
+        for n in nn:
+            cor_pro2ns_ofs[(correlative, is_pro)].append((n, of))
 
     # For each grouping,
     dets = []
     pros = []
-    for correlative, is_pro in sorted(cor_pro2plurals_ofs):
-        plurals_ofs = cor_pro2plurals_ofs[(correlative, is_pro)]
+    for correlative, is_pro in sorted(cor_pro2ns_ofs):
+        ns_ofs = cor_pro2ns_ofs[(correlative, is_pro)]
 
         # Collect the variety of how many/out of there are for this word.
-        plurals, ofs = map(set, zip(*plurals_ofs))
+        ns, ofs = map(set, zip(*ns_ofs))
 
         # Require that each out-of range is contiguous.  This is also because it
         # happens to be true and it allows Selectors to contain ranges instead
@@ -119,26 +148,22 @@ def combine_entries(aaa, cor2res_gno):
         ofs = sorted(ofs)
         assert ofs == range(ofs[0], ofs[-1] + 1)
 
-        # Get the possible range of how many there are.
-        if False in plurals:
-            n_min = N5.SING
-        else:
-            n_min = N5.DUAL
-        n_max = max(ofs)
+        for n_min, n_max in split_into_ranges(sorted(ns)):
+            # Get the possible range of how many they were selected from.
+            of_n_min = min(min(ofs), n_min)
+            of_n_max = max(max(ofs), n_max)
 
-        # Get the possible range of how many they were selected from.
-        of_n_min = min(ofs)
-        of_n_max = max(ofs)
+            # Create a Selector that covers all of those tuples.
+            r = Selector(correlative, n_min, n_max, of_n_min, of_n_max)
+            count_restriction, _ = cor2res_gno[correlative]
+            r = r.fitted_to_count_restriction(count_restriction)
+            if not r:
+                continue
 
-        # Create a Selector that covers all of those tuples.
-        r = Selector(correlative, n_min, n_max, of_n_min, of_n_max)
-        count_restriction, _ = cor2res_gno[correlative]
-        r.shrink(count_restriction)
-
-        if is_pro:
-            pros.append(r)
-        else:
-            dets.append(r)
+            if is_pro:
+                pros.append(r)
+            else:
+                dets.append(r)
 
     return dets, pros
 
@@ -175,14 +200,24 @@ class DetPronounManager(object):
             self.determiner2selectors[s] = dets
             self.pronoun2selectors[s] = pros
 
+    def show(self):
+        print '-' * 80
+        print 'DetPronounManager'
+        print
+        for cor, is_pro, is_plur, of_n in sorted(self.cor_pro_plur_of2s):
+            s = self.cor_pro_plur_of2s[(cor, is_pro, is_plur, of_n)]
+            print '*', Correlative.to_str[cor], is_pro, is_plur, \
+                N5.to_str[of_n], s
+        print '-' * 80
+
     def say(self, selector, is_pro):
         """
         Selector, whether pronoun or determiner -> SayResult or None
 
         See if the args can be said using a determiner or (impersonal) pronoun.
         """
-        key = (selector.correlative, is_pro, selector.guess_n(N2),
-               selector.guess_of_n(N5))
+        is_plur = True if selector.guess_n(N2) == N2.PLUR else False
+        key = (selector.correlative, is_pro, is_plur, selector.guess_of_n(N5))
         s = self.cor_pro_plur_of2s.get(key)
         if not s:
             return None
