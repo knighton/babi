@@ -1,5 +1,5 @@
 from panoptes.ling.glue.grammatical_number import compints_from_nx, N2, N5, \
-    nx_le_nx_is_guaranteed
+    nx_le_nx_is_guaranteed, nx_to_nxs
 
 
 # "Correlative" covers articles, interrogatives, demonstratives, and
@@ -117,6 +117,12 @@ class Selector(object):
     def is_interrogative(self):
         return self.correlative == Correlative.INTR
 
+    def guess_n(self, NX):
+        return nx_to_nxs(self.n_max, NX)[-1]
+
+    def guess_of_n(self, NX):
+        return nx_to_nxs(self.of_n_max, NX)[-1]
+
     def to_compints(self):
         aa = []
         for n in xrange(self.n_min, self.n_max + 1):
@@ -169,6 +175,13 @@ class Selector(object):
                 n2 = N2.PLUR
 
         return n2
+
+    def shrink(self, count_restriction):
+        aa = COUNT_RESTRICTION2WORST_BOUNDS[count_restriction]
+        self.n_min = max(self.n_min, aa[0])
+        self.n_max = min(self.n_max, aa[1])
+        self.of_n_min = max(self.of_n_min, aa[2])
+        self.of_n_max = min(self.of_n_max, aa[3])
 
     @staticmethod
     def load(d, loader):
