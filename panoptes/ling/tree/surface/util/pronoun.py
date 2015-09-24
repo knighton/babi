@@ -130,6 +130,7 @@ def combine_entries(aaa, cor2res_gno):
             nn = [N5.ZERO, N5.DUAL, N5.FEW, N5.MANY]
         else:
             nn = [N5.SING]
+        nn = filter(lambda n: n <= of, nn)
         for n in nn:
             cor_pro2ns_ofs[(correlative, is_pro)].append((n, of))
 
@@ -150,8 +151,8 @@ def combine_entries(aaa, cor2res_gno):
 
         for n_min, n_max in split_into_ranges(sorted(ns)):
             # Get the possible range of how many they were selected from.
-            of_n_min = min(min(ofs), n_min)
-            of_n_max = max(max(ofs), n_max)
+            of_n_min = min(ofs)
+            of_n_max = max(ofs)
 
             # Create a Selector that covers all of those tuples.
             r = Selector(correlative, n_min, n_max, of_n_min, of_n_max)
