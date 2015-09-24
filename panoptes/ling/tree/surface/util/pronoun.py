@@ -38,10 +38,8 @@ def parse_det_pronoun_entry(s, of):
         if s == '-':
             continue
 
-        # Plural vs singular doesn't make any sense for the SING column.
-        if of == N5.SING:
-            if is_plur:
-                continue
+        if is_plur and of in (N5.ZERO, N5.SING):
+            continue
 
         yield is_pro, is_plur, s
 
@@ -90,100 +88,114 @@ def make_det_pronoun_table():
             cor = Correlative.from_str[cor]
             of = sss[0][col_index]
             of = N5.from_str[of]
+
+            if is_plur and of in (N5.ZERO, N5.SING):
+                continue
+
             for is_pro, is_plur, s in parse_det_pronoun_entry(s, of):
                 cor_pro_plur_of2s[(cor, is_pro, is_plur, of)] = s
     return cor_pro_plur_of2s
 
 
+def combine_entries(aaa):
+    """
+    list of (Correlative, is pronoun, is plural, out of) -> (Selector, Selector)
+    """
+    # They all have to have the same Correlative.  I am requiring this because
+    # it happens to be true (and this fact will not change), and it allows me to
+    # return just one Selector per determiner or pronoun.
+    assert len(set(map(lambda aa: aa[0], aaa))) == 1
+
+    rr = []
+    for is_pro in [False, True]:
+        plurals = set()
+        ofs = set()
+        for cor, _, is_plural, of_n5 in filter(lambda aa: aa[2] == is_pro, aaa):
+            plurals.add(is_plural)
+            ofs.add(of_n5)
+
+        if False in plurals:
+            n_min = N5.SING
+        else:
+            n_min = N5.DUAL
+        n_max = max(ofs)
+
+        of_n_min = min(ofs)
+        of_n_max = max(ofs)
+
+        correlative = aaa[0][0]
+        r = Selector(correlative, n_min, n_max, of_n_min, of_n_max)
+
+        count_restriction, _ = cor2res_gno[correlative]
+        r.shrink(count_restriction)
+
+        rr.append(r)
+    return rr
+
+
 class DetPronounManager(object):
-    def __init__(self, count_restriction_checker):
-        # CountRestrictionChecker.
-        self.count_restriction_checker = count_restriction_checker
+    def __init__(self):
+        # (Correlative, is pronoun, is plural, out of N5) -> word.
+        self.cor_pro_plur_of2s = make_det_pronoun_table()
+
+        # Word -> list of Selectors.
+        self.determiner2selector = {}
+        self.pronoun2selector = {}
+        s2cors_pros_plurs_ofs = v2kk_from_k2v(self.cor_pro_plur_of2s)
+        for s, aaa in s2cors_pros_plurs_ofs:
+            det, pro = combine_entries(aaa)
+            if det:
+                self.determiner2selector[s] = det
+            if pro:
+                self.pronoun2selector[s] = pro
 
         # Correlative -> count restriction, grammatical number override.
         C = Correlative
         R = CountRestriction
-        self.cor2counts = {
-            C.INDEF: (R.SOME, None),
-            C.DEF: (R.ALL, None),
-            C.INTR: (R.ANY, None),
-            C.PROX: (R.ALL, None),
-            C.DIST: (R.ALL, None),
-            C.EXIST: (R.ONE_OF_PLURAL, None),
-            C.ELECT_ANY: (R.SOME, None),
-            C.ELECT_EVER: (R.ANY, None),
-            C.UNIV_EVERY: (R.ALL, N2.SING),
-            C.UNIV_ALL: (R.ALL, N2.PLUR),
-            C.NEG: (R.NONE, None),
-            C.ALT: (R.ONE_OF_PLURAL, None),
+        self.cor2res_gno = {
+            C.INDEF:      (R.SOME,          None),
+            C.DEF:        (R.ALL,           None),
+            C.INTR:       (R.ANY,           None),
+            C.PROX:       (R.ALL,           None),
+            C.DIST:       (R.ALL,           None),
+            C.EXIST:      (R.ONE_OF_PLURAL, None),
+            C.ELECT_ANY:  (R.SOME,          None),
+            C.ELECT_EVER: (R.ANY,           None),
+            C.UNIV_EVERY: (R.ALL,           N2.SING),
+            C.UNIV_ALL:   (R.ALL,           N2.PLUR),
+            C.NEG:        (R.NONE,          None),
+            C.ALT:        (R.ONE_OF_PLURAL, None),
         }
 
-        self.cor_pro_plur_of2s = make_det_pronoun_table()
-
-        self.s2cors_pros_plurs_ofs = v2kk_from_k2v(self.cor_pro_plur_of2s)
-
-    def get_grammatical_number(self, cor, n, of_n):
+    def say(self, selector, is_pro):
         """
-        Correlative, n, of_n -> N2 or None if invalid
+        Selector, whether pronoun or determiner -> SayResult or None
+
+        See if the args can be said using a determiner or (impersonal) pronoun.
         """
-        # Verify counts against its det-pronoun field.
-        restriction, override_gram_num = self.cor2counts[cor]
-        if not self.count_restriction_checker.is_possible(restriction, n, of_n):
-            return None
-
-        if override_gram_num:
-            gram_num = override_gram_num
-        else:
-            gram_num = nx_to_nx(n, N2)
-        return gram_num
-
-    def say(self, cor, n, of_n, is_pro):
-        """
-        args -> SayResult or None
-
-        See if the args can be expressed using a det/pronoun correlative.
-        """
-        # Can't be selected out of zero.
-        if of_n == N5.ZERO:
-            return None
-
-        gram_num = self.get_grammatical_number(cor, n, of_n)
-        if not gram_num:
-            return None
-
-        is_plur = gram_num == N2.PLUR
-        if is_plur and of_n in (N5.ZERO, N5.SING):
-            return None
-
-        s = self.cor_pro_plur_of2s.get((cor, is_pro, is_plur, of_n))
+        key = (selector.correlative, is_pro, selector.guess_n(N2),
+               selector.guess_of_n(N5))
+        s = self.cor_pro_plur_of2s.get(key)
         if not s:
             return None
 
-        conj = N2_TO_CONJ[gram_num]
+        n2 = selector.decide_grammatical_number(self.cor2res_gno)
+        if not n2:
+            return None
+        conj = N2_TO_CONJ[n2]
+
         return SayResult(tokens=[s], conjugation=conj, eat_prep=False)
 
-    def parse(self, s, want_is_pro):
-        """
-        word -> list of (Correlative, n, of_n)
-
-        Get the possible meanings of a word.
-        """
-        rr = []
-        for cor, is_pro, is_plur, of_n in self.s2cors_pros_plurs_ofs[s]:
-            if is_pro != want_is_pro:
-                continue
-            restriction, override_gram_num = self.cor2counts[cor]
-            n2 = N2.PLUR if is_plur else N2.SING
-            for n in nx_to_nxs(n2, N3):
-                if not self.count_restriction_checker.is_possible(
-                        restriction, n, of_n):
-                    continue
-                r = (cor, n, of_n)
-                rr.append(r)
-        return rr
-
     def parse_det(self, s):
-        return self.parse(s, False)
+        """
+        word -> Selector or None
+        """
+        r = self.determiner2selector.get(s)
+        return deepcopy(r)
 
     def parse_pro(self, s):
-        return self.parse(s, True)
+        """
+        word -> Selector or None
+        """
+        r = self.pronoun2selector.get(s)
+        return deepcopy(r)
