@@ -28,7 +28,7 @@ class SurfaceCommonNoun(SurfaceArgument):
     """
 
     def __init__(self, possessor, correlative, gram_number, gram_of_number,
-                 explicit_number, attributes, noun, say_noun, preps_nargs):
+                 explicit_number, attributes, noun, preps_nargs):
         # Possessor.
         #
         # If it has a possessor, correlative must be definite (eg, "[Tim's] cat"
@@ -79,13 +79,9 @@ class SurfaceCommonNoun(SurfaceArgument):
         #
         # Say the noun when it is non-obvious from context, otherwise it's more
         # parsimonious not to.
-        #
-        # If 'say_noun', 'noun' must exist.
         self.noun = noun
-        self.say_noun = say_noun
-        if self.say_noun or self.noun:
+        if self.noun:
             assert isinstance(self.noun, basestring)
-            assert self.noun
 
         # Descriptive or restrictive child structures coming after the head.
         self.preps_nargs = preps_nargs
@@ -132,7 +128,6 @@ class SurfaceCommonNoun(SurfaceArgument):
             'explicit_number': num,
             'attributes': map(lambda a: a.dump(), self.attributes),
             'noun': self.noun,
-            'say_noun': self.say_noun,
             'preps_nargs': preps_nargs,
         }
 
@@ -322,7 +317,7 @@ class SurfaceCommonNoun(SurfaceArgument):
 
     def say_head(self, state, idiolect, context):
         # Try various options for rendering it.
-        if self.say_noun:
+        if self.noun:
             r = self.say_head_as_shortcut(state, idiolect, context)
             if not r:
                 r = self.say_head_as_full(state, idiolect, context, self.noun)
@@ -385,7 +380,6 @@ class SurfaceCommonNoun(SurfaceArgument):
         explicit_number = loader.load(d['explicit_number'])
         attributes = map(loader.load, d['attributes'])
         noun = d['noun']
-        say_noun = d['say_noun']
 
         preps_nargs = []
         for prep, arg in d['preps_nargs']:
@@ -395,4 +389,4 @@ class SurfaceCommonNoun(SurfaceArgument):
 
         return SurfaceCommonNoun(
             possessor, correlative, gram_number, gram_of_number,
-            explicit_number, attributes, noun, say_noun)
+            explicit_number, attributes, noun, preps_nargs)
