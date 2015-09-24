@@ -10,7 +10,7 @@ from panoptes.ling.tree.surface.base import SayResult
 from panoptes.ling.tree.surface.util.count_restriction import CountRestriction
 
 
-ShortcutColumn = enum("""ShortcutColumn =
+ProAdverbColumn = enum("""ProAdverbColumn =
     ONE BODY THING PLACE SOURCE SOURCE_FROM GOAL TIME WAY WAY_BY REASON
     REASON_FORE REASON_LATIN""")
 
@@ -31,7 +31,7 @@ def parse_partial(text):
 
     cols = []
     for s in sss[0]:
-        col = ShortcutColumn.from_str[s]
+        col = ProAdverbColumn.from_str[s]
         cols.append(col)
 
     mel_sh2ss_archaic = {}
@@ -52,7 +52,7 @@ def parse_partial(text):
     return mel_sh2ss_archaic
 
 
-def make_shortcut_table():
+def make_pro_adverb_table():
     text_part_one = """
            ONE          BODY        THING      PLACE      SOURCE
 INDEF      -            -           -          -          -
@@ -113,25 +113,25 @@ ALT        -         -           -
     for k, v in c.iteritems():
         r[k] = v
 
-    shortcut_cols = set()
-    for (cor, sc), (ss, is_archaic) in r.iteritems():
-        shortcut_cols.add(sc)
-    assert shortcut_cols == ShortcutColumn.values
+    pro_adverb_cols = set()
+    for (cor, pac), (ss, is_archaic) in r.iteritems():
+        pro_adverb_cols.add(pac)
+    assert pro_adverb_cols == ProAdverbColumn.values
 
     return r
 
 
-class ShortcutManager(object):
+class ProAdverbManager(object):
     """
-    Saying and parsing of shortcuts.
+    Saying and parsing of pro-adverbs and the like.
     """
 
     def __init__(self):
-        # Correlative, ShortcutColumn -> tokens, is_archaic.
-        self.cor_sc2ss_archaic = make_shortcut_table()
+        # Correlative, ProAdverbColumn -> tokens, is_archaic.
+        self.cor_pac2ss_archaic = make_pro_adverb_table()
 
-        # Tokens, is_archaic -> list of (Correlative, ShortcutColumn).
-        self.ss_archaic2cors_scs = v2kk_from_k2v(self.cor_sc2ss_archaic)
+        # Tokens, is_archaic -> list of (Correlative, ProAdverbColumn).
+        self.ss_archaic2cors_pacs = v2kk_from_k2v(self.cor_pac2ss_archaic)
 
         # Noun -> preposition to hallucinate.
         self.noun2hallucinate_prep = {
@@ -142,25 +142,25 @@ class ShortcutManager(object):
         # Correlative -> (count restriction if possible, grammatical number
         # override if any).
         C = Correlative
-        CR = CountRestriction
+        R = CountRestriction
         self.cor2res_ogn = {
-            C.INDEF:      (None,             None),
-            C.DEF:        (None,             None),
-            C.INTR:       (CR.ALL_ONE,       None),
-            C.PROX:       (CR.ALL_ONE,       None),
-            C.DIST:       (CR.ALL_ONE,       None),
-            C.EXIST:      (CR.ONE_OF_PLURAL, None),
-            C.ELECT_ANY:  (CR.ONE_OF_PLURAL, None),
-            C.ELECT_EVER: (CR.ALL_ONE,       None),
-            C.UNIV_EVERY: (CR.ALL,           N2.SING),
-            C.UNIV_ALL:   (CR.ALL,           N2.SING),
-            C.NEG:        (CR.NONE,          N2.SING),
-            C.ALT:        (CR.ONE_OF_PLURAL, None),
+            C.INDEF:      (None,            None),
+            C.DEF:        (None,            None),
+            C.INTR:       (R.ALL_ONE,       None),
+            C.PROX:       (R.ALL_ONE,       None),
+            C.DIST:       (R.ALL_ONE,       None),
+            C.EXIST:      (R.ONE_OF_PLURAL, None),
+            C.ELECT_ANY:  (R.ONE_OF_PLURAL, None),
+            C.ELECT_EVER: (R.ALL_ONE,       None),
+            C.UNIV_EVERY: (R.ALL,           N2.SING),
+            C.UNIV_ALL:   (R.ALL,           N2.SING),
+            C.NEG:        (R.NONE,          N2.SING),
+            C.ALT:        (R.ONE_OF_PLURAL, None),
         }
 
-        # Noun -> shortcut columns.
-        C = ShortcutColumn
-        self.noun2shortcut_cols = defaultdict(list, {
+        # Noun -> pro-adverb columns.
+        C = ProAdverbColumn
+        self.noun2pro_adverb_cols = defaultdict(list, {
             'person': [C.ONE, C.BODY],
             'thing':  [C.THING],
             'place':  [C.PLACE],
@@ -171,14 +171,14 @@ class ShortcutManager(object):
             'reason': [C.REASON, C.REASON_FORE, C.REASON_LATIN],
         })
 
-        # Shortcut column -> noun.
-        self.shortcut_col2noun = v2k_from_k2vv(self.noun2shortcut_cols)
+        # Pro-adverb column -> noun.
+        self.pro_adverb_col2noun = v2k_from_k2vv(self.noun2pro_adverb_cols)
 
     def say(self, prep, selector, noun, allow_archaic):
         """
         args -> SayResult or None
 
-        See if the args can be expressed using a 'shortcut' word.
+        See if the args can be expressed using a pro-adverb.
         """
         n2 = selector.decide_n2(self.cor2res_gno)
         if not n2:
@@ -186,15 +186,15 @@ class ShortcutManager(object):
 
         conj = N2_TO_CONJ[n2]
 
-        for shortcut_col in self.noun2shortcut_cols[noun]:
-            key = (selector.correlative, shortcut_col)
-            tokens, is_archaic = self.cor_sc2ss_archaic[key]
+        for pro_adverb_col in self.noun2pro_adverb_cols[noun]:
+            key = (selector.correlative, pro_adverb_col)
+            tokens, is_archaic = self.cor_pac2ss_archaic[key]
             tokens = list(tokens)
 
             if is_archaic and not allow_archaic:
                 continue
 
-            noun = self.shortcut_col2noun[shortcut_col]
+            noun = self.pro_adverb_col2noun[pro_adverb_col]
             eat_prep = noun in self.noun2hallucinate_prep
 
             return SayResult(tokens=tokens, conjugation=conj, eat_prep=eat_prep)
@@ -205,13 +205,14 @@ class ShortcutManager(object):
         """
         tokens -> list of (hallucinated preposition, Selector, noun)
 
-        Try to pull a shortcut out of the given words (typically just one word).
+        Try to pull a pro-adverb out of the given words (typically just one
+        word).
         """
         rr = []
         for is_archaic in [False, True]:
-            for correlative, shortcut_col in \
-                    self.ss_archaic2cors_scs[(ss, is_archaic)]:
-                noun = self.shortcut_col2noun[shortcut_col]
+            for correlative, pro_adverb_col in \
+                    self.ss_archaic2cors_pacs[(ss, is_archaic)]:
+                noun = self.pro_adverb_col2noun[pro_adverb_col]
                 prep = self.noun2hallucinate_prep.get(noun)
                 count_res, _ = self.cor2res_ogn[correlative]
                 selector = Selector.from_correlative(correlative, count_res)
