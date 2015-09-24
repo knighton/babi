@@ -108,24 +108,35 @@ def combine_entries(aaa):
 
     rr = []
     for is_pro in [False, True]:
+        # Collect the variety of how many/out of there are for this word.
         plurals = set()
         ofs = set()
         for cor, _, is_plural, of_n5 in filter(lambda aa: aa[2] == is_pro, aaa):
             plurals.add(is_plural)
             ofs.add(of_n5)
 
+        # Require that each out-of range is contiguous.  This is also because it
+        # happens to be true and it allows Selectors to contain ranges instead
+        # of the insanity of individual N5s.
+        ofs = sorted(ofs)
+        assert ofs == range(ofs[0], ofs[-1] + 1)
+
+        # Get the possible range of how many there are.
         if False in plurals:
             n_min = N5.SING
         else:
             n_min = N5.DUAL
         n_max = max(ofs)
 
+        # Get the possible range of how many they were selected from.
         of_n_min = min(ofs)
         of_n_max = max(ofs)
 
+        # We already verified that they're all the same Correlative.
         correlative = aaa[0][0]
-        r = Selector(correlative, n_min, n_max, of_n_min, of_n_max)
 
+        # Create a Selector that covers all of those tuples.
+        r = Selector(correlative, n_min, n_max, of_n_min, of_n_max)
         count_restriction, _ = cor2res_gno[correlative]
         r.shrink(count_restriction)
 
