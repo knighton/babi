@@ -130,7 +130,7 @@ class Selector(object):
 
         return aa, bb
 
-    def decide_n2(self, cor2res_gno):
+    def decide_grammatical_number(self, cor2res_gno):
         """
         (Correlative -> (CountRestriction or None, N2 or None)) -> N2 or None
 

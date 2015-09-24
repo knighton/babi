@@ -180,7 +180,7 @@ class ProAdverbManager(object):
 
         See if the args can be expressed using a pro-adverb.
         """
-        n2 = selector.decide_n2(self.cor2res_gno)
+        n2 = selector.decide_grammatical_number(self.cor2res_gno)
         if not n2:
             return None
 
