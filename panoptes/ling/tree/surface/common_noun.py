@@ -164,17 +164,17 @@ class SurfaceCommonNoun(SurfaceArgument):
 
     def is_sentient(self):
         """
-        -> None, False, or True
+        -> bool
 
         Our personhood matters to the relative pronouns of our child relative
         clauses.
 
+        Noun is always present when the object has children.
+
         Eg, "the dog [that] saw you" but "the boy [who] saw you"
         """
-        if self.noun:
-            return is_noun_sentient(self.noun)
-        else:
-            return None
+        assert self.noun:
+        return is_noun_sentient(self.noun)
 
     def decide_conjugation(self, state, idiolect, context):
         return self.say_head(state, idiolect, context).conjugation
