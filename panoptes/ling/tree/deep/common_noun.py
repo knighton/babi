@@ -6,7 +6,7 @@ from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
 
 class DeepCommonNoun(DeepArgument):
     def __init__(self, possessor=None, selector=None, number=None,
-                 attributes=None, noun=None, say_noun=True, rels_nargs=None):
+                 attributes=None, noun=None, rels_nargs=None):
         if attributes is None:
             attributes = []
         if rels_nargs is None:
@@ -29,8 +29,7 @@ class DeepCommonNoun(DeepArgument):
             assert False  # NOTE: not in demo.
 
         self.noun = noun
-        self.say_noun = say_noun
-        if self.say_noun or self.noun:
+        if self.noun:
             assert isinstance(self.noun, basestring)
             assert self.noun
 
@@ -65,7 +64,6 @@ class DeepCommonNoun(DeepArgument):
             'number': number,
             'attributes': map(lambda a: a.dump(), self.attributes),
             'noun': self.noun,
-            'say_noun': self.say_noun,
             'rels_nargs': rels_nargs,
         }
 
@@ -118,7 +116,7 @@ class DeepCommonNoun(DeepArgument):
             preps_nargs.append([prep, narg])
 
         return SurfaceCommonNoun(possessor, self.selector, number, attributes,
-                                 self.noun, self.say_noun, preps_nargs)
+                                 self.noun, preps_nargs)
 
     # --------------------------------------------------------------------------
     # Static.
@@ -130,7 +128,6 @@ class DeepCommonNoun(DeepArgument):
         number = loader.load(d['number'])
         attributes = map(loader.load, d['attributes'])
         noun = d['noun']
-        say_noun = d['say_noun']
 
         rels_nargs = []
         for rel, arg in d['rels_nargs']:
@@ -139,4 +136,4 @@ class DeepCommonNoun(DeepArgument):
             rels_nargs.append((rel, arg))
 
         return DeepCommonNoun(possessor, selector, number, attributes, noun,
-                              say_noun, rels_nargs)
+                              rels_nargs)
