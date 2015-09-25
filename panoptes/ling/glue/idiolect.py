@@ -3,11 +3,11 @@ class Idiolect(object):
     Collection of flags that decide amongst variations in how it can say things.
     """
 
-    def __init__(self, archaic_shortcuts=False, contractions=True,
+    def __init__(self, archaic_pro_adverbs=False, contractions=True,
                  pedantic_plurals=False, stranding=True, split_infinitive=True,
                  subjunctive_were=True, whom=False):
-        # Whether to use 'archaic' shortcuts ("come hither" vs "come here").
-        self.archaic_shortcuts = archaic_shortcuts
+        # Whether to use 'archaic' pro-adverbs ("come hither" vs "come here").
+        self.archaic_pro_adverbs = archaic_pro_adverbs
 
         # Whether to use contractions.
         self.contractions = contractions

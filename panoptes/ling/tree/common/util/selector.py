@@ -139,7 +139,7 @@ class Selector(object):
         count_restriction, gram_num_override = cor2res_gno[self.correlative]
 
         # If there is no CountRestriction, it's not possible (eg, DEF is okay
-        # for correlatives ("the"), but there is no such shortcut).
+        # for correlatives ("the"), but there is no such pro-adverb).
         if not count_restriction:
             return None
 
