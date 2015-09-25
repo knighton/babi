@@ -249,12 +249,13 @@ class ParseToSurface(object):
 
         return rr
 
-    def reecog_adverb(self, root_token):
+    def recog_adverb(self, root_token):
         pp_nn = []
         ss = root_token.text,
         for prep, selector, noun in self.pro_adverb_mgr.parse(ss):
+            prep_tuple = prep,
             n = SurfaceCommonNoun(selector=selector, noun=noun)
-            pp_nn.append((prep, n))
+            pp_nn.append((prep_tuple, n))
         return pp_nn
 
     def recog_rb(self, root_token):
@@ -334,7 +335,7 @@ class ParseToSurface(object):
         ppp_nnn = []
         for rel, t in root_token.downs:
             if rel not in ('nsubj', 'nsubjpass', 'agent', 'dobj', 'dative',
-                           'expl', 'attr'):
+                           'expl', 'attr', 'advmod'):
                 continue
 
             if rel == 'agent':
