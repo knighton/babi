@@ -49,7 +49,8 @@ class English(object):
         # Text -> surface structure -> deep structure.
         self.text_to_parse = TextToParse()
         self.parse_to_surface = ParseToSurface(
-            det_pronoun_mgr, personal_mgr, plural_mgr, self.say_state, verb_mgr)
+            det_pronoun_mgr, personal_mgr, plural_mgr, pro_adverb_mgr,
+            self.say_state, verb_mgr)
         self.surface_to_deep = SurfaceToDeep(purpose_mgr, relation_mgr)
 
         self.joiner = Joiner()

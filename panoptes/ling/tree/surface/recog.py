@@ -121,8 +121,8 @@ class ParseToSurface(object):
     Object that converts parses to surface structure.
     """
 
-    def __init__(self, det_pronoun_mgr, personal_mgr, plural_mgr, say_state,
-                 verb_mgr):
+    def __init__(self, det_pronoun_mgr, personal_mgr, plural_mgr,
+                 pro_adverb_mgr, say_state, verb_mgr):
         # For extracting the correct verb conjugation from subjects.
         self.arbitrary_idiolect = Idiolect()
         self.say_state = say_state
@@ -135,8 +135,9 @@ class ParseToSurface(object):
         self.det_pronoun_mgr = det_pronoun_mgr
         self.personal_mgr = personal_mgr
         self.plural_mgr = plural_mgr
+        self.pro_adverb_mgr = pro_adverb_mgr
 
-        self.tag2recognize = {
+        self.tag2recognize_arg = {
             'DT': self.recog_dt,
             'EX': self.recog_ex,
             'NN': self.recog_nn,
@@ -144,6 +145,11 @@ class ParseToSurface(object):
             'NNP': self.recog_nnp,
             'PRP': self.recog_prp,
             'WP': self.recog_wp,
+        }
+
+        self.tag2recognize_prep_arg = {
+            'RB': self.recog_rb,
+            'WRB': self.recog_wrb,
         }
 
     def recog_dt(self, root_token):
@@ -243,8 +249,34 @@ class ParseToSurface(object):
 
         return rr
 
+    def reecog_adverb(self, root_token):
+        pp_nn = []
+        ss = root_token.text,
+        for prep, selector, noun in self.pro_adverb_mgr.parse(ss):
+            n = SurfaceCommonNoun(selector=selector, noun=noun)
+            pp_nn.append((prep, n))
+        return pp_nn
+
+    def recog_rb(self, root_token):
+        return self.recog_adverb(root_token)
+
+    def recog_wrb(self, root_token):
+        return self.recog_adverb(root_token)
+
     def recognize_verb_arg(self, root_token):
-        return self.tag2recognize[root_token.tag](root_token)
+        """
+        Token -> list of (prep or None, SurfaceArgument)
+        """
+        f = self.tag2recognize_arg.get(root_token.tag)
+        if f:
+            nn = f(root_token)
+            return map(lambda n: (None, n), nn)
+
+        f = self.tag2recognize_prep_arg.get(root_token.tag)
+        if f:
+            return f(root_token)
+
+        assert False
 
     def find_subject(self, verb_span_pair, varg_root_indexes):
         """
@@ -312,11 +344,8 @@ class ParseToSurface(object):
                 t = down
 
             varg_root_indexes.append(t.index)
-            pp = [None]
-            nn = self.recognize_verb_arg(t)
-            pp_nn = []
-            for p, n in each_choose_one_from_each([pp, nn]):
-                pp_nn.append((p, n))
+
+            pp_nn = self.recognize_verb_arg(t)
             ppp_nnn.append(pp_nn)
 
         subj_argx, vmain_index = \
