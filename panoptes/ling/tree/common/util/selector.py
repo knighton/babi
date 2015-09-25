@@ -207,7 +207,7 @@ class Selector(object):
         return Selector(self.correlative, n_min, n_max, of_n_min, of_n_max)
 
     @staticmethod
-    def load(d, loader):
+    def load(d):
         correlative = Correlative.from_str[d['correlative']]
         n_min = N5.from_str[d['n_min']]
         n_max = N5.from_str[d['n_max']]
