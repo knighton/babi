@@ -48,9 +48,19 @@ class Verb(object):
         Tell auxiliary 'have' apart from regular 'have' because one of them
         forms contractions and the other doens't.
         """
-        return Verb(self.lemma, self.pres_part, self.past_part,
-                    map(annotate_as_aux, self.nonpast),
-                    map(annotate_as_aux, self.past))
+        lemma = annotate_as_aux(self.lemma)
+        nonpast = map(annotate_as_aux, self.nonpast)
+        past = map(annotate_as_aux, self.past)
+        return Verb(lemma, self.pres_part, self.past_part, nonpast, past)
+
+    def dump(self):
+        return {
+            'lemma': self.lemma,
+            'pres_part': self.pres_part,
+            'past_part': self.past_part,
+            'nonpast': self.nonpast,
+            'past': self.past,
+        }
 
 
 def conjugations_from_file(fn):
