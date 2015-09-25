@@ -193,8 +193,8 @@ class DetPronounManager(object):
         self.cor_pro_plur_of2s = make_det_pronoun_table()
 
         # Word -> list of Selectors.
-        self.determiner2selectors = {}
-        self.pronoun2selectors = {}
+        self.determiner2selectors = defaultdict(list)
+        self.pronoun2selectors = defaultdict(list)
         s2cors_pros_plurs_ofs = v2kk_from_k2v(self.cor_pro_plur_of2s)
         for s, aaa in s2cors_pros_plurs_ofs.iteritems():
             dets, pros = combine_entries(aaa, self.cor2res_gno)
@@ -240,12 +240,12 @@ class DetPronounManager(object):
         """
         word -> list of Selectors
         """
-        rr = self.determiner2selectors.get(s)
+        rr = self.determiner2selectors[s]
         return deepcopy(rr)
 
     def parse_pronoun(self, s):
         """
         word -> list of Selectors
         """
-        rr = self.pronoun2selectors.get(s)
+        rr = self.pronoun2selectors[s]
         return deepcopy(rr)
