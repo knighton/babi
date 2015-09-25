@@ -2,7 +2,7 @@ from copy import deepcopy
 
 from panoptes.etc.enum import enum
 from panoptes.ling.glue.grammatical_number import compints_from_nx, N2, N5, \
-    nx_to_nxs
+    nx_to_nx, nx_to_nxs
 
 
 # "Correlative" covers articles, interrogatives, demonstratives, and
@@ -168,9 +168,9 @@ class Selector(object):
 
         return n2
 
-    def restricted_to_grammatical_number(self, required_gram_n2, cor2res_gno):
+    def restricted_to_grammatical_number(self, required_gram_num, cor2res_gno):
         """
-        required gram number, (cor -> (res, gno)) -> list of Selector
+        N2, (Correlative -> (CountResriction/None, N2/None)) -> list of Selector
 
         Restrict my count ranges to only fit the given grammatical number.
         Returns new objects.
@@ -191,7 +191,8 @@ class Selector(object):
 
         # Else, collect the grammatical numbers as N2s.
         gram_nums = set()
-        for n2 in xrange(self.n_min, self.n_max + 1):
+        for n5 in xrange(self.n_min, self.n_max + 1):
+            n2 = nx_to_nx(n5, N2)
             gram_nums.add(n2)
 
         # If there's just one, we are either fine or hosed.
