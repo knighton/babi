@@ -1,4 +1,5 @@
 import json
+import yaml
 
 from panoptes.ling.verb.verb import SurfaceVerb
 from panoptes.ling.verb.verb_manager import VerbManager
@@ -43,6 +44,34 @@ def main():
     sss = ((), ('go',))
     vv = m.parse(sss)
     assert any(map(lambda v: v.may_match(v_to_say), vv))
+
+    text = """
+        sbj_handling: WERE_SBJ
+        relative_cont: NOT_REL
+        contract_not: true
+        split_inf: true
+        is_split: true
+        conj: S2
+        voice: ACTIVE
+        intrinsics:
+            lemma: go
+            polarity:
+                tf: true
+                is_contrary: false
+            tense: PRESENT
+            aspect:
+                is_perf: true
+                is_prog: false
+            modality:
+                flavor: INDICATIVE
+                is_cond: true
+            verb_form: FINITE
+            is_pro_verb: false
+    """
+    j = yaml.load(text)
+    v = SurfaceVerb.load(j)
+
+    assert m.say(v) == (['would'], ['[AUX]have', 'gone'])
 
 
 if __name__ == '__main__':
