@@ -46,13 +46,11 @@ class SurfaceToDeep(object):
 
         rr = []
         for pos in poss:
-            assert not n.explicit_number
+            assert not n.number
             assert not n.attributes
             assert not n.preps_nargs
-            d = DeepCommonNoun(
-                pos, n.correlative, n.gram_number, n.gram_of_number, None, [],
-                n.noun, n.say_noun, [])
-            rr.append(d)
+            r = DeepCommonNoun(possessor=pos, selector=n.selector, noun=n.noun)
+            rr.append(r)
         return rr
 
     def decide_prep(self, fronted_prep, stranded_prep):

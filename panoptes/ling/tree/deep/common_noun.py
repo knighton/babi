@@ -46,8 +46,8 @@ class DeepCommonNoun(DeepArgument):
         else:
             possessor = None
 
-        if self.explicit_number:
-            number = self.explicit_number.dump()
+        if self.number:
+            number = self.number.dump()
         else:
             number = None
 
