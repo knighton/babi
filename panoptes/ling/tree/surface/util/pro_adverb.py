@@ -5,9 +5,9 @@ from panoptes.etc.enum import enum
 from panoptes.ling.glue.grammatical_number import N2, nx_to_nx
 from panoptes.ling.glue.inflection import N2_TO_CONJ
 from panoptes.ling.glue.magic_token import PLACE_PREP, TIME_PREP
-from panoptes.ling.tree.common.util.selector import Correlative
+from panoptes.ling.tree.common.util.selector import Correlative, \
+    CountRestriction
 from panoptes.ling.tree.surface.base import SayResult
-from panoptes.ling.tree.surface.util.count_restriction import CountRestriction
 
 
 ProAdverbColumn = enum("""ProAdverbColumn =

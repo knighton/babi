@@ -9,10 +9,8 @@ from panoptes.ling.tree.deep.recog import SurfaceToDeep
 from panoptes.ling.tree.common.personal_pronoun import PersonalManager
 from panoptes.ling.tree.surface.base import SayContext, SayState
 from panoptes.ling.tree.surface.recog import ParseToSurface
-from panoptes.ling.tree.surface.util.correlative import CorrelativeManager
-from panoptes.ling.tree.surface.util.count_restriction import \
-    CountRestrictionChecker
-from panoptes.ling.tree.surface.util.shortcut import ShortcutManager
+from panoptes.ling.tree.surface.util.pro_adverb import ProAdverbManager
+from panoptes.ling.tree.surface.util.pronoun import DetPronounManager
 from panoptes.ling.verb.verb_manager import VerbManager
 
 
@@ -22,9 +20,8 @@ class English(object):
         verb_f = 'data/verbs.json'
         verb_mgr = VerbManager.from_files(conj_f, verb_f)
 
-        count_restriction_mgr = CountRestrictionChecker()
-        correlative_mgr = CorrelativeManager(count_restriction_mgr)
-        shortcut_mgr = ShortcutManager(count_restriction_mgr)
+        det_pronoun_mgr = DetPronounManager()
+        pro_adverb_mgr = ProAdverbManager()
 
         inflection_mgr = InflectionManager()
         personal_mgr = PersonalManager(inflection_mgr)
@@ -37,8 +34,8 @@ class English(object):
             cat_f, rule_f, nonsuffixable_f, cap_f)
 
         self.say_state = SayState(
-            correlative_mgr, inflection_mgr, personal_mgr, plural_mgr,
-            shortcut_mgr, verb_mgr)
+            det_pronoun_mgr, inflection_mgr, personal_mgr, plural_mgr,
+            pro_adverb_mgr, verb_mgr)
 
         # The SayContext is needed for conjugation.  None of its fields affect
         # conjugation for any object.
@@ -52,7 +49,7 @@ class English(object):
         # Text -> surface structure -> deep structure.
         self.text_to_parse = TextToParse()
         self.parse_to_surface = ParseToSurface(
-            correlative_mgr, personal_mgr, plural_mgr, self.say_state, verb_mgr)
+            det_pronoun_mgr, personal_mgr, plural_mgr, self.say_state, verb_mgr)
         self.surface_to_deep = SurfaceToDeep(purpose_mgr, relation_mgr)
 
         self.joiner = Joiner()
