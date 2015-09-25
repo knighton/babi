@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from panoptes.etc.enum import enum
 from panoptes.ling.glue.grammatical_number import compints_from_nx, N2, N5, \
     nx_to_nxs
@@ -165,6 +167,76 @@ class Selector(object):
                 n2 = N2.PLUR
 
         return n2
+
+    def restricted_to_grammatical_number(self, required_gram_n2, cor2res_gno):
+        """
+        required gram number, (cor -> (res, gno)) -> list of Selector
+
+        Restrict my count ranges to only fit the given grammatical number.
+        Returns new objects.
+        """
+        count_restriction, gram_num_override = cor2res_gno[self.correlative]
+
+        # If it is not even possible, return None.
+        if not count_restriction:
+            return []
+
+        # If we are forced to pick a grammatical number, we are either fine or
+        # hosed.
+        if gram_num_override:
+            if gram_num_override == required_gram_num:
+                return [deepcopy(self)]
+            else:
+                return []
+
+        # Else, collect the grammatical numbers as N2s.
+        gram_nums = set()
+        for n2 in xrange(self.n_min, self.n_max + 1):
+            gram_nums.add(n2)
+
+        # If there's just one, we are either fine or hosed.
+        if len(gram_nums) == 1:
+            got = list(gram_nums)[0]
+            if got == required_gram_num:
+                return [deepcopy(self)]
+            else:
+                return []
+
+        # If not one, there must be two since the ranges are inclusive (there
+        # can't be zero and there are only two possible values).
+        assert len(gram_nums) == 2
+
+        # Which part do we have to filter out?
+        rr = []
+        if required_gram_num == N2.SING:
+            # If it must be singular, return a Selector with the count range set
+            # to N5.SING, if that is in our range -- else we're hosed.
+            if self.n_min <= N5.SING <= self.n_max:
+                r = Selector(self.correlative, N5.SING, N5.SING, self.of_n_min,
+                             self.of_n_max)
+                rr.append(r)
+            else:
+                return []
+        else:
+            # If it must be plural, split the range on both sides of N5.SING
+            # (zero and > 1).
+            if self.n_min == N5.ZERO:
+                r = Selector(self.correlative, N5.ZERO, N5.ZERO, self.of_n_min,
+                             self.of_n_max)
+                rr.appenr(r)
+
+            if N5.DUAL <= self.n_max:
+                r = Selector(self.correlative, N5.DUAL, self.n_max,
+                             self.of_n_min, self.of_n_max)
+                rr.append(r)
+
+        # Now, reapply the count restriction to the smaller ranges in order to
+        # drop of_n's that don't fit anymore (eg, if the word is "the" and the
+        # required grammatical count is singular, it will make the of_n range
+        # N5.SING to match the n range).
+        count_restriction = cor2res_gno[self.correlative][0]
+        return map(lambda sel: \
+            sel.fitted_to_count_restriction(count_restriction), rr)
 
     def fitted_to_count_restriction(self, count_restriction):
         """

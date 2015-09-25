@@ -155,7 +155,7 @@ class ParseToSurface(object):
     def recog_ex(self, root_token):
         return [ExistentialThere()]
 
-    def recog_dt_nn(self, root_token, noun, n2):
+    def recog_dt_nn(self, root_token, noun, gram_n2):
         if not len(root_token.downs) == 1:
             return []
 
@@ -170,14 +170,13 @@ class ParseToSurface(object):
 
         rr = []
         for selector in self.det_pronoun_mgr.parse_determiner(s):
-            selector = selector.fitted_to_nx(n2)
-            if not selector:
-                continue
-            r = SurfaceCommonNoun(selector=selector, noun=noun)
-            rr.append(r)
+            for selector in selector.restricted_to_grammatical_number(
+                    gram_n2, self.det_pronoun_mgr.cor2res_gno):
+                r = SurfaceCommonNoun(selector=selector, noun=noun)
+                rr.append(r)
         return rr
 
-    def recog_posdet_nn(self, root_token, noun, n2):
+    def recog_posdet_nn(self, root_token, noun, gram_n2):
         """
         * PRP$ NN(S)
         * WP$ NN(S)
@@ -196,9 +195,13 @@ class ParseToSurface(object):
             correlative = Correlative.DEF
             count_restriction = self.det_pronoun_mgr.cor2res_gno[correlative][0]
             selector = Selector.from_correlative(correlative, count_restriction)
-
-            r = SurfaceCommonNoun(possessor=pos, selector=selector, noun=noun)
-            rr.append(r)
+            if not selector:
+                continue
+            for selector in selector.restricted_to_grammatical_number(
+                    gram_n2, self.det_pronoun_mgr.cor2res_gno):
+                r = SurfaceCommonNoun(possessor=pos, selector=selector,
+                                      noun=noun)
+                rr.append(r)
         return rr
 
     def recog_common_noun(self, root_token, noun, n2):
