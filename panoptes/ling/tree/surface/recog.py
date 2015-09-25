@@ -1,7 +1,6 @@
 from copy import deepcopy
 
 from panoptes.etc.combinatorics import each_choose_one_from_each
-from panoptes.ling.glue.correlative import SurfaceCorrelative
 from panoptes.ling.glue.grammatical_number import N2, N3, N5, \
     nx_eq_nx_is_possible, nx_to_nxs
 from panoptes.ling.glue.idiolect import Idiolect
@@ -121,7 +120,7 @@ class ParseToSurface(object):
     Object that converts parses to surface structure.
     """
 
-    def __init__(self, correlative_mgr, personal_mgr, plural_mgr, say_state,
+    def __init__(self, det_pronoun_mgr, personal_mgr, plural_mgr, say_state,
                  verb_mgr):
         # For extracting the correct verb conjugation from subjects.
         self.arbitrary_idiolect = Idiolect()
@@ -132,7 +131,7 @@ class ParseToSurface(object):
         self.end_punct_clf = EndPunctClassifier()
         self.verb_extractor = VerbExtractor(verb_mgr)
 
-        self.correlative_mgr = correlative_mgr
+        self.det_pronoun_mgr = det_pronoun_mgr
         self.personal_mgr = personal_mgr
         self.plural_mgr = plural_mgr
 
@@ -147,13 +146,9 @@ class ParseToSurface(object):
         }
 
     def recog_dt(self, root_token):
-        s = root_token.text
         rr = []
-        for cor, n, of_n in self.correlative_mgr.parse_pro(s):
-            possessor = None
-            r = SurfaceCommonNoun(
-                possessor, cor, n, of_n, explicit_number=None, attributes=[],
-                noun=None, say_noun=False, preps_nargs=[])
+        for selector in self.det_pronoun_mgr.parse_pronoun(root_token.text):
+            r = SurfaceCommonNoun(selector=selector)
             rr.append(r)
         return rr
 
@@ -173,16 +168,14 @@ class ParseToSurface(object):
         if s in ['a', 'an']:
             s = A_OR_AN
 
-        nn = []
-        for cor, n, of_n in self.correlative_mgr.parse_det(s):
-            if not nx_eq_nx_is_possible(n, n2):
+        rr = []
+        for selector in self.det_pronoun_mgr.parse_determiner(s):
+            selector = selector.fitted_to_nx(n2)
+            if not selector:
                 continue
-            possessor = None
-            n = SurfaceCommonNoun(
-                possessor, cor, n, of_n, explicit_number=None, attributes=[],
-                noun=noun, say_noun=True, preps_nargs=[])
-            nn.append(n)
-        return nn
+            r = SurfaceCommonNoun(selector=selector, noun=noun)
+            rr.append(r)
+        return rr
 
     def recog_posdet_nn(self, root_token, noun, n2):
         """
@@ -198,17 +191,14 @@ class ParseToSurface(object):
 
         rr = []
         for declension in self.personal_mgr.posdet_parse((child.text,)):
-            possessor = PersonalPronoun(declension, PersonalPronounCase.OBJECT)
-            cor = SurfaceCorrelative.DEF
-            if n2 == N2.SING:
-                n = N3.SING
-            else:
-                n = N3.PLUR
-            for of_n in nx_to_nxs(n, N5):
-                r = SurfaceCommonNoun(
-                    possessor, cor, n, of_n, explicit_number=None,
-                    attributes=[], noun=noun, say_noun=True, preps_nargs=[])
-                rr.append(r)
+            pos = PersonalPronoun(declension, PersonalPronounCase.OBJECT)
+
+            correlative = Correlative.DEF
+            count_restriction = self.det_pronoun_mgr.cor2res_gno[correlative][0]
+            selector = Selector.from_correlative(correlative, count_restriction)
+
+            r = SurfaceCommonNoun(possessor=pos, selector=selector, noun=noun)
+            rr.append(r)
         return rr
 
     def recog_common_noun(self, root_token, noun, n2):
@@ -239,12 +229,8 @@ class ParseToSurface(object):
         rr = []
 
         # For WP like "what".
-        s = root_token.text
-        for cor, n, of_n in self.correlative_mgr.parse_pro(s):
-            possessor = None
-            r = SurfaceCommonNoun(
-                possessor, cor, n, of_n, explicit_number=None, attributes=[],
-                noun=None, say_noun=False, preps_nargs=[])
+        for selector in self.det_pronoun_mgr.parse_pronoun(root_token.text):
+            r = SurfaceCommonNoun(selector=selector)
             rr.append(r)
 
         # For WP like "who".
