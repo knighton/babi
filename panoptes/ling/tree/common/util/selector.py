@@ -92,7 +92,6 @@ class Selector(object):
 
     def dump(self):
         return {
-            'type': 'Selector',
             'correlative': Correlative.to_str[self.correlative],
             'n_min': N5.to_str[self.n_min],
             'n_max': N5.to_str[self.n_max],
