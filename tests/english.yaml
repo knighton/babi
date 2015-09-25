@@ -128,13 +128,15 @@
                   - TARGET
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: DEF
-                    gram_number: SING
-                    gram_of_number: SING
-                    explicit_number:
+                    selector:
+                        correlative: DEF
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: SING
+                        of_n_max: SING
+                    number:
                     attributes: []
                     noun: boat 
-                    say_noun: true
                     rels_nargs: []
             subj_index: 0
   - text: The sailors dog the barmaids.
@@ -163,25 +165,29 @@
                   - AGENT
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: DEF
-                    gram_number: PLUR
-                    gram_of_number: FEW
-                    explicit_number:
+                    selector:
+                        correlative: DEF
+                        n_min: DUAL
+                        n_max: MANY
+                        of_n_min: DUAL
+                        of_n_max: MANY
+                    number:
                     attributes: []
                     noun: sailor
-                    say_noun: true
                     rels_nargs: []
               -
                   - TARGET
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: DEF
-                    gram_number: PLUR
-                    gram_of_number: FEW
-                    explicit_number:
+                    selector:
+                        correlative: DEF
+                        n_min: DUAL
+                        n_max: MANY
+                        of_n_min: DUAL
+                        of_n_max: MANY
+                    number:
                     attributes: []
                     noun: barmaid
-                    say_noun: true
                     rels_nargs: []
             subj_index: 0
   - text: Casey has been baking him a cake.
@@ -220,13 +226,15 @@
                   - TARGET
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: INDEF
-                    gram_number: SING
-                    gram_of_number: MANY
-                    explicit_number:
+                    selector:
+                        correlative: INDEF
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: DUAL
+                        of_n_max: MANY
+                    number:
                     attributes: []
                     noun: cake
-                    say_noun: true
                     rels_nargs: []
             subj_index: 0
   - text: Your books should be there now.
@@ -258,37 +266,43 @@
                         type: PersonalPronoun
                         declension: YOU
                         ppcase: OBJECT
-                    correlative: DEF
-                    gram_number: PLUR
-                    gram_of_number: MANY
-                    explicit_number:
+                    selector:
+                        correlative: DEF
+                        n_min: DUAL
+                        n_max: MANY
+                        of_n_min: DUAL
+                        of_n_max: MANY
+                    number:
                     attributes: []
                     noun: book
-                    say_noun: true
                     rels_nargs: []
               -
                   - PLACE
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: DIST
-                    gram_number: SING
-                    gram_of_number: SING
-                    explicit_number:
+                    selector:
+                        correlative: DIST
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: SING
+                        of_n_max: SING
+                    number:
                     attributes: []
                     noun: place
-                    say_noun: true
                     rels_nargs: []
               -
                   - TIME
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: PROX
-                    gram_number: SING
-                    gram_of_number: SING
-                    explicit_number:
+                    selector:
+                        correlative: PROX
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: SING
+                        of_n_max: SING
+                    number:
                     attributes: []
                     noun: time
-                    say_noun: true
                     rels_nargs: []
             subj_index: 0
   - text: Who are you?
@@ -355,13 +369,15 @@
                   - TARGET
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: INTR
-                    gram_number: SING
-                    gram_of_number: MANY
-                    explicit_number:
+                    selector:
+                        correlative: INTR
+                        n_min: SING
+                        n_max: MANY
+                        of_n_min: SING
+                        of_n_max: MANY
+                    number:
                     attributes: []
-                    noun: dog
-                    say_noun: false
+                    noun:
                     rels_nargs: []
             subj_index: 0
   - text: Whose cat is this?
@@ -390,13 +406,15 @@
                   - AGENT
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: PROX
-                    gram_number: SING
-                    gram_of_number: SING
-                    explicit_number:
+                    selector:
+                        correlative: PROX
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: SING
+                        of_n_max: SING
+                    number:
                     attributes: []
-                    noun: cat
-                    say_noun: false
+                    noun:
                     rels_nargs: []
               -
                   - TARGET
@@ -405,13 +423,15 @@
                         type: PersonalPronoun
                         declension: WHO1
                         ppcase: OBJECT
-                    correlative: DEF
-                    gram_number: SING
-                    gram_of_number: SING
-                    explicit_number:
+                    selector:
+                        correlative: DEF
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: SING
+                        of_n_max: SING
+                    number:
                     attributes: []
                     noun: cat
-                    say_noun: true
                     rels_nargs: []
             subj_index: 0
   - text: Where would they be going?
@@ -445,13 +465,15 @@
                   - PLACE
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: INTR
-                    gram_number: SING
-                    gram_of_number: SING
-                    explicit_number:
+                    selector:
+                        correlative: INTR
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: SING
+                        of_n_max: SING
+                    number:
                     attributes: []
                     noun: place
-                    say_noun: true
                     rels_nargs: []
             subj_index: 0
   - text: Where would they have gone?
@@ -485,13 +507,15 @@
                   - PLACE
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: INTR
-                    gram_number: SING
-                    gram_of_number: SING
-                    explicit_number:
+                    selector:
+                        correlative: INTR
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: SING
+                        of_n_max: SING
+                    number:
                     attributes: []
                     noun: place
-                    say_noun: true
                     rels_nargs: []
             subj_index: 0
   - text: Where did they go?
@@ -525,13 +549,15 @@
                   - PLACE
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: INTR
-                    gram_number: SING
-                    gram_of_number: SING
-                    explicit_number:
+                    selector:
+                        correlative: INTR
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: SING
+                        of_n_max: SING
+                    number:
                     attributes: []
                     noun: place
-                    say_noun: true
                     rels_nargs: []
             subj_index: 0
   - text: They went?
@@ -593,13 +619,15 @@
                   - TARGET
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: DEF
-                    gram_number: SING
-                    gram_of_number: SING
-                    explicit_number:
+                    selector:
+                        correlative: DEF
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: SING
+                        of_n_max: SING
+                    number:
                     attributes: []
                     noun: cat
-                    say_noun: true
                     rels_nargs: []
             subj_index: 0
   - text: Is there a person there?
@@ -631,25 +659,29 @@
                   - TARGET
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: INDEF
-                    gram_number: SING
-                    gram_of_number: MANY
-                    explicit_number:
+                    selector:
+                        correlative: INDEF
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: DUAL
+                        of_n_max: MANY
+                    number:
                     attributes: []
                     noun: person
-                    say_noun: true
                     rels_nargs: []
               -
                   - PLACE
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: DIST
-                    gram_number: SING
-                    gram_of_number: SING
-                    explicit_number:
+                    selector:
+                        correlative: DIST
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: SING
+                        of_n_max: SING
+                    number:
                     attributes: []
                     noun: place
-                    say_noun: true
                     rels_nargs: []
             subj_index: 0
   - text: Must there be someone there?
@@ -681,25 +713,29 @@
                   - TARGET
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: EXIST
-                    gram_number: SING
-                    gram_of_number: MANY
-                    explicit_number:
+                    selector:
+                        correlative: EXIST
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: DUAL
+                        of_n_max: MANY
+                    number:
                     attributes: []
                     noun: person
-                    say_noun: true
                     rels_nargs: []
               -
                   - PLACE
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: DIST
-                    gram_number: SING
-                    gram_of_number: SING
-                    explicit_number:
+                    selector:
+                        correlative: DIST
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: SING
+                        of_n_max: SING
+                    number:
                     attributes: []
                     noun: place
-                    say_noun: true
                     rels_nargs: []
             subj_index: 0
   - text: There must be someone there.
@@ -731,25 +767,29 @@
                   - TARGET
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: EXIST
-                    gram_number: SING
-                    gram_of_number: MANY
-                    explicit_number:
+                    selector:
+                        correlative: EXIST
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: DUAL
+                        of_n_max: MANY
+                    number:
                     attributes: []
                     noun: person
-                    say_noun: true
                     rels_nargs: []
               -
                   - PLACE
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: DIST
-                    gram_number: SING
-                    gram_of_number: SING
-                    explicit_number:
+                    selector:
+                        correlative: DIST
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: SING
+                        of_n_max: SING
+                    number:
                     attributes: []
                     noun: place
-                    say_noun: true
                     rels_nargs: []
             subj_index: 0
   - text: Be here now.
@@ -783,24 +823,28 @@
                   - PLACE
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: PROX
-                    gram_number: SING
-                    gram_of_number: SING
-                    explicit_number:
+                    selector:
+                        correlative: PROX
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: SING
+                        of_n_max: SING
+                    number:
                     attributes: []
                     noun: place
-                    say_noun: true
                     rels_nargs: []
               -
                   - TIME
                   - type: DeepCommonNoun
                     possessor:
-                    correlative: PROX
-                    gram_number: SING
-                    gram_of_number: SING
-                    explicit_number:
+                    selector:
+                        correlative: PROX
+                        n_min: SING
+                        n_max: SING
+                        of_n_min: SING
+                        of_n_max: SING
+                    number:
                     attributes: []
                     noun: time
-                    say_noun: true
                     rels_nargs: []
             subj_index: 0
