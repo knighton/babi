@@ -12,6 +12,7 @@ from panoptes.ling.tree.common.existential_there import ExistentialThere
 from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun, \
     PersonalPronounCase
 from panoptes.ling.tree.common.proper_noun import ProperNoun
+from panoptes.ling.tree.common.util.selector import Correlative, Selector
 from panoptes.ling.tree.surface.base import SayContext, SayState
 from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
 from panoptes.ling.tree.surface.content_clause import Complementizer, \

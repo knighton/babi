@@ -6,7 +6,7 @@ from panoptes.ling.glue.grammatical_number import N2, nx_to_nx
 from panoptes.ling.glue.inflection import N2_TO_CONJ
 from panoptes.ling.glue.magic_token import PLACE_PREP, TIME_PREP
 from panoptes.ling.tree.common.util.selector import Correlative, \
-    CountRestriction
+    CountRestriction, Selector
 from panoptes.ling.tree.surface.base import SayResult
 
 
@@ -216,5 +216,5 @@ class ProAdverbManager(object):
                 prep = self.noun2hallucinate_prep.get(noun)
                 count_res, _ = self.cor2res_gno[correlative]
                 selector = Selector.from_correlative(correlative, count_res)
-                rr.append(prep, selector, noun)
+                rr.append((prep, selector, noun))
         return rr
