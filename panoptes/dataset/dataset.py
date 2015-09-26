@@ -54,13 +54,15 @@ class Task(object):
             print
             e.show()
 
-    def evaluate(self, agent):
+    def evaluate(self, agent, max_num_episodes):
         """
         Agent -> accuracy
         """
         correct = 0
         total = 0
-        for episode in self.episodes:
+        for i, episode in enumerate(self.episodes):
+            if i == max_num_episodes:
+                break
             agent.reset()
             uid = agent.new_user()
             a, b = episode.evaluate(agent, uid)
@@ -99,10 +101,10 @@ class Dataset(object):
         for i, task in enumerate(self.tasks):
             task.preview(i + 1, num_episodes_to_show)
 
-    def evaluate(self, agent, out=None):
+    def evaluate(self, agent, max_num_episodes=None, out=None):
         names_accs = []
         for task in self.tasks:
-            acc = task.evaluate(agent)
+            acc = task.evaluate(agent, max_num_episodes)
             names_accs.append((task.name, acc))
 
         if out:
