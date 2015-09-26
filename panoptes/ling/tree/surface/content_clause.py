@@ -130,7 +130,7 @@ class SurfaceContentClause(SurfaceArgument):
         you_plur = PersonalPronoun(Declension.YALL, PersonalPronounCase.SUBJECT)
         for you in [you_sing, you_plur]:
             pre = self.preps_vargs[:self.vmain_index]
-            subject = [None, you]
+            subject = (None, you)
             post = self.preps_vargs[self.vmain_index:]
             pp_nn = pre + [subject] + post
             yield pp_nn, self.vmain_index
