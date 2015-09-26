@@ -23,4 +23,10 @@ class PhilosophicalZombie(Agent):
 
     def put(self, uid, text):
         assert uid in self.user_ids_set
-        return text
+        dsens = list(self.english.each_dsen_from_text(text))
+        if not dsens:
+            return
+
+        dsen = dsens[0]
+        import json
+        print json.dumps(dsen.dump(), indent=4, sort_keys=True)

@@ -8,7 +8,7 @@ def main():
     agent = PhilosophicalZombie()
     uid = agent.new_user()
     while True:
-        text = raw_input('> ')
+        text = raw_input('> ').decode('utf-8')
         print agent.put(uid, text)
 
 
