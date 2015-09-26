@@ -152,6 +152,10 @@ class ParseToSurface(object):
             'WRB': self.recog_wrb,
         }
 
+        self.invalid_verb_arg_root_tags = set([
+            '.'
+        ])
+
     def recog_dt(self, root_token):
         nn = []
         for selector in self.det_pronoun_mgr.parse_pronoun(root_token.text):
@@ -307,6 +311,9 @@ class ParseToSurface(object):
         if f:
             return f(root_token)
 
+        if root_token.tag in self.invalid_verb_arg_root_tags:
+            return []
+
         print 'Unknown tag:', root_token.tag
         assert False
 
@@ -379,7 +386,7 @@ class ParseToSurface(object):
                 rel, down = t.downs[0]
                 assert rel == 'pobj'
                 t = down
-            elif rel == 'prep':
+            elif t.tag == 'IN':
                 prep = t.text,
                 assert len(t.downs) == 1
                 rel, down = t.downs[0]
