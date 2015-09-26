@@ -5,6 +5,8 @@
 #
 # Used for deciding sentence-ending punctuation, whether to do-split a verb, if
 # there are wh-roles to possibly front, etc.
+#
+# TODO: replace ind_cond with is_modality_not_squirrely or something.
 
 from collections import defaultdict
 from itertools import product
@@ -73,9 +75,9 @@ class PurposeInfo(object):
 class PurposeManager(object):
     def __init__(self):
         data = """
-            WH_Q      T  F  ?  ??  T
-            TF_Q      F  T  ?  ??  T
-            VERIFY_Q  F  F  ?  ?!  T
+            WH_Q      T  F  ?  ??  F
+            TF_Q      F  T  ?  ??  F
+            VERIFY_Q  F  F  ?  ?!  F
             INFO      F  F  .  !   F
         """
 
