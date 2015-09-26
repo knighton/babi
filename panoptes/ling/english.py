@@ -1,3 +1,5 @@
+import json
+
 from panoptes.ling.glue.inflection import InflectionManager
 from panoptes.ling.glue.purpose import PurposeManager
 from panoptes.ling.glue.relation import RelationManager
@@ -55,18 +57,41 @@ class English(object):
 
         self.joiner = Joiner()
 
-    def each_dsen_from_text(self, text):
-        ok = False
+    def each_dsen_from_text(self, text, verbose=True):
+        parses = []
         for parse in self.text_to_parse.parse(text):
-            print '>>>>> PARSE'
-            parse.dump()
+            parses.append(parse)
+
+        if verbose:
+            print '-- %d parses' % len(parses)
+
+        keys = set()
+        keys_ssens = []
+        for parse in self.text_to_parse.parse(text):
             for ssen in self.parse_to_surface.recog(parse):
-                print '>>>>> >>>>> SURFACE SENTENCE'
-                for dsen in self.surface_to_deep.recog(ssen):
-                    print '>>>>> >>>>> >>>>> DEEP SENTENCE'
-                    yield dsen
-                    ok = True
-        assert ok
+                key = json.dumps(ssen.dump(), indent=4, sort_keys=True)
+                if key in keys:
+                    continue
+                keys_ssens.append((key, ssen))
+        keys_ssens.sort()
+
+        if verbose:
+            print '-- %d ssens' % len(keys_ssens)
+
+        keys = set()
+        keys_dsens = []
+        for _ssen in keys_ssens:
+            for dsen in self.surface_to_deep.recog(ssen):
+                key = json.dumps(ssen.dump(), indent=4, sort_keys=True)
+                if key in keys:
+                    continue
+                keys_dsens.append((key, dsen))
+        keys_dsens.sort()
+
+        if verbose:
+            print '-- %d dsens' % len(keys_dsens)
+
+        return map(lambda (k, d): k, keys_dsens)
 
     def text_from_dsen(self, dsen, idiolect):
         ssen = dsen.to_surface(self.transform_state, self.say_state, idiolect)
