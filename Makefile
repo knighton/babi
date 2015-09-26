@@ -1,6 +1,9 @@
 babi:
 	python -m tests.babi
 
+console:
+	python -m scripts.console
+
 env:
 	virtualenv env --system-site-packages
 
