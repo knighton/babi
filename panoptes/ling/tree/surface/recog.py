@@ -153,14 +153,15 @@ class ParseToSurface(object):
         }
 
     def recog_dt(self, root_token):
-        rr = []
+        nn = []
         for selector in self.det_pronoun_mgr.parse_pronoun(root_token.text):
-            r = SurfaceCommonNoun(selector=selector)
-            rr.append(r)
-        return rr
+            n = SurfaceCommonNoun(selector=selector)
+            nn.append(n)
+        return map(lambda n: (None, n), nn)
 
     def recog_ex(self, root_token):
-        return [ExistentialThere()]
+        p_n = (None, ExistentialThere())
+        return [p_n]
 
     def recog_dt_nn(self, root_token, noun, gram_n2):
         if not len(root_token.downs) == 1:
@@ -175,13 +176,13 @@ class ParseToSurface(object):
         if s in ['a', 'an']:
             s = A_OR_AN
 
-        rr = []
+        nn = []
         for selector in self.det_pronoun_mgr.parse_determiner(s):
             for selector in selector.restricted_to_grammatical_number(
                     gram_n2, self.det_pronoun_mgr.cor2res_gno):
-                r = SurfaceCommonNoun(selector=selector, noun=noun)
-                rr.append(r)
-        return rr
+                n = SurfaceCommonNoun(selector=selector, noun=noun)
+                nn.append(n)
+        return map(lambda n: (None, n), nn)
 
     def recog_posdet_nn(self, root_token, noun, gram_n2):
         """
@@ -195,7 +196,7 @@ class ParseToSurface(object):
         if dep != 'poss':
             return []
 
-        rr = []
+        nn = []
         for declension in self.personal_mgr.posdet_parse((child.text,)):
             pos = PersonalPronoun(declension, PersonalPronounCase.OBJECT)
 
@@ -206,21 +207,36 @@ class ParseToSurface(object):
                 continue
             for selector in selector.restricted_to_grammatical_number(
                     gram_n2, self.det_pronoun_mgr.cor2res_gno):
-                r = SurfaceCommonNoun(possessor=pos, selector=selector,
+                n = SurfaceCommonNoun(possessor=pos, selector=selector,
                                       noun=noun)
-                rr.append(r)
-        return rr
+                nn.append(n)
+        return map(lambda n: (None, n), nn)
+
+    def recog_shortcut(self, root_token):
+        pp_nn = []
+        ss = root_token.text,
+        for prep, selector, noun in self.pro_adverb_mgr.parse(ss):
+            n = SurfaceCommonNoun(selector=selector, noun=noun)
+            pp_nn.append((prep, n))
+        return pp_nn
 
     def recog_common_noun(self, root_token, noun, n2):
-        rr = self.recog_dt_nn(root_token, noun, n2)
-        rr += self.recog_posdet_nn(root_token, noun, n2)
-        return rr
+        pp_nn = self.recog_dt_nn(root_token, noun, n2)
+        pp_nn += self.recog_posdet_nn(root_token, noun, n2)
+        pp_nn += self.recog_shortcut(root_token)
+        return pp_nn
 
     def recog_nn(self, root_token):
+        """
+        Eg, cat.
+        """
         sing = root_token.text
         return self.recog_common_noun(root_token, sing, N2.SING)
 
     def recog_nns(self, root_token):
+        """
+        Eg, cats.
+        """
         rr = []
         for sing in self.plural_mgr.to_singular(root_token.text):
             for r in self.recog_common_noun(root_token, sing, N2.PLUR):
@@ -228,40 +244,55 @@ class ParseToSurface(object):
         return rr
 
     def recog_nnp(self, root_token):
+        """
+        Eg, James.
+        """
         name = root_token.text,
-        return [ProperNoun(name=name, is_plur=False)]
+        n = ProperNoun(name=name, is_plur=False)
+        return [(None, n)]
 
     def recog_prp(self, root_token):
+        """
+        Eg, you.
+        """
         ss = root_token.text,
-        return self.personal_mgr.perspro_parse(ss)
+        nn = self.personal_mgr.perspro_parse(ss)
+        return map(lambda n: (None, n), nn)
 
     def recog_wp(self, root_token):
-        rr = []
+        """
+        Eg, who.
+        """
+        nn = []
 
         # For WP like "what".
         for selector in self.det_pronoun_mgr.parse_pronoun(root_token.text):
-            r = SurfaceCommonNoun(selector=selector)
-            rr.append(r)
+            n = SurfaceCommonNoun(selector=selector)
+            nn.append(n)
 
         # For WP like "who".
         ss = root_token.text,
-        rr += self.personal_mgr.perspro_parse(ss)
+        nn += self.personal_mgr.perspro_parse(ss)
 
-        return rr
+        return map(lambda n: (None, n), nn)
 
     def recog_adverb(self, root_token):
-        pp_nn = []
-        ss = root_token.text,
-        for prep, selector, noun in self.pro_adverb_mgr.parse(ss):
-            prep_tuple = prep,
-            n = SurfaceCommonNoun(selector=selector, noun=noun)
-            pp_nn.append((prep_tuple, n))
-        return pp_nn
+        """
+        We don't normally bother with adverbs, but do recognize pro-adverbs as
+        actually being (prep, argument) pairs encoded into a single word.
+        """
+        return self.recog_shortcut(root_token)
 
     def recog_rb(self, root_token):
+        """
+        Eg, here.
+        """
         return self.recog_adverb(root_token)
 
     def recog_wrb(self, root_token):
+        """
+        Eg, where.
+        """
         return self.recog_adverb(root_token)
 
     def recognize_verb_arg(self, root_token):
@@ -270,8 +301,7 @@ class ParseToSurface(object):
         """
         f = self.tag2recognize_arg.get(root_token.tag)
         if f:
-            nn = f(root_token)
-            return map(lambda n: (None, n), nn)
+            return f(root_token)
 
         f = self.tag2recognize_prep_arg.get(root_token.tag)
         if f:
