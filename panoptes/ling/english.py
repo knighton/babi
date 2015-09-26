@@ -91,7 +91,7 @@ class English(object):
         if verbose:
             print '-- %d dsens' % len(keys_dsens)
 
-        return map(lambda (k, d): k, keys_dsens)
+        return map(lambda (k, d): d, keys_dsens)
 
     def text_from_dsen(self, dsen, idiolect):
         ssen = dsen.to_surface(self.transform_state, self.say_state, idiolect)
