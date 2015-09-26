@@ -7,8 +7,8 @@
 # there are wh-roles to possibly front, etc.
 
 from collections import defaultdict
-from itertools import product
 
+from panoptes.etc.combinatorics import each_choose_one_from_each
 from panoptes.etc.enum import enum
 
 
@@ -107,7 +107,7 @@ class PurposeManager(object):
             bools,  # is_fronting
             bools,  # is_ind_cond
         ]
-        for args in product(*options):
+        for args in each_choose_one_from_each(options):
             has_q_args, is_split, is_fronting, is_ind_cond = args
             for info in self.purpose2info.itervalues():
                 if has_q_args != info.has_q_args:

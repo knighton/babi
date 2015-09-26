@@ -1,5 +1,4 @@
-from itertools import product
-
+from panoptes.etc.combinatorics import each_choose_one_from_each
 from panoptes.ling.glue.purpose import PurposeManager
 from panoptes.ling.glue.relation import RelationManager
 from panoptes.ling.tree.base import ArgPosRestriction
@@ -156,7 +155,8 @@ class SurfaceToDeep(object):
                     map(lambda (p, n): n, unfronted_preps_vargs))
 
             for purpose, is_intense in purposes_isstresseds:
-                for deeps in product(*deep_options_per_arg):
+                for deeps in each_choose_one_from_each(
+                        deep_options_per_arg):
                     ok = True
                     for i, deep in enumerate(deeps):
                         res = deep.arg_position_restriction()
@@ -175,7 +175,8 @@ class SurfaceToDeep(object):
                     if not ok:
                         continue
 
-                    for rels in product(*relation_options_per_arg):
+                    for rels in each_choose_one_from_each(
+                            relation_options_per_arg):
                         rels_vargs = zip(rels, deeps)
                         r = DeepContentClause(
                             status, purpose, is_intense, c.verb.intrinsics,

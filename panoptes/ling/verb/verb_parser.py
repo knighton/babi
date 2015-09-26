@@ -1,10 +1,10 @@
 from collections import defaultdict
-from itertools import chain, product
+from itertools import chain
 import json
 import os
 
-from panoptes.etc.combinatorics import collapse_int_tuples_to_wildcards, \
-    expand_int_tuples_from_wildcards
+from panoptes.etc.combinatorics import each_choose_one_from_each, \
+    collapse_int_tuples_to_wildcards, expand_int_tuples_from_wildcards
 from panoptes.ling.verb.conjugation import Conjugator, MAGIC_INTS_LEMMA
 from panoptes.ling.verb.verb import SurfaceVerb
 
@@ -141,7 +141,8 @@ def construct_one_lookup_table(verb_sayer, lemmas, is_pro_verbs):
     finite_options = SurfaceVerb.finite_options(lemmas, is_pro_verbs)
     nonfinite_options = SurfaceVerb.nonfinite_options(lemmas, is_pro_verbs)
     sss2vv = defaultdict(list)
-    for aa in chain(product(*finite_options), product(*nonfinite_options)):
+    for aa in chain(each_choose_one_from_each(finite_options),
+                    each_choose_one_from_each(nonfinite_options)):
         v = SurfaceVerb.from_tuple(aa)
         for sss in verb_sayer.get_all_say_options(v):
             sss = (tuple(sss[0]), tuple(sss[1]))

@@ -135,8 +135,8 @@ class ProAdverbManager(object):
 
         # Noun -> preposition to hallucinate.
         self.noun2hallucinate_prep = {
-            'place': (PLACE_PREP,),
-            'time':  (TIME_PREP,),
+            'place': PLACE_PREP,
+            'time':  TIME_PREP,
         }
 
         # Correlative -> (count restriction if possible, grammatical number

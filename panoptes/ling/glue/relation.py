@@ -327,7 +327,7 @@ class RelationManager(object):
         prepless = []
         for i, (prep, arg_type) in enumerate(preps_rats):
             if prep:
-                options_per_arg[i] = self.decode_prep_type(prep, arg_type)
+                options_per_arg[x] = self.decode_prep_type(prep, arg_type)
             else:
                 prepless.append(i)
 
