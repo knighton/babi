@@ -2,6 +2,7 @@ from random import randint
 
 from panoptes.agent.agent import Agent
 from panoptes.ling.english import English
+from panoptes.mind.mind import Mind
 
 
 class PhilosophicalZombie(Agent):
@@ -13,16 +14,29 @@ class PhilosophicalZombie(Agent):
         self.reset()
 
     def reset(self):
-        self.user_ids_set = set()
+        self.mind = Mind()
+        self.bot_uid = self.mind.new_user()
 
     def new_user(self):
-        uid = randint(0, 0x7FFFFFFFFFFFFFFF)
-        assert uid not in self.user_ids_set
-        self.user_ids_set.add(uid)
-        return uid
+        return self.mind.new_user()
 
-    def put(self, uid, text):
-        assert uid in self.user_ids_set
+    def put(self, from_uid, text):
+        dsens = list(self.english.each_dsen_from_text(text))
+        if not dsens:
+            return
+
+        dsen = dsens[0]
+        import json
+        print '>>>', text
+        print json.dumps(dsen.dump(), indent=4, sort_keys=True)
+
+        r = self.mind.overhear(dsen, [from_uid], [self.bot_uid])
+        if not r:
+            return
+
+        return self.english.say(r)
+
+    def put(self, from_uid, text):
         dsens = list(self.english.each_dsen_from_text(text))
         if not dsens:
             return
@@ -30,3 +44,9 @@ class PhilosophicalZombie(Agent):
         dsen = dsens[0]
         import json
         print json.dumps(dsen.dump(), indent=4, sort_keys=True)
+
+        r = self.mind.overhear(dsen, [from_uid], [self.bot_uid])
+        if not r:
+            return
+
+        return self.english.say(r)

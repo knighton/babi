@@ -38,7 +38,7 @@ def task_from_fn(fn):
     episodes = []
     pairs = []
     prev_n = None
-    with open(fn) as f:
+    with codecs.open(fn, encoding='utf-8') as f:
         for line in f:
             x = line.find(' ')
             n = int(line[:x])

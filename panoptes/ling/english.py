@@ -60,6 +60,7 @@ class English(object):
     def each_dsen_from_text(self, text, verbose=True):
         parses = []
         for parse in self.text_to_parse.parse(text):
+            parse.dump()
             parses.append(parse)
 
         if verbose:

@@ -1,3 +1,6 @@
+babi_mini:
+	python -m tests.babi_mini
+
 babi:
 	python -m tests.babi
 

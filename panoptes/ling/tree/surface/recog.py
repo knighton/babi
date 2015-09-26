@@ -307,6 +307,7 @@ class ParseToSurface(object):
         if f:
             return f(root_token)
 
+        print 'Unknown tag:', root_token.tag
         assert False
 
     def find_subject(self, verb_span_pair, varg_root_indexes):
