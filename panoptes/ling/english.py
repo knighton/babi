@@ -60,11 +60,16 @@ class English(object):
     def each_dsen_from_text(self, text, verbose=True):
         parses = []
         for parse in self.text_to_parse.parse(text):
-            parse.dump()
             parses.append(parse)
 
         if verbose:
             print '-- %d parses' % len(parses)
+            for parse in parses:
+                print '-- PARSE'
+                parse.dump()
+
+        if not parses:
+            return []
 
         keys = set()
         keys_ssens = []
@@ -78,6 +83,9 @@ class English(object):
 
         if verbose:
             print '-- %d ssens' % len(keys_ssens)
+            for key, ssen in keys_ssens:
+                print '-- SSEN'
+                print json.dumps(ssen.dump(), indent=4, sort_keys=True)
 
         keys = set()
         keys_dsens = []
@@ -91,6 +99,11 @@ class English(object):
 
         if verbose:
             print '-- %d dsens' % len(keys_dsens)
+            for key, dsen in keys_dsens:
+                print '-- DSEN'
+                print json.dumps(dsen.dump(), indent=4, sort_keys=True)
+
+        assert keys_dsens
 
         return map(lambda (k, d): d, keys_dsens)
 

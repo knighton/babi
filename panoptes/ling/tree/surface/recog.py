@@ -384,7 +384,7 @@ class ParseToSurface(object):
         ppp_nnn = []
         for rel, t in root_token.downs:
             if rel not in ('nsubj', 'nsubjpass', 'agent', 'dobj', 'dative',
-                           'expl', 'attr', 'advmod', 'prep'):
+                           'expl', 'attr', 'advmod', 'prep', 'compound'):
                 continue
 
             if rel == 'agent':
@@ -406,7 +406,7 @@ class ParseToSurface(object):
 
             pp_nn = self.recognize_verb_arg(t)
             spoken_preps = [prep] * len(pp_nn)
-            absorbed_preps, vargs = zip(*pp_nn) if pp_nn else [], []
+            absorbed_preps, vargs = zip(*pp_nn) if pp_nn else ([], [])
             pp_nn = []
             for spoken_prep, absorbed_prep, varg in \
                     zip(spoken_preps, absorbed_preps, vargs):
@@ -414,7 +414,10 @@ class ParseToSurface(object):
                     prep = spoken_prep
                 elif absorbed_prep:
                     prep = absorbed_prep
+                else:
+                    prep = None
                 pp_nn.append((prep, varg))
+
             ppp_nnn.append(pp_nn)
 
         r = self.find_subject(verb_span_pair, varg_root_indexes)
@@ -482,6 +485,7 @@ class ParseToSurface(object):
         cc = []
         for verb_span_pair, vv in \
                 self.verb_extractor.extract(root_token, is_root_clause):
+
             # Hack to compensate for a bug in imperative verb saying.
             if verb_span_pair[0] and not verb_span_pair[1]:
                 vv = filter(lambda v: not v.is_imperative(), vv)
