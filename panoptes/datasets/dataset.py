@@ -14,18 +14,16 @@ class Episode(object):
         for in_s, out in self.pairs:
             print '    %s' % in_s.encode('utf-8')
             if out:
-                print
                 print '        > %s' % out.encode('utf-8')
-                print
 
-    def evaluate(self, agent):
+    def evaluate(self, agent, uid):
         """
         Agent -> (num correct tests, num tests)
         """
         correct = 0
         total = 0
         for in_s, out in self.pairs:
-            got_out = agent.overhear(in_s)
+            got_out = agent.put(uid, in_s)
             if out is not None:
                 correct += out == got_out
                 total += 1
@@ -67,7 +65,8 @@ class Task(object):
         total = 0
         for episode in self.episodes:
             agent.reset()
-            a, b = episode.evaluate(agent)
+            uid = agent.new_user()
+            a, b = episode.evaluate(agent, uid)
             correct += a
             total += b
         return float(correct) / total
@@ -98,7 +97,7 @@ class Dataset(object):
                 print s,
             print
 
-    def preview(self, num_episodes_to_show=2):
+    def preview(self, num_episodes_to_show=1):
         print 'Preview of %s:' % self.name.encode('utf-8')
         for i, task in enumerate(self.tasks):
             task.preview(i + 1, num_episodes_to_show)
