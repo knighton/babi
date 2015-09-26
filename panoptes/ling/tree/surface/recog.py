@@ -150,6 +150,7 @@ class ParseToSurface(object):
         self.tag2recognize_prep_arg = {
             'RB': self.recog_rb,
             'WRB': self.recog_wrb,
+            'RBR': self.recog_rbr,
         }
 
         self.invalid_verb_arg_root_tags = set([
@@ -298,6 +299,12 @@ class ParseToSurface(object):
         Eg, where.
         """
         return self.recog_adverb(root_token)
+
+    def recog_rbr(self, root_token):
+        """
+        For bAbi, as a verb argument, just present in invalid parses?
+        """
+        return []
 
     def recognize_verb_arg(self, root_token):
         """
