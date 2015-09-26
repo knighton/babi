@@ -311,7 +311,7 @@ class ParseToSurface(object):
 
     def find_subject(self, verb_span_pair, varg_root_indexes):
         """
-        args -> subj arg index, vmain index
+        args -> (subj arg index, vmain index) or None if impossible
         """
         a, b = verb_span_pair
         if a and b:
@@ -331,6 +331,9 @@ class ParseToSurface(object):
             for i, arg in enumerate(varg_root_indexes):
                 if a[1] < arg:
                     return i, i + 1
+
+            # If there are no args afterward, it isn't possible.
+            return None
         elif b:
             # Just the main span ("you would", "go!").
 
@@ -357,9 +360,10 @@ class ParseToSurface(object):
 
     def extract_verb_args(self, root_token, verb_span_pair):
         """
-        root token, verb span pair -> subj arg index, vmain idx, options per arg
+        (root token, verb span pair) -> args or None if impossible
 
-        ... where an option is a (prep, verb arg).
+        Where args are (subj arg index, vmain idx, options per arg), where an
+        option is a (prep, verb arg).
         """
         varg_root_indexes = []
         ppp_nnn = []
@@ -379,8 +383,10 @@ class ParseToSurface(object):
             pp_nn = self.recognize_verb_arg(t)
             ppp_nnn.append(pp_nn)
 
-        subj_argx, vmain_index = \
-            self.find_subject(verb_span_pair, varg_root_indexes)
+        r = self.find_subject(verb_span_pair, varg_root_indexes)
+        if r is None:
+            return None
+        subj_argx, vmain_index = r
 
         return subj_argx, vmain_index, ppp_nnn
 
@@ -448,8 +454,10 @@ class ParseToSurface(object):
             if not vv:
                 continue
 
-            subj_argx, vmain_index, ppp_nnn = self.extract_verb_args(
-                root_token, verb_span_pair)
+            r = self.extract_verb_args(root_token, verb_span_pair)
+            if r is None:
+                continue
+            subj_argx, vmain_index, ppp_nnn = r
 
             if subj_argx is None:
                 vv = filter(lambda v: v.is_imperative(), vv)
