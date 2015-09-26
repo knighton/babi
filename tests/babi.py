@@ -1,3 +1,6 @@
+import sys
+
+from panoptes.agent.pzombie import PhilosophicalZombie
 from panoptes.dataset.babi import load_babi
 
 
@@ -6,7 +9,8 @@ def main():
     babi = load_babi(d)
     babi.preview()
     babi.overview()
-    print babi
+    agent = PhilosophicalZombie()
+    babi.evaluate(agent, sys.stdout)
 
 
 if __name__ == '__main__':

@@ -1,10 +1,15 @@
 from random import randint
 
 from panoptes.agent.agent import Agent
+from panoptes.ling.english import English
 
 
 class PhilosophicalZombie(Agent):
     def __init__(self):
+        # Static state.
+        self.english = English()
+
+        # Dynamic state.
         self.reset()
 
     def reset(self):
@@ -16,6 +21,6 @@ class PhilosophicalZombie(Agent):
         self.user_ids_set.add(uid)
         return uid
 
-    def put(uid, text):
+    def put(self, uid, text):
         assert uid in self.user_ids_set
         return text

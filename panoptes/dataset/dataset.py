@@ -1,6 +1,3 @@
-from panoptes.agent import Agent
-
-
 class Episode(object):
     """
     A single run of some input/output pairs against an Agent before resetting
@@ -102,12 +99,16 @@ class Dataset(object):
         for i, task in enumerate(self.tasks):
             task.preview(i + 1, num_episodes_to_show)
 
-    def evaluate(agent):
+    def evaluate(self, agent, out=None):
         names_accs = []
         for task in self.tasks:
             acc = task.evaluate(agent)
             names_accs.append((task.name, acc))
 
-        z = max(map(len, zip(*names_accs)[0]))
-        for task, acc in names_accs:
-            print '%s %.3f' % (task.ljust(z), acc * 100)
+        if out:
+            z = max(map(len, zip(*names_accs)[0]))
+            for task, acc in names_accs:
+                line = '%s %.3f\n' % (task.ljust(z), acc * 100)
+                out.write(line)
+
+        return float(sum(map(lambda (n, a): a, names_accs))) / len(names_accs)

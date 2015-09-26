@@ -1,7 +1,7 @@
 import codecs
 from glob import glob
 
-from panoptes.datasets.dataset import Dataset, Task, Episode
+from panoptes.dataset.dataset import Dataset, Task, Episode
 
 
 def int_from_fn(f):

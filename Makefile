@@ -1,3 +1,6 @@
+babi:
+	python -m tests.babi
+
 env:
 	virtualenv env --system-site-packages
 
