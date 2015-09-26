@@ -68,9 +68,6 @@ class English(object):
                 print '-- PARSE'
                 parse.dump()
 
-        if not parses:
-            return []
-
         keys = set()
         keys_ssens = []
         for parse in self.text_to_parse.parse(text):
@@ -83,9 +80,9 @@ class English(object):
 
         if verbose:
             print '-- %d ssens' % len(keys_ssens)
-            for key, ssen in keys_ssens:
-                print '-- SSEN'
-                print json.dumps(ssen.dump(), indent=4, sort_keys=True)
+            for i, (key, ssen) in enumerate(keys_ssens):
+                print '-- SSEN %d' % i
+                print key
 
         keys = set()
         keys_dsens = []
@@ -99,9 +96,9 @@ class English(object):
 
         if verbose:
             print '-- %d dsens' % len(keys_dsens)
-            for key, dsen in keys_dsens:
-                print '-- DSEN'
-                print json.dumps(dsen.dump(), indent=4, sort_keys=True)
+            for i, (key, dsen) in enumerate(keys_dsens):
+                print '-- DSEN %d' % i
+                print key
 
         assert keys_dsens
 

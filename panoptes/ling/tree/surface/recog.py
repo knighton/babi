@@ -169,12 +169,12 @@ class ParseToSurface(object):
         return [p_n]
 
     def recog_dt_nn(self, root_token, noun, gram_n2):
-        if not len(root_token.downs) == 1:
+        deps_childs = filter(lambda (d, c): d == 'det', root_token.downs)
+
+        if len(deps_childs) != 1:
             return []
 
-        dep, child = root_token.downs[0]
-        if dep != 'det':
-            return []
+        dep, child = deps_childs[0]
 
         s = child.text
 
@@ -194,12 +194,12 @@ class ParseToSurface(object):
         * PRP$ NN(S)
         * WP$ NN(S)
         """
-        if not len(root_token.downs) == 1:
+        deps_childs = filter(lambda (d, c): d == 'poss', root_token.downs)
+
+        if len(deps_childs) != 1:
             return []
 
-        dep, child = root_token.downs[0]
-        if dep != 'poss':
-            return []
+        dep, child = deps_childs[0]
 
         nn = []
         for declension in self.personal_mgr.posdet_parse((child.text,)):
