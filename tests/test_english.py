@@ -15,6 +15,8 @@ def main():
     ee = yaml.load(open(fn))
     for e in ee:
         text = e['text']
+        print
+        print text
         structure = e['structure']
         dsen = DeepSentence.load(structure, loader)
 
@@ -22,9 +24,13 @@ def main():
         assert structure == new_structure
 
         new_text = english.text_from_dsen(dsen, idiolect)
-        print text
         print new_text
         print
+        assert text == new_text
+
+        for new_dsen in english.each_dsen_from_text(unicode(text)):
+            pass
+            # print '*', json.dumps(new_dsen.dump(), sort_keys=True, indent=4)
 
 
 if __name__ == '__main__':

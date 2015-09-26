@@ -58,18 +58,12 @@ class English(object):
     def each_dsen_from_text(self, text):
         ok = False
         for parse in self.text_to_parse.parse(text):
-            print
             print '>>>>> PARSE'
-            print
             parse.dump()
             for ssen in self.parse_to_surface.recog(parse):
-                print
                 print '>>>>> >>>>> SURFACE SENTENCE'
-                print
                 for dsen in self.surface_to_deep.recog(ssen):
-                    print
                     print '>>>>> >>>>> >>>>> DEEP SENTENCE'
-                    print
                     yield dsen
                     ok = True
         assert ok
