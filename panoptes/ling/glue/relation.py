@@ -98,6 +98,13 @@ RELATION_TEXT = """
       - while PREPLESS_GERUND
       - during INERT
 
+  - relation: BEFORE
+    core: OBLIQUE
+    order: 50
+    preps:
+      - before FINITE_CLAUSE
+      - before INERT
+
   - relation: BECAUSE
     core: OBLIQUE
     order: 100
