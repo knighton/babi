@@ -370,18 +370,37 @@ class ParseToSurface(object):
         ppp_nnn = []
         for rel, t in root_token.downs:
             if rel not in ('nsubj', 'nsubjpass', 'agent', 'dobj', 'dative',
-                           'expl', 'attr', 'advmod'):
+                           'expl', 'attr', 'advmod', 'prep'):
                 continue
 
             if rel == 'agent':
+                prep = 'by',
                 assert len(t.downs) == 1
                 rel, down = t.downs[0]
                 assert rel == 'pobj'
                 t = down
+            elif rel == 'prep':
+                prep = t.text,
+                assert len(t.downs) == 1
+                rel, down = t.downs[0]
+                assert rel == 'pobj'
+                t = down
+            else:
+                prep = None
 
             varg_root_indexes.append(t.index)
 
             pp_nn = self.recognize_verb_arg(t)
+            spoken_preps = [prep] * len(pp_nn)
+            absorbed_preps, vargs = zip(*pp_nn) if pp_nn else [], []
+            pp_nn = []
+            for spoken_prep, absorbed_prep, varg in \
+                    zip(spoken_preps, absorbed_preps, vargs):
+                if spoken_prep:
+                    prep = spoken_prep
+                elif absorbed_prep:
+                    prep = absorbed_prep
+                pp_nn.append((prep, varg))
             ppp_nnn.append(pp_nn)
 
         r = self.find_subject(verb_span_pair, varg_root_indexes)
