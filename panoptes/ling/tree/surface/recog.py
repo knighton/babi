@@ -1,6 +1,6 @@
 from copy import deepcopy
+from itertools import product
 
-from panoptes.etc.combinatorics import each_choose_one_from_each
 from panoptes.ling.glue.grammatical_number import N2, N3, N5, \
     nx_eq_nx_is_possible, nx_to_nxs
 from panoptes.ling.glue.idiolect import Idiolect
@@ -457,7 +457,7 @@ class ParseToSurface(object):
                 assert 0 <= subj_argx < len(ppp_nnn)
 
             for v in vv:
-                for pp_nn in each_choose_one_from_each(ppp_nnn):
+                for pp_nn in product(*ppp_nnn):
                     for conj in self.possible_conjugations(v, pp_nn, subj_argx):
                         complementizer = Complementizer.ZERO
                         new_v = deepcopy(v)
