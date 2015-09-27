@@ -431,7 +431,8 @@ class ParseToSurface(object):
                 t = down
             elif t.tag == 'IN':
                 prep = t.text,
-                assert len(t.downs) == 1
+                if len(t.downs) != 1:
+                    continue
                 rel, down = t.downs[0]
                 assert rel == 'pobj'
                 t = down
