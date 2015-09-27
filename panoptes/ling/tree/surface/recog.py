@@ -155,7 +155,8 @@ class ParseToSurface(object):
         }
 
         self.invalid_verb_arg_root_tags = set([
-            '.'
+            '.',
+            'VB',
         ])
 
     def recog_dt(self, root_token):
