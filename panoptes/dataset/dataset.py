@@ -85,7 +85,7 @@ def distribution(nn):
     rr = []
     for n in sorted(d):
         c = d[n]
-        rr.append((d, c))
+        rr.append((n, c))
     return rr
 
 
