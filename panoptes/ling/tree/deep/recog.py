@@ -7,6 +7,7 @@ from panoptes.ling.tree.common.base import CommonArgument
 from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
 from panoptes.ling.tree.deep.content_clause import DeepContentClause, Status
+from panoptes.ling.tree.deep.direction import DeepDirection
 from panoptes.ling.tree.deep.sentence import DeepSentence
 from panoptes.ling.tree.surface.sentence import SurfaceSentence
 from panoptes.ling.verb.verb import ModalFlavor, Voice
@@ -37,6 +38,7 @@ class SurfaceToDeep(object):
 
         self.type2do = {
             'SurfaceCommonNoun': self.recog_common_noun,
+            'SurfaceDirection': self.recog_surface_direction,
         }
 
     def recog_common_noun(self, n):
@@ -53,6 +55,14 @@ class SurfaceToDeep(object):
             r = DeepCommonNoun(possessor=pos, selector=n.selector, noun=n.noun)
             rr.append(r)
         return rr
+
+    def recog_surface_direction(self, n):
+        if n.of:
+            ofs = self.recog_arg(n.of)
+        else:
+            ofs = []
+
+        return map(lambda of: DeepDirection(n.which, of), ofs)
 
     def decide_prep(self, fronted_prep, stranded_prep):
         """
