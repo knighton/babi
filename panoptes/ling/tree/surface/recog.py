@@ -373,8 +373,9 @@ class ParseToSurface(object):
 
             assert False
         elif a:
-            # We must have args.
-            assert varg_root_indexes
+            # We must have args.  Otherwise, it's not possible.
+            if not varg_root_indexes:
+                return None
 
             # Just the pre span ("would you?"): find the argument directly
             # after the verb words.
