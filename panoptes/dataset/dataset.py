@@ -144,16 +144,19 @@ class Dataset(object):
                     ssens.append(len(d.recognized.ssens))
                     dsens.append(len(d.recognized.dsens))
 
+                out.write('   * parse\n')
                 for length, count in distribution(parses):
-                    line = '   * %d (%d)\n' % (length, count)
+                    line = '     * %d (%d)\n' % (length, count)
                     out.write(line)
 
+                out.write('   * surface\n')
                 for length, count in distribution(ssens):
-                    line = '   * %d (%d)\n' % (length, count)
+                    line = '     * %d (%d)\n' % (length, count)
                     out.write(line)
 
+                out.write('   * deep\n')
                 for length, count in distribution(dsens):
-                    line = '   * %d (%d)\n' % (length, count)
+                    line = '     * %d (%d)\n' % (length, count)
                     out.write(line)
 
         return float(sum(accs)) / len(accs)
