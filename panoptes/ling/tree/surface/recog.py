@@ -345,7 +345,7 @@ class ParseToSurface(object):
         """
         For bAbi, as a verb argument, just present in invalid parses?
         """
-        return []
+        return None
 
     def recognize_verb_arg(self, root_token):
         """
