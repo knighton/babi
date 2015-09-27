@@ -23,14 +23,16 @@ def main():
         new_structure = dsen.dump()
         assert structure == new_structure
 
-        new_text = english.text_from_dsen(dsen, idiolect)
-        print new_text
-        print
+        new_text = english.say(dsen, idiolect)
         assert text == new_text
 
-        for new_dsen in english.each_dsen_from_text(unicode(text)):
-            pass
-            # print '*', json.dumps(new_dsen.dump(), sort_keys=True, indent=4)
+        ss = []
+        recog = english.recognize(unicode(text))
+        assert recog.dsens
+        for dsen in recog.dsens:
+            ss.append(json.dumps(dsen.dump(), sort_keys=True, indent=4))
+
+        s = json.dumps(new_structure, sort_keys=True, indent=4)
 
 
 if __name__ == '__main__':
