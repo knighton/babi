@@ -1,6 +1,6 @@
 from random import randint
 
-from panoptes.agent.agent import Agent
+from panoptes.agent.agent import Agent, Deliberation
 from panoptes.ling.english import English
 from panoptes.mind.mind import Mind
 
@@ -21,32 +21,16 @@ class PhilosophicalZombie(Agent):
         return self.mind.new_user()
 
     def put(self, from_uid, text):
-        dsens = list(self.english.each_dsen_from_text(text))
-        if not dsens:
-            return
+        recog = self.english.recognize(text)
+        delib = Deliberation(recog)
 
-        dsen = dsens[0]
-        import json
-        print '>>>', text
-        print json.dumps(dsen.dump(), indent=4, sort_keys=True)
+        if not delib.recognized.dsens:
+            return None, delib
 
-        r = self.mind.overhear(dsen, [from_uid], [self.bot_uid])
-        if not r:
-            return
-
-        return self.english.say(r)
-
-    def put(self, from_uid, text):
-        dsens = list(self.english.each_dsen_from_text(text))
-        if not dsens:
-            return
-
-        dsen = dsens[0]
-        import json
-        print json.dumps(dsen.dump(), indent=4, sort_keys=True)
+        dsen = delib.recognized.dsens[0]
 
         r = self.mind.overhear(dsen, [from_uid], [self.bot_uid])
         if not r:
-            return
+            return None, delib
 
-        return self.english.say(r)
+        return self.english.say(r), delib

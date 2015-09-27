@@ -1,3 +1,6 @@
+from collections import defaultdict
+
+
 class Episode(object):
     """
     A single run of some input/output pairs against an Agent before resetting
@@ -15,16 +18,18 @@ class Episode(object):
 
     def evaluate(self, agent, uid):
         """
-        Agent -> (num correct tests, num tests)
+        Agent -> (num correct tests, num tests, list of Deliberation)
         """
         correct = 0
         total = 0
+        delibs = []
         for in_s, out in self.pairs:
-            got_out = agent.put(uid, in_s)
+            got_out, delib = agent.put(uid, in_s)
+            delibs.append(delib)
             if out is not None:
                 correct += out == got_out
                 total += 1
-        return correct, total
+        return correct, total, delibs
 
 
 class Task(object):
@@ -56,19 +61,32 @@ class Task(object):
 
     def evaluate(self, agent, max_num_episodes):
         """
-        Agent -> accuracy
+        Agent -> accuracy, list of stats
         """
         correct = 0
         total = 0
+        delibs = []
         for i, episode in enumerate(self.episodes):
             if i == max_num_episodes:
                 break
             agent.reset()
             uid = agent.new_user()
-            a, b = episode.evaluate(agent, uid)
+            a, b, sub_delibs = episode.evaluate(agent, uid)
             correct += a
             total += b
-        return float(correct) / total
+            delibs += sub_delibs
+        return float(correct) / total, delibs
+
+
+def distribution(nn):
+    d = defaultdict(int)
+    for n in nn:
+        d[n] += 1
+    rr = []
+    for n in sorted(d):
+        c = d[n]
+        rr.append((d, c))
+    return rr
 
 
 class Dataset(object):
@@ -102,15 +120,40 @@ class Dataset(object):
             task.preview(i + 1, num_episodes_to_show)
 
     def evaluate(self, agent, max_num_episodes=None, out=None):
-        names_accs = []
-        for task in self.tasks:
-            acc = task.evaluate(agent, max_num_episodes)
-            names_accs.append((task.name, acc))
+        accs = []
+        delibs_per_task = []
+        for i, task in enumerate(self.tasks):
+            if i < 0:
+                continue
+            acc, delibs = task.evaluate(agent, max_num_episodes)
+            accs.append(acc)
+            delibs_per_task.append(delibs)
 
         if out:
-            z = max(map(len, zip(*names_accs)[0]))
-            for task, acc in names_accs:
-                line = '%s %.3f\n' % (task.ljust(z), acc * 100)
+            names = map(lambda t: t.name, self.tasks)
+
+            for name, acc, delibs in zip(names, accs, delibs_per_task):
+                line = '-- %s (%.3f%%)\n' % (name, acc)
                 out.write(line)
 
-        return float(sum(map(lambda (n, a): a, names_accs))) / len(names_accs)
+                parses = []
+                ssens = []
+                dsens = []
+                for d in delibs:
+                    parses.append(len(d.recognized.parses))
+                    ssens.append(len(d.recognized.ssens))
+                    dsens.append(len(d.recognized.dsens))
+
+                for length, count in distribution(parses):
+                    line = '   * %d (%d)\n' % (length, count)
+                    out.write(line)
+
+                for length, count in distribution(ssens):
+                    line = '   * %d (%d)\n' % (length, count)
+                    out.write(line)
+
+                for length, count in distribution(dsens):
+                    line = '   * %d (%d)\n' % (length, count)
+                    out.write(line)
+
+        return float(sum(accs)) / len(accs)

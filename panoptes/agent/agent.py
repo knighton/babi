@@ -1,3 +1,12 @@
+from panoptes.ling.english import Recognition
+
+
+class Deliberation(object):
+    def __init__(self, recognized):
+        self.recognized = recognized
+        assert isinstance(self.recognized, Recognition)
+
+
 class Agent(object):
     def reset(self):
         """
@@ -17,8 +26,9 @@ class Agent(object):
 
     def put(self, uid, s):
         """
-        (user ID int, text) -> text or None
+        (user ID int, text) -> (text or None, Deliberation)
 
-        Receive input and maybe respond.
+        Receive input and maybe respond; also return information about what we
+        did.
         """
         raise NotImplementedError

@@ -10,7 +10,7 @@ def main():
     babi.preview()
     babi.overview()
     agent = PhilosophicalZombie()
-    babi.evaluate(agent, sys.stdout, 5)
+    babi.evaluate(agent, max_num_episodes=2, out=sys.stdout)
 
 
 if __name__ == '__main__':

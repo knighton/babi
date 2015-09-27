@@ -16,6 +16,17 @@ from panoptes.ling.tree.surface.util.pronoun import DetPronounManager
 from panoptes.ling.verb.verb_manager import VerbManager
 
 
+class Recognition(object):
+    """
+    The results of recognizing deep structure in English text.
+    """
+
+    def __init__(self, parses, ssens, dsens):
+        self.parses = parses
+        self.ssens = ssens
+        self.dsens = dsens
+
+
 class English(object):
     def __init__(self):
         conj_f = 'panoptes/config/conjugations.csv'
@@ -57,7 +68,10 @@ class English(object):
 
         self.joiner = Joiner()
 
-    def each_dsen_from_text(self, text, verbose=True):
+    def recognize(self, text, verbose=True):
+        """
+        text -> Recognition
+        """
         parses = []
         for parse in self.text_to_parse.parse(text):
             parses.append(parse)
@@ -100,11 +114,14 @@ class English(object):
                 print '-- DSEN %d' % i
                 print key
 
-        assert keys_dsens
+        ssens = map(lambda (k, s): s, keys_ssens)
+        dsens = map(lambda (k, d): d, keys_dsens)
+        return Recognition(parses, ssens, dsens)
 
-        return map(lambda (k, d): d, keys_dsens)
-
-    def text_from_dsen(self, dsen, idiolect):
+    def say(self, dsen, idiolect):
+        """
+        DeepSentence, Idiolect -> text
+        """
         ssen = dsen.to_surface(self.transform_state, self.say_state, idiolect)
         tokens = ssen.say(self.say_state, idiolect)
         text = self.joiner.join(tokens, idiolect.contractions)
