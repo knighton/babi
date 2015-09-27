@@ -27,6 +27,18 @@ class Parse(object):
         self.tokens = tokens  # list of Tokens
         self.root = root      # the root Token in tokens
 
+    def is_possible(self):
+        """
+        We completely give up on certain parse shapes.
+        """
+        for token in self.tokens:
+            if token.up is None:
+                continue
+            dep, t = token.up
+            if dep == 'aux':
+                return False
+        return True
+
     def dump(self):
         print 'Parse {'
 
