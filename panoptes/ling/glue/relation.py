@@ -90,6 +90,12 @@ RELATION_TEXT = """
     preps:
       - on INERT
 
+  - relation: INSIDE
+    core: OBLIQUE
+    order: 30
+    preps:
+      - inside INERT
+
   - relation: BELOW
     core: OBLIQUE
     order: 30
