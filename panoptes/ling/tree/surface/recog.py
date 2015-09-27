@@ -238,6 +238,14 @@ class ParseToSurface(object):
 
         dep, child = root_token.downs[0]
 
+        if dep != 'prep':
+            return []
+
+        if len(child.downs) != 1:
+            return []
+
+        dep, child = child.downs[0]
+
         if dep != 'pobj':
             return []
 

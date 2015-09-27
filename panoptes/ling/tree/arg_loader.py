@@ -30,9 +30,9 @@ class ArgLoader(object):
             ProperNoun,
 
             # Surface.
-            SurfaceDirection,
             SurfaceCommonNoun,
             SurfaceContentClause,
+            SurfaceDirection,
         ]
 
         self.type2load = {}

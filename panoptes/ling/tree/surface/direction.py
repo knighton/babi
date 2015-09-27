@@ -1,3 +1,4 @@
+from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.tree.surface.base import SurfaceArgument, SayContext, \
     SayResult
 
@@ -17,6 +18,7 @@ class SurfaceDirection(SurfaceArgument):
 
     def dump(self):
         return {
+            'type': 'SurfaceDirection',
             'which': self.which,
             'of': self.of.dump() if self.of else None,
         }
