@@ -136,7 +136,7 @@
                         of_n_max: SING
                     number:
                     attributes: []
-                    noun: boat 
+                    noun: boat
                     rels_nargs: []
             subj_index: 0
   - text: The sailors dog the barmaids.
