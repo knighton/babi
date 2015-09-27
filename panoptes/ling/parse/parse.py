@@ -32,10 +32,7 @@ class Parse(object):
         We completely give up on certain parse shapes.
         """
         for token in self.tokens:
-            if token.up is None:
-                continue
-            dep, t = token.up
-            if dep == 'aux':
+            if token.tag == 'XX':
                 return False
         return True
 
