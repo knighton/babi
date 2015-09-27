@@ -86,7 +86,7 @@ class English(object):
 
         keys = set()
         keys_dsens = []
-        for _ssen in keys_ssens:
+        for _, ssen in keys_ssens:
             for dsen in self.surface_to_deep.recog(ssen):
                 key = json.dumps(ssen.dump(), indent=4, sort_keys=True)
                 if key in keys:
