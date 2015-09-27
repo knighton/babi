@@ -5,6 +5,7 @@ from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
 from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
 from panoptes.ling.tree.surface.content_clause import SurfaceContentClause
+from panoptes.ling.tree.surface.direction import SurfaceDirection
 
 
 class ArgLoader(object):
@@ -21,6 +22,7 @@ class ArgLoader(object):
             # Deep.
             DeepCommonNoun,
             DeepContentClause,
+            # TODO: DeepDirection,
 
             # Common.
             ExistentialThere,
@@ -28,6 +30,7 @@ class ArgLoader(object):
             ProperNoun,
 
             # Surface.
+            SurfaceDirection,
             SurfaceCommonNoun,
             SurfaceContentClause,
         ]

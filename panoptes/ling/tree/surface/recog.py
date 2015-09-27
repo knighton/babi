@@ -17,6 +17,7 @@ from panoptes.ling.tree.surface.base import SayContext, SayState
 from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
 from panoptes.ling.tree.surface.content_clause import Complementizer, \
     SurfaceContentClause
+from panoptes.ling.tree.surface.direction import SurfaceDirection
 from panoptes.ling.tree.surface.sentence import SurfaceSentence
 from panoptes.ling.verb.annotation import annotate_as_aux
 from panoptes.ling.verb.verb import ModalFlavor
@@ -231,12 +232,37 @@ class ParseToSurface(object):
         pp_nn += self.recog_shortcut(root_token)
         return pp_nn
 
+    def recog_direction(self, root_token):
+        if len(root_token.downs) != 1:
+            return []
+
+        dep, child = root_token.downs[0]
+
+        if dep != 'pobj':
+            return []
+
+        r = self.recognize_verb_arg(child)
+        if r is None:
+            return []
+        pp_nn = r
+
+        pp_nn = filter(lambda (p, n): not p, pp_nn)
+        ofs = map(lambda (p, n): n, pp_nn)
+
+        pp_nn = []
+        for of in ofs:
+            d = SurfaceDirection(root_token.text, of)
+            pp_nn.append((None, d))
+        return pp_nn
+
     def recog_nn(self, root_token):
         """
         Eg, cat.
         """
         sing = root_token.text
-        return self.recog_common_noun(root_token, sing, N2.SING)
+        rr = self.recog_common_noun(root_token, sing, N2.SING)
+        rr += self.recog_direction(root_token)
+        return rr
 
     def recog_nns(self, root_token):
         """
