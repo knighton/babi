@@ -488,7 +488,7 @@
                 polarity:
                     tf: true
                     is_contrary: false
-                tense: PRESENT
+                tense: PAST
                 aspect:
                     is_perf: true
                     is_prog: false
