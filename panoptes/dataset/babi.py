@@ -25,7 +25,7 @@ def name_from_fn(f):
     s = '_train.txt'
     if f.endswith(s):
         return f[:-len(s)]
-    
+
     s = '_test.txt'
     if f.endswith(s):
         return f[:-len(s)]
@@ -51,6 +51,7 @@ def task_from_fn(fn):
                 in_s, out_s = ss[0], None
             elif len(ss) == 3:
                 in_s, out_s = ss[0], ss[1]
+                in_s = in_s.strip()
             else:
                 assert False
             pairs.append((in_s, out_s))
