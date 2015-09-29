@@ -1,3 +1,4 @@
+import json
 from random import randint
 
 from panoptes.ling.glue.inflection import Declension
@@ -54,6 +55,14 @@ class Mind(object):
             DeepContentClause: self.decode_content_clause,
         }
         self.next_clause_id = 0
+
+    def show(self):
+        print '-' * 80
+        print 'Mind:'
+        for i, idea in enumerate(self.ideas):
+            print '[%d]' % i
+            print json.dumps(idea.dump(), indent=4, sort_keys=True)
+        print '-' * 80
 
     def new_clause_id(self):
         r = self.next_clause_id
@@ -151,6 +160,8 @@ class Mind(object):
         x, = self.decode(deep_ref, from_xx, to_xx)
         c = self.ideas[x]
 
+        self.show()
+
         rels = set(c.rel2xx.iterkeys())
         go_lemmas = set(['go', 'journey', 'travel'])
 
@@ -177,6 +188,9 @@ class Mind(object):
                     assert False  # XXX
                 elif place.identity == Identity.REQUESTED:
                     x = agent.location
+                    if x is None:
+                        return None
+
                     n = self.ideas[x]
                     return n.noun
                 else:
