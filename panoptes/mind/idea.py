@@ -69,8 +69,37 @@ class Noun(Idea):
         if self.location is not None:
             assert isinstance(self.location, int)
 
+    def dump(self):
+        rel2xx = {}
+        for rel, xx in self.rel2xx.iteritems():
+            rel2xx[Relation.to_str[rel]] = xx
+        return {
+            'identity': Identity.to_str[self.identity],
+            'name': self.name,
+            'gender': Gender.to_str[self.gender] if self.gender else None,
+            'is_animate': self.is_animate,
+            'selector': self.selector.dump() if self.selector else None,
+            'noun': self.noun,
+            'rel2xx': rel2xx,
+            'location': self.location,
+        }
+
     def matches(self, view):
-        return view.noun == self.noun
+        match = False
+
+        if view.name and self.name:
+            if view.name == self.name:
+                match = True
+            else:
+                return False
+
+        if view.noun and self.noun:
+            if view.noun == self.noun:
+                match = True
+            else:
+                return False
+
+        return match
 
 
 class Clause(Idea):
@@ -98,6 +127,18 @@ class Clause(Idea):
             assert isinstance(xx, list)
             for x in xx:
                 assert isinstance(x, int)
+
+    def dump(self):
+        rel2xx = {}
+        for rel, xx in self.rel2xx.iteritems():
+            rel2xx[Relation.to_str[rel]] = xx
+        return {
+            'status': Status.to_str[self.status],
+            'purpose': Purpose.to_str[self.purpose],
+            'is_intense': self.is_intense,
+            'verb': self.verb.dump() if self.verb else None,
+            'rel2xx': rel2xx,
+        }
 
     def matches(self, view):
         return False
