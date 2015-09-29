@@ -37,7 +37,7 @@ class IdeaReference(object):
         # Affects case (eg, "I" vs "me").
         self.is_subj = is_subj
 
-        # Nonempty list of sorted, unique memory item indexes (eg, "no one" is a
+        # Nonempty list of sorted, unique memory indexes (eg, "no one" is a
         # common noun where the correlative is NEG).
         self.xx = xx
 
@@ -49,7 +49,14 @@ class Mind(object):
         self.type2decode = {
             ProperNoun: self.decode_proper_noun,
             DeepCommonNoun: self.decode_common_noun,
+            DeepContentClause: self.decode_content_clause,
         }
+        self.next_clause_id = 0
+
+    def new_clause_id(self):
+        r = self.next_clause_id
+        self.next_clause_id += 1
+        return r
 
     def new_user(self):
         uid = randint(0, 0x7FFFFFFFFFFFFFFF)
@@ -71,11 +78,11 @@ class Mind(object):
                 return [i]
 
         idea = idea_from_view(view)
-        x = self.add_item(item)
+        x = self.add_idea(idea)
         return [x]
 
     def decode_proper_noun(self, deep_ref, from_xx, to_xx):
-        view = View(name=deep_ref.name)
+        view = View(name=deep_ref.arg.name)
         return self.resolve_one(view)
 
     def decode_common_noun(self, deep_ref, from_xx, to_xx):
@@ -129,8 +136,6 @@ class Mind(object):
         return f(deep_ref, from_xx, to_xx)
 
     def overhear(self, dsen, from_uids, to_uids):
-        return None
-
         from_xx = map(lambda u: self.uid2x[u], from_uids)
         to_xx = map(lambda u: self.uid2x[u], to_uids)
         deep_ref = DeepReference(

@@ -58,10 +58,11 @@ class Noun(Idea):
             assert isinstance(self.noun, basestring)
 
         self.rel2xx = rel2xx
-        if self.rel2xx:
-            for rel, arg in self.rel2xx.iteritems():
-                assert Relation.is_valid(rel)
-                assert isinstance(arg, Idea)
+        for rel, x in self.rel2xx.iteritems():
+            assert Relation.is_valid(rel)
+            assert isinstance(xx, list)
+            for x in xx:
+                assert isinstance(x, int)
 
     def matches(self, view):
         return view.noun == self.noun
@@ -87,9 +88,11 @@ class Clause(Idea):
             assert isinstance(self.verb, DeepVerb)
 
         self.rel2xx = rel2xx
-        for rel, arg in self.rel2xx.iteritems():
+        for rel, xx in self.rel2xx.iteritems():
             assert Relation.is_valid(rel)
-            assert isinstance(arg, Idea)
+            assert isinstance(xx, list)
+            for x in xx:
+                assert isinstance(x, int)
 
     def matches(self, view):
         return False
