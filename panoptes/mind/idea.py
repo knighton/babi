@@ -29,7 +29,8 @@ Identity = enum('Identity = GIVEN REQUESTED')
 
 class Noun(Idea):
     def __init__(self, identity=Identity.GIVEN, name=None, gender=None,
-                 is_animate=None, selector=None, noun=None, rel2xx=None):
+                 is_animate=None, selector=None, noun=None, rel2xx=None,
+                 location=None):
         if rel2xx is None:
             rel2xx = {}
 
@@ -63,6 +64,10 @@ class Noun(Idea):
             assert isinstance(xx, list)
             for x in xx:
                 assert isinstance(x, int)
+
+        self.location = location
+        if self.location is not None:
+            assert isinstance(self.location, int)
 
     def matches(self, view):
         return view.noun == self.noun

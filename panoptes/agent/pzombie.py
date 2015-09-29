@@ -33,4 +33,5 @@ class PhilosophicalZombie(Agent):
         if not r:
             return None, delib
 
-        return self.english.say(r), delib
+        # return self.english.say(r), delib
+        return r, delib

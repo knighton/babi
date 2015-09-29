@@ -26,9 +26,15 @@ class Episode(object):
         for in_s, out in self.pairs:
             got_out, delib = agent.put(uid, in_s)
             delibs.append(delib)
+            print '\t\t\tEVAL INPUT:', in_s
+            if out:
+                print '\t\t\tEVAL EXPECTED OUTPUT: (%s)' % out
+            if got_out:
+                print '\t\t\tEVAL GOT OUTPUT: (%s)' % got_out
             if out is not None:
                 correct += out == got_out
                 total += 1
+                assert out == got_out
         return correct, total, delibs
 
 

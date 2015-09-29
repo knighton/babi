@@ -1,11 +1,13 @@
 from random import randint
 
 from panoptes.ling.glue.inflection import Declension
+from panoptes.ling.glue.purpose import Purpose
+from panoptes.ling.glue.relation import Relation
 from panoptes.ling.tree.common.util.selector import Correlative
 from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
-from panoptes.mind.idea import Clause, Noun, View, idea_from_view
+from panoptes.mind.idea import Clause, Identity, Noun, View, idea_from_view
 
 
 class DeepReference(object):
@@ -105,6 +107,12 @@ class Mind(object):
         assert not n.attributes
         assert not n.rels_nargs
 
+        if n.selector.correlative == Correlative.INTR:
+            idea = Noun(identity=Identity.REQUESTED, selector=n.selector,
+                        noun=n.noun)
+            x = self.add_idea(idea)
+            return [x]
+
         view = View(noun=n.noun)
         return self.resolve_one(view)
 
@@ -140,4 +148,38 @@ class Mind(object):
         to_xx = map(lambda u: self.uid2x[u], to_uids)
         deep_ref = DeepReference(
             owning_clause_id=None, is_subj=False, arg=dsen.root)
-        self.decode(deep_ref, from_xx, to_xx)
+        x, = self.decode(deep_ref, from_xx, to_xx)
+        c = self.ideas[x]
+
+        rels = set(c.rel2xx.iterkeys())
+        go_lemmas = set(['go', 'journey', 'travel'])
+
+        if (c.purpose == Purpose.INFO
+                and c.verb.lemma in go_lemmas
+                and rels == set([Relation.AGENT, Relation.TO_LOCATION])):
+            if len(c.rel2xx[Relation.TO_LOCATION]) == 1:
+                location_x, = c.rel2xx[Relation.TO_LOCATION]
+                for x in c.rel2xx[Relation.AGENT]:
+                    self.ideas[x].location = location_x
+        elif (c.purpose == Purpose.WH_Q
+                and c.verb.lemma == 'be'
+                and rels == set([Relation.AGENT, Relation.PLACE])):
+            agent_xx = c.rel2xx[Relation.AGENT]
+            place_xx = c.rel2xx[Relation.PLACE]
+            if len(agent_xx) == 1 and len(place_xx) == 1:
+                x, = agent_xx
+                agent = self.ideas[x]
+
+                x, = place_xx
+                place = self.ideas[x]
+
+                if agent.identity == Identity.REQUESTED:
+                    assert False  # XXX
+                elif place.identity == Identity.REQUESTED:
+                    x = agent.location
+                    n = self.ideas[x]
+                    return n.noun
+                else:
+                    assert False
+        else:
+            pass
