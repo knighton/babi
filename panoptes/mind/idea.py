@@ -29,9 +29,9 @@ Identity = enum('Identity = GIVEN REQUESTED')
 
 class Noun(Idea):
     def __init__(self, identity=Identity.GIVEN, name=None, gender=None,
-                 is_animate=None, selector=None, noun=None, rel2arg=None):
-        if rel2arg:
-            rel2arg = {}
+                 is_animate=None, selector=None, noun=None, rel2xx=None):
+        if rel2xx is None:
+            rel2xx = {}
 
         self.identity = identity
         assert Identity.is_valid(self.identity)
@@ -57,18 +57,22 @@ class Noun(Idea):
         if self.noun:
             assert isinstance(self.noun, basestring)
 
-        self.rel2arg = rel2arg
-        if self.rel2arg:
-            for rel, arg in self.rel2arg.iteritems():
+        self.rel2xx = rel2xx
+        if self.rel2xx:
+            for rel, arg in self.rel2xx.iteritems():
                 assert Relation.is_valid(rel)
                 assert isinstance(arg, Idea)
 
-    def relevance(self, view):
-        return 0.0
+    def matches(self, view):
+        return view.noun == self.noun
 
 
 class Clause(Idea):
-    def __init__(self, status, purpose, is_intense, verb, re2arg):
+    def __init__(self, status=Status.ACTUAL, purpose=Purpose.INFO,
+                 is_intense=False, verb=None, rel2xx=None):
+        if rel2xx is None:
+            rel2xx = {}
+
         self.status = status
         assert Status.is_valid(self.status)
 
@@ -79,16 +83,17 @@ class Clause(Idea):
         assert isinstance(self.is_intense, bool)
 
         self.verb = verb
-        assert isinstance(self.verb, DeepVerb)
+        if self.verb:
+            assert isinstance(self.verb, DeepVerb)
 
-        self.rel2arg = rel2arg
-        for rel, arg in self.rel2arg.iteritems():
+        self.rel2xx = rel2xx
+        for rel, arg in self.rel2xx.iteritems():
             assert Relation.is_valid(rel)
             assert isinstance(arg, Idea)
 
-    def relevance(self, view):
-        return 0.0
+    def matches(self, view):
+        return False
 
 
 def idea_from_view(view):
-    assert False
+    return Noun(name=view.name, noun=view.noun)
