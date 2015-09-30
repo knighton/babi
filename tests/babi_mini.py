@@ -7,8 +7,8 @@ from panoptes.dataset.babi import load_babi
 def main():
     d = 'data/tasks_1-20_v1-2/en-10k/'
     babi = load_babi(d)
-    babi.preview()
     babi.overview()
+    babi.preview(5)
     agent = PhilosophicalZombie()
     babi.evaluate(agent, max_num_episodes=5, out=sys.stdout)
 

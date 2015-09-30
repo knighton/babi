@@ -2,9 +2,13 @@ from panoptes.ling.english import Recognition
 
 
 class Deliberation(object):
-    def __init__(self, recognized):
+    def __init__(self, recognized, out=None):
         self.recognized = recognized
         assert isinstance(self.recognized, Recognition)
+
+        self.out = None
+        if self.out:
+            assert isinstance(self.out, basestring)
 
 
 class Agent(object):
@@ -26,7 +30,7 @@ class Agent(object):
 
     def put(self, uid, s):
         """
-        (user ID int, text) -> (text or None, Deliberation)
+        (user ID int, text) -> Deliberation
 
         Receive input and maybe respond; also return information about what we
         did.

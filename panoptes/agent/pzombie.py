@@ -2,7 +2,7 @@ from random import randint
 
 from panoptes.agent.agent import Agent, Deliberation
 from panoptes.ling.english import English
-from panoptes.mind.mind import Mind
+from panoptes.mind.mind import Mind, OverhearResult
 
 
 class PhilosophicalZombie(Agent):
@@ -15,7 +15,7 @@ class PhilosophicalZombie(Agent):
 
     def reset(self):
         self.mind = Mind()
-        self.bot_uid = self.mind.new_user()
+        self.self_uid = self.mind.new_user()
 
     def new_user(self):
         return self.mind.new_user()
@@ -25,13 +25,19 @@ class PhilosophicalZombie(Agent):
         delib = Deliberation(recog)
 
         if not delib.recognized.dsens:
-            return None, delib
+            return delib
 
-        dsen = delib.recognized.dsens[0]
+        for dsen in delib.recognized.dsens:
+            r = self.mind.overhear(dsen, [from_uid], [self.self_uid])
 
-        r = self.mind.overhear(dsen, [from_uid], [self.bot_uid])
-        if not r:
-            return None, delib
+            # Returns None if it rejected the input dsen.
+            if not r:
+                continue
 
-        # return self.english.say(r), delib
-        return r, delib
+            # Else, r.out contains the output, which may be None.
+            # if r.out:
+            #     delib.out = self.english.say(r.out)
+            delib.out = r.out
+            return delib
+
+        return delib

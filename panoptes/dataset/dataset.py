@@ -23,18 +23,18 @@ class Episode(object):
         correct = 0
         total = 0
         delibs = []
-        for in_s, out in self.pairs:
-            got_out, delib = agent.put(uid, in_s)
+        for in_s, expect_out in self.pairs:
+            delib = agent.put(uid, in_s)
             delibs.append(delib)
             print '\t\t\tEVAL INPUT:', in_s
-            if out:
-                print '\t\t\tEVAL EXPECTED OUTPUT: (%s)' % out
-            if got_out:
-                print '\t\t\tEVAL GOT OUTPUT: (%s)' % got_out
-            if out is not None:
-                correct += out == got_out
+            if expect_out:
+                print '\t\t\tEVAL EXPECTED OUTPUT: (%s)' % expect_out
+            if delib.out:
+                print '\t\t\tEVAL GOT OUTPUT: (%s)' % delib.out
+            if expect_out is not None:
+                correct += expect_out == delib.out
                 total += 1
-                assert out == got_out
+                assert expect_out == delib.out
         return correct, total, delibs
 
 

@@ -45,6 +45,11 @@ class IdeaReference(object):
         self.xx = xx
 
 
+class OverhearResult(object):
+    def __init__(self, out=None):
+        self.out = out
+
+
 class Mind(object):
     def __init__(self):
         self.ideas = []
@@ -172,6 +177,7 @@ class Mind(object):
                 location_x, = c.rel2xx[Relation.TO_LOCATION]
                 for x in c.rel2xx[Relation.AGENT]:
                     self.ideas[x].location = location_x
+                return OverhearResult()
         elif (c.purpose == Purpose.WH_Q
                 and c.verb.lemma == 'be'
                 and rels == set([Relation.AGENT, Relation.PLACE])):
@@ -192,7 +198,7 @@ class Mind(object):
                         return None
 
                     n = self.ideas[x]
-                    return n.noun
+                    return OverhearResult(n.noun)
                 else:
                     assert False
         else:
