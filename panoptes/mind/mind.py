@@ -61,6 +61,13 @@ class Mind(object):
         }
         self.next_clause_id = 0
 
+        self.place_rels = set([
+            Relation.PLACE,
+            Relation.TO_LOCATION,
+        ])
+
+        self.place_kinds = set()
+
     def show(self):
         print '-' * 80
         print 'Mind:'
@@ -90,7 +97,7 @@ class Mind(object):
     def resolve_one(self, view):
         for i in xrange(len(self.ideas) - 1, -1, -1):
             idea = self.ideas[i]
-            if idea.matches(view):
+            if idea.matches(view, self.place_kinds):
                 return [i]
 
         idea = idea_from_view(view)
@@ -98,7 +105,7 @@ class Mind(object):
         return [x]
 
     def decode_proper_noun(self, deep_ref, from_xx, to_xx):
-        view = View(name=deep_ref.arg.name)#, noun='person')
+        view = View(name=deep_ref.arg.name)
         return self.resolve_one(view)
 
     def decode_common_noun(self, deep_ref, from_xx, to_xx):
@@ -157,6 +164,17 @@ class Mind(object):
         f = self.type2decode[type(deep_ref.arg)]
         return f(deep_ref, from_xx, to_xx)
 
+    def learn_places(self, c):
+        for rel in self.place_rels:
+            if rel not in c.rel2xx:
+                continue
+            for x in c.rel2xx[rel]:
+                idea = self.ideas[x]
+                kind = idea.kind
+                if not kind:
+                    continue
+                self.place_kinds.add(kind)
+
     def overhear(self, dsen, from_uids, to_uids):
         from_xx = map(lambda u: self.uid2x[u], from_uids)
         to_xx = map(lambda u: self.uid2x[u], to_uids)
@@ -191,6 +209,7 @@ class Mind(object):
                     agent.location = location_x
                     for x2 in agent.carrying:
                         self.ideas[x2].location = location_x
+                self.learn_places(c)
                 return OverhearResult()
         elif (c.purpose == Purpose.INFO
                 and c.verb.lemma in pick_up_lemmas
@@ -202,6 +221,7 @@ class Mind(object):
             agent.carrying.append(target_x)
             target = self.ideas[target_x]
             target.location = agent.location
+            self.learn_places(c)
             return OverhearResult()
         elif (c.purpose == Purpose.INFO
                 and c.verb.lemma in drop_lemmas
@@ -209,7 +229,10 @@ class Mind(object):
             agent_x, = c.rel2xx[Relation.AGENT]
             target_x, = c.rel2xx[Relation.TARGET]
             agent = self.ideas[agent_x]
+            for x in agent.carrying:
+                self.ideas[x].location = agent.location
             agent.carrying = filter(lambda n: n != target_x, agent.carrying)
+            self.learn_places(c)
             return OverhearResult()
         elif (c.purpose == Purpose.INFO
                 and c.verb.lemma in bring_lemmas
@@ -218,6 +241,8 @@ class Mind(object):
             target_x, = c.rel2xx[Relation.TARGET]
             to_x, = c.rel2xx[Relation.TO_LOCATION]
             self.ideas[target_x].location = to_x
+            self.learn_places(c)
+            return OverhearResult()
         elif (c.purpose == Purpose.INFO
                 and c.verb.lemma in bring_lemmas
                 and rels == agent_target_place):
@@ -245,6 +270,7 @@ class Mind(object):
                         return None
 
                     n = self.ideas[x]
+                    self.learn_places(c)
                     return OverhearResult(n.kind)
                 else:
                     assert False

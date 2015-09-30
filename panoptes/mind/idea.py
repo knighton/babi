@@ -97,7 +97,7 @@ class Noun(Idea):
             'carrying': self.carrying,
         }
 
-    def matches(self, view):
+    def matches(self, view, place_kinds):
         match = False
 
         if view.name and self.name:
@@ -108,6 +108,8 @@ class Noun(Idea):
 
         if view.kind and self.kind:
             if view.kind == self.kind:
+                match = True
+            elif view.kind == 'place' and self.kind in place_kinds:
                 match = True
             else:
                 return False
@@ -153,7 +155,7 @@ class Clause(Idea):
             'rel2xx': rel2xx,
         }
 
-    def matches(self, view):
+    def matches(self, view, place_kinds):
         return False
 
 
