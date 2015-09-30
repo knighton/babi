@@ -172,8 +172,11 @@ class Mind(object):
         move_lemmas = set(['go', 'journey', 'move', 'travel'])
         pick_up_lemmas = set(['get', 'grab'])
         drop_lemmas = set(['drop', 'put'])
+        bring_lemmas = set(['take'])
 
         agent_target = set([Relation.AGENT, Relation.TARGET])
+        agent_target_toloc = set([
+            Relation.AGENT, Relation.TARGET, Relation.TO_LOCATION])
         agent_toloc = set([Relation.AGENT, Relation.TO_LOCATION])
         agent_target_place = set([
             Relation.AGENT, Relation.TARGET, Relation.PLACE])
@@ -208,6 +211,20 @@ class Mind(object):
             agent = self.ideas[agent_x]
             agent.carrying = filter(lambda n: n != target_x, agent.carrying)
             return OverhearResult()
+        elif (c.purpose == Purpose.INFO
+                and c.verb.lemma in bring_lemmas
+                and rels == agent_target_toloc):
+            agent_x, = c.rel2xx[Relation.AGENT]
+            target_x, = c.rel2xx[Relation.TARGET]
+            to_x, = c.rel2xx[Relation.TO_LOCATION]
+            self.ideas[target_x].location = to_x
+        elif (c.purpose == Purpose.INFO
+                and c.verb.lemma in bring_lemmas
+                and rels == agent_target_place):
+            agent_x, = c.rel2xx[Relation.AGENT]
+            target_x, = c.rel2xx[Relation.TARGET]
+            to_x, = c.rel2xx[Relation.PLACE]
+            self.ideas[target_x].location = to_x
         elif (c.purpose == Purpose.WH_Q
                 and c.verb.lemma == 'be'
                 and rels == set([Relation.AGENT, Relation.PLACE])):
