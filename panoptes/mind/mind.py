@@ -98,7 +98,7 @@ class Mind(object):
         return [x]
 
     def decode_proper_noun(self, deep_ref, from_xx, to_xx):
-        view = View(name=deep_ref.arg.name)
+        view = View(name=deep_ref.arg.name)#, noun='person')
         return self.resolve_one(view)
 
     def decode_common_noun(self, deep_ref, from_xx, to_xx):
@@ -168,16 +168,46 @@ class Mind(object):
         self.show()
 
         rels = set(c.rel2xx.iterkeys())
-        go_lemmas = set(['go', 'journey', 'move', 'travel'])
+
+        move_lemmas = set(['go', 'journey', 'move', 'travel'])
+        pick_up_lemmas = set(['get', 'grab'])
+        drop_lemmas = set(['drop', 'put'])
+
+        agent_target = set([Relation.AGENT, Relation.TARGET])
+        agent_toloc = set([Relation.AGENT, Relation.TO_LOCATION])
+        agent_target_place = set([
+            Relation.AGENT, Relation.TARGET, Relation.PLACE])
 
         if (c.purpose == Purpose.INFO
-                and c.verb.lemma in go_lemmas
-                and rels == set([Relation.AGENT, Relation.TO_LOCATION])):
+                and c.verb.lemma in move_lemmas
+                and rels == agent_toloc):
             if len(c.rel2xx[Relation.TO_LOCATION]) == 1:
                 location_x, = c.rel2xx[Relation.TO_LOCATION]
                 for x in c.rel2xx[Relation.AGENT]:
-                    self.ideas[x].location = location_x
+                    agent = self.ideas[x]
+                    agent.location = location_x
+                    for x2 in agent.carrying:
+                        self.ideas[x2].location = location_x
                 return OverhearResult()
+        elif (c.purpose == Purpose.INFO
+                and c.verb.lemma in pick_up_lemmas
+                and rels == agent_target_place):
+            agent_x, = c.rel2xx[Relation.AGENT]
+            target_x, = c.rel2xx[Relation.TARGET]
+            location_x, = c.rel2xx[Relation.PLACE]
+            agent = self.ideas[agent_x]
+            agent.carrying.append(target_x)
+            target = self.ideas[target_x]
+            target.location = agent.location
+            return OverhearResult()
+        elif (c.purpose == Purpose.INFO
+                and c.verb.lemma in drop_lemmas
+                and rels == agent_target):
+            agent_x, = c.rel2xx[Relation.AGENT]
+            target_x, = c.rel2xx[Relation.TARGET]
+            agent = self.ideas[agent_x]
+            agent.carrying = filter(lambda n: n != target_x, agent.carrying)
+            return OverhearResult()
         elif (c.purpose == Purpose.WH_Q
                 and c.verb.lemma == 'be'
                 and rels == set([Relation.AGENT, Relation.PLACE])):

@@ -12,6 +12,12 @@ class View(object):
         self.name = name
         self.noun = noun
 
+    def dump(self):
+        return {
+            'name': self.name,
+            'noun': self.noun,
+        }
+
 
 class Idea(object):
     def relevance(self, view):
@@ -30,9 +36,11 @@ Identity = enum('Identity = GIVEN REQUESTED')
 class Noun(Idea):
     def __init__(self, identity=Identity.GIVEN, name=None, gender=None,
                  is_animate=None, selector=None, noun=None, rel2xx=None,
-                 location=None):
+                 location=None, carrying=None):
         if rel2xx is None:
             rel2xx = {}
+        if carrying is None:
+            carrying = []
 
         self.identity = identity
         assert Identity.is_valid(self.identity)
@@ -69,6 +77,10 @@ class Noun(Idea):
         if self.location is not None:
             assert isinstance(self.location, int)
 
+        self.carrying = carrying
+        for x in self.carrying:
+            assert isinstance(x, int)
+
     def dump(self):
         rel2xx = {}
         for rel, xx in self.rel2xx.iteritems():
@@ -82,6 +94,7 @@ class Noun(Idea):
             'noun': self.noun,
             'rel2xx': rel2xx,
             'location': self.location,
+            'carrying': self.carrying,
         }
 
     def matches(self, view):
@@ -145,4 +158,5 @@ class Clause(Idea):
 
 
 def idea_from_view(view):
+    print 'IDEA FROM VIEW', view.dump()
     return Noun(name=view.name, noun=view.noun)
