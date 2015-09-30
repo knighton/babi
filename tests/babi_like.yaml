@@ -1,5 +1,19 @@
-  - name: task1
+  - name: task1_simple
     pairs:
       - in: John travelled to the hallway.
       - in: Where is John?
         out: hallway
+  - name: task1_move
+    pairs:
+      - in: John travelled to the hallway.
+      - in: John moved to the dungeon.
+      - in: Where is John?
+        out: dungeon
+  - name: task2
+    pairs:
+      - in: John picked up the ball.
+      - in: John moved to the dungeon.
+      - in: Where is John?
+        out: dungeon
+      - in: Where is the ball?
+        out: dungeon
