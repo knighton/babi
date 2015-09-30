@@ -56,4 +56,4 @@ class Parser(object):
 
         root = tt[x2deps_xx[None][0][1]]
         parse = Parse(tt, root)
-        return filter(lambda p: p.is_possible(), [parse])
+        return filter(bool, map(lambda p: p.fixed(), [parse]))

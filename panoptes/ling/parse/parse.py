@@ -27,14 +27,34 @@ class Parse(object):
         self.tokens = tokens  # list of Tokens
         self.root = root      # the root Token in tokens
 
-    def is_possible(self):
+    def fixed(self):
         """
         We completely give up on certain parse shapes.
         """
         for token in self.tokens:
             if token.tag == 'XX':
-                return False
-        return True
+                return None
+
+        # Handle advmod descending from a noun (relative clauses?), when at
+        # least in bAbi it is always descended from the verb.
+        for t in self.tokens:
+            dep, up = t.up
+            if up is None:
+                continue
+            if dep != 'advmod':
+                continue
+            if up.tag != 'NN':
+                continue
+
+            # Do the tree surgery.
+            for i, (_, child) in enumerate(up.downs):
+                if child.index == t.index:
+                    del up.downs[i]
+                    break
+            t.up = dep, up.up[1]
+            t.up[1].downs.append((dep, t))
+
+        return self
 
     def dump(self):
         print 'Parse {'
