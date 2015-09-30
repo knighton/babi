@@ -1,0 +1,5 @@
+  - name: task1
+    pairs:
+      - in: John travelled to the hallway.
+      - in: Where is John?
+        out: hallway
