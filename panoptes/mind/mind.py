@@ -168,7 +168,7 @@ class Mind(object):
         self.show()
 
         rels = set(c.rel2xx.iterkeys())
-        go_lemmas = set(['go', 'journey', 'travel'])
+        go_lemmas = set(['go', 'journey', 'move', 'travel'])
 
         if (c.purpose == Purpose.INFO
                 and c.verb.lemma in go_lemmas
