@@ -8,14 +8,14 @@ from panoptes.ling.verb.verb import DeepVerb
 
 
 class View(object):
-    def __init__(self, name=None, noun=None):
+    def __init__(self, name=None, kind=None):
         self.name = name
-        self.noun = noun
+        self.kind = kind
 
     def dump(self):
         return {
             'name': self.name,
-            'noun': self.noun,
+            'kind': self.kind,
         }
 
 
@@ -35,7 +35,7 @@ Identity = enum('Identity = GIVEN REQUESTED')
 
 class Noun(Idea):
     def __init__(self, identity=Identity.GIVEN, name=None, gender=None,
-                 is_animate=None, selector=None, noun=None, rel2xx=None,
+                 is_animate=None, selector=None, kind=None, rel2xx=None,
                  location=None, carrying=None):
         if rel2xx is None:
             rel2xx = {}
@@ -62,9 +62,9 @@ class Noun(Idea):
         if self.selector:
             assert isinstance(self.selector, Selector)
 
-        self.noun = noun
-        if self.noun:
-            assert isinstance(self.noun, basestring)
+        self.kind = kind
+        if self.kind:
+            assert isinstance(self.kind, basestring)
 
         self.rel2xx = rel2xx
         for rel, x in self.rel2xx.iteritems():
@@ -91,7 +91,7 @@ class Noun(Idea):
             'gender': Gender.to_str[self.gender] if self.gender else None,
             'is_animate': self.is_animate,
             'selector': self.selector.dump() if self.selector else None,
-            'noun': self.noun,
+            'kind': self.kind,
             'rel2xx': rel2xx,
             'location': self.location,
             'carrying': self.carrying,
@@ -106,8 +106,8 @@ class Noun(Idea):
             else:
                 return False
 
-        if view.noun and self.noun:
-            if view.noun == self.noun:
+        if view.kind and self.kind:
+            if view.kind == self.kind:
                 match = True
             else:
                 return False
@@ -159,4 +159,4 @@ class Clause(Idea):
 
 def idea_from_view(view):
     print 'IDEA FROM VIEW', view.dump()
-    return Noun(name=view.name, noun=view.noun)
+    return Noun(name=view.name, kind=view.kind)

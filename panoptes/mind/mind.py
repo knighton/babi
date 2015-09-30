@@ -78,7 +78,7 @@ class Mind(object):
         uid = randint(0, 0x7FFFFFFFFFFFFFFF)
         assert uid not in self.uid2x
         x = len(self.ideas)
-        self.ideas.append(Noun(noun='person'))
+        self.ideas.append(Noun(kind='person'))
         self.uid2x[uid] = x
         return uid
 
@@ -123,11 +123,11 @@ class Mind(object):
 
         if n.selector.correlative == Correlative.INTR:
             idea = Noun(identity=Identity.REQUESTED, selector=n.selector,
-                        noun=n.noun)
+                        kind=n.noun)
             x = self.add_idea(idea)
             return [x]
 
-        view = View(noun=n.noun)
+        view = View(kind=n.noun)
         return self.resolve_one(view)
 
     def decode_content_clause(self, deep_ref, from_xx, to_xx):
@@ -228,7 +228,7 @@ class Mind(object):
                         return None
 
                     n = self.ideas[x]
-                    return OverhearResult(n.noun)
+                    return OverhearResult(n.kind)
                 else:
                     assert False
         else:
