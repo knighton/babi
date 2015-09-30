@@ -37,7 +37,7 @@ class PhilosophicalZombie(Agent):
             # Else, r.out contains the output, which may be None.
             # if r.out:
             #     delib.out = self.english.say(r.out)
-            delib.text = r.text
+            delib.out = r.text
             return delib
 
         return delib

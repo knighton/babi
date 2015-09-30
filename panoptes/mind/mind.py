@@ -8,6 +8,7 @@ from panoptes.ling.tree.common.util.selector import Correlative
 from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
+from panoptes.ling.tree.deep.direction import DeepDirection
 from panoptes.mind.idea import Clause, Identity, Noun, View, idea_from_view
 from panoptes.mind.semantics import SemanticsManager
 
@@ -59,6 +60,7 @@ class Mind(object):
             ProperNoun: self.decode_proper_noun,
             DeepCommonNoun: self.decode_common_noun,
             DeepContentClause: self.decode_content_clause,
+            DeepDirection: self.decode_direction,
         }
         self.next_clause_id = 0
 
@@ -121,12 +123,14 @@ class Mind(object):
         ]
         d = n.selector.dump()
         del d['correlative']
-        assert d == {
+        if d != {
             'n_min': 'SING',
             'n_max': 'SING',
             'of_n_min': 'SING',
             'of_n_max': 'SING',
-        }
+        }:
+            return []
+
         assert not n.number
         assert not n.attributes
         assert not n.rels_nargs
@@ -159,6 +163,9 @@ class Mind(object):
 
         x = self.add_idea(idea)
         return [x]
+
+    def decode_direction(self, deep_ref, from_xx, to_xx):
+        return []
 
     def decode(self, deep_ref, from_xx, to_xx):
         """

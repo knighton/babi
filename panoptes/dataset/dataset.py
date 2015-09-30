@@ -35,7 +35,7 @@ class Episode(object):
             if expect_out is not None:
                 correct += expect_out == delib.out
                 total += 1
-                assert expect_out == delib.out
+                # assert expect_out == delib.out
         return correct, total, delibs
 
 
@@ -140,7 +140,7 @@ class Dataset(object):
             names = map(lambda t: t.name, self.tasks)
 
             for name, acc, delibs in zip(names, accs, delibs_per_task):
-                line = '-- %s (%.3f%%)\n' % (name, acc)
+                line = '-- %s (%.3f%%)\n' % (name, acc * 100.0)
                 out.write(line)
 
                 parses = []
