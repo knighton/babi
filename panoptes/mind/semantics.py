@@ -120,7 +120,7 @@ class Drop(ClauseMeaning):
             target = ideas[x]
             target.location = to_x
 
-        return Reponse()
+        return Response()
 
 
 class WhereIs(ClauseMeaning):
