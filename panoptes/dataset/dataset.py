@@ -20,13 +20,14 @@ class Episode(object):
         """
         Agent -> (num correct tests, num tests, list of Deliberation)
         """
+        print '\t\t\tEVAL' + '-' * 80
         correct = 0
         total = 0
         delibs = []
         for in_s, expect_out in self.pairs:
+            print '\t\t\tEVAL INPUT:', in_s
             delib = agent.put(uid, in_s)
             delibs.append(delib)
-            print '\t\t\tEVAL INPUT:', in_s
             if expect_out:
                 print '\t\t\tEVAL EXPECTED OUTPUT: (%s)' % expect_out
             if delib.out:
