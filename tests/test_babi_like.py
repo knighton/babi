@@ -12,6 +12,7 @@ def main():
     fn = 'tests/babi_like.yaml'
     jj = yaml.load(open(fn))
     for j in jj:
+        print PRE, '-' * 80
         agent.reset()
         uid = agent.new_user()
         name = j['name']
@@ -23,7 +24,7 @@ def main():
             if want_out:
                 want_out = want_out.decode('utf-8')
             print PRE, 'WANT OUT (%s)' % want_out
-            got_out = agent.put(uid, in_s).out
+            got_out = agent.put(uid, in_s).text
             print PRE, 'GOT OUT (%s)' % got_out
             assert want_out == got_out
 

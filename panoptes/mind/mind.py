@@ -9,6 +9,7 @@ from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
 from panoptes.mind.idea import Clause, Identity, Noun, View, idea_from_view
+from panoptes.mind.semantics import SemanticsManager
 
 
 class DeepReference(object):
@@ -67,6 +68,8 @@ class Mind(object):
         ])
 
         self.place_kinds = set()
+
+        self.semantics_mgr = SemanticsManager()
 
     def show(self):
         print '-' * 80
@@ -176,6 +179,8 @@ class Mind(object):
                 self.place_kinds.add(kind)
 
     def overhear(self, dsen, from_uids, to_uids):
+        cutoff = len(self.ideas)
+
         from_xx = map(lambda u: self.uid2x[u], from_uids)
         to_xx = map(lambda u: self.uid2x[u], to_uids)
         deep_ref = DeepReference(
@@ -183,96 +188,10 @@ class Mind(object):
         x, = self.decode(deep_ref, from_xx, to_xx)
         c = self.ideas[x]
 
-        self.show()
-
-        rels = set(c.rel2xx.iterkeys())
-
-        move_lemmas = set(['go', 'journey', 'move', 'travel'])
-        pick_up_lemmas = set(['get', 'grab'])
-        drop_lemmas = set(['drop', 'put'])
-        bring_lemmas = set(['take'])
-
-        agent_target = set([Relation.AGENT, Relation.TARGET])
-        agent_target_toloc = set([
-            Relation.AGENT, Relation.TARGET, Relation.TO_LOCATION])
-        agent_toloc = set([Relation.AGENT, Relation.TO_LOCATION])
-        agent_target_place = set([
-            Relation.AGENT, Relation.TARGET, Relation.PLACE])
-
-        if (c.purpose == Purpose.INFO
-                and c.verb.lemma in move_lemmas
-                and rels == agent_toloc):
-            if len(c.rel2xx[Relation.TO_LOCATION]) == 1:
-                location_x, = c.rel2xx[Relation.TO_LOCATION]
-                for x in c.rel2xx[Relation.AGENT]:
-                    agent = self.ideas[x]
-                    agent.location = location_x
-                    for x2 in agent.carrying:
-                        self.ideas[x2].location = location_x
-                self.learn_places(c)
-                return OverhearResult()
-        elif (c.purpose == Purpose.INFO
-                and c.verb.lemma in pick_up_lemmas
-                and rels == agent_target_place):
-            agent_x, = c.rel2xx[Relation.AGENT]
-            target_x, = c.rel2xx[Relation.TARGET]
-            location_x, = c.rel2xx[Relation.PLACE]
-            agent = self.ideas[agent_x]
-            agent.carrying.append(target_x)
-            target = self.ideas[target_x]
-            target.location = agent.location
+        r = self.semantics_mgr.handle(c, self.ideas)
+        if r:
             self.learn_places(c)
-            return OverhearResult()
-        elif (c.purpose == Purpose.INFO
-                and c.verb.lemma in drop_lemmas
-                and rels == agent_target):
-            agent_x, = c.rel2xx[Relation.AGENT]
-            target_x, = c.rel2xx[Relation.TARGET]
-            agent = self.ideas[agent_x]
-            for x in agent.carrying:
-                self.ideas[x].location = agent.location
-            agent.carrying = filter(lambda n: n != target_x, agent.carrying)
-            self.learn_places(c)
-            return OverhearResult()
-        elif (c.purpose == Purpose.INFO
-                and c.verb.lemma in bring_lemmas
-                and rels == agent_target_toloc):
-            agent_x, = c.rel2xx[Relation.AGENT]
-            target_x, = c.rel2xx[Relation.TARGET]
-            to_x, = c.rel2xx[Relation.TO_LOCATION]
-            self.ideas[target_x].location = to_x
-            self.learn_places(c)
-            return OverhearResult()
-        elif (c.purpose == Purpose.INFO
-                and c.verb.lemma in bring_lemmas
-                and rels == agent_target_place):
-            agent_x, = c.rel2xx[Relation.AGENT]
-            target_x, = c.rel2xx[Relation.TARGET]
-            to_x, = c.rel2xx[Relation.PLACE]
-            self.ideas[target_x].location = to_x
-        elif (c.purpose == Purpose.WH_Q
-                and c.verb.lemma == 'be'
-                and rels == set([Relation.AGENT, Relation.PLACE])):
-            agent_xx = c.rel2xx[Relation.AGENT]
-            place_xx = c.rel2xx[Relation.PLACE]
-            if len(agent_xx) == 1 and len(place_xx) == 1:
-                x, = agent_xx
-                agent = self.ideas[x]
-
-                x, = place_xx
-                place = self.ideas[x]
-
-                if agent.identity == Identity.REQUESTED:
-                    assert False  # XXX
-                elif place.identity == Identity.REQUESTED:
-                    x = agent.location
-                    if x is None:
-                        return None
-
-                    n = self.ideas[x]
-                    self.learn_places(c)
-                    return OverhearResult(n.kind)
-                else:
-                    assert False
         else:
-            pass
+            self.ideas = self.ideas[:cutoff]
+        print type(r)
+        return r
