@@ -198,7 +198,7 @@ class GiveQuestion(ClauseMeaning):
                 Relation.TARGET: what_xx,
             }
             want_rel = Relation.TO_RECIPIENT
-        elif what.identity == Identity.REQUSTED:
+        elif what.identity == Identity.REQUESTED:
             rel2xx = {
                 Relation.AGENT: give_xx,
                 Relation.TO_RECIPIENT: recv_xx,

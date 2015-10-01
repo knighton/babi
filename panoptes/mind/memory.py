@@ -192,7 +192,7 @@ class Memory(object):
     def decode_direction(self, deep_ref, from_xx, to_xx):
         return []
 
-    def decode_personal_pronoun(self, deep_Ref, from_xx, to_xx):
+    def decode_personal_pronoun(self, deep_ref, from_xx, to_xx):
         return []
 
     def decode(self, deep_ref, from_xx, to_xx):
