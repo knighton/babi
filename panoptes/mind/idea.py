@@ -7,18 +7,6 @@ from panoptes.ling.tree.deep.content_clause import Status
 from panoptes.ling.verb.verb import DeepVerb
 
 
-class View(object):
-    def __init__(self, name=None, kind=None):
-        self.name = name
-        self.kind = kind
-
-    def dump(self):
-        return {
-            'name': self.name,
-            'kind': self.kind,
-        }
-
-
 class Idea(object):
     def relevance(self, view):
         """
@@ -97,7 +85,7 @@ class Noun(Idea):
             'carrying': self.carrying,
         }
 
-    def matches(self, view, place_kinds):
+    def matches_noun_view(self, view, place_kinds):
         match = False
 
         if view.name and self.name:
@@ -115,6 +103,26 @@ class Noun(Idea):
                 return False
 
         return match
+
+    def matches_clause_view(self, view):
+        return False
+
+
+class NounView(object):
+    def __init__(self, name=None, kind=None):
+        self.name = name
+        self.kind = kind
+
+    def dump(self):
+        return {
+            'name': self.name,
+            'kind': self.kind,
+        }
+
+
+def idea_from_view(view):
+    print 'IDEA FROM VIEW', view.dump()
+    return Noun(name=view.name, kind=view.kind)
 
 
 class Clause(Idea):
@@ -155,10 +163,30 @@ class Clause(Idea):
             'rel2xx': rel2xx,
         }
 
-    def matches(self, view, place_kinds):
+    def matches_noun_view(self, view, place_kinds):
         return False
 
+    def matches_clause_view(self, view):
+        if self.verb.lemma not in self.possible_lemmas:
+            return False
 
-def idea_from_view(view):
-    print 'IDEA FROM VIEW', view.dump()
-    return Noun(name=view.name, kind=view.kind)
+        for rel, xx in view.rel2xx.iteritems():
+            if rel not in self.rel2xx:
+                continue
+
+            my_xx = self.rel2xx[rel]
+            if xx != my_xx:
+                return False
+
+        return True
+
+
+class ClauseView(object):
+    def __init__(self, possible_lemmas=None, rel2xx=None):
+        if possible_lemmas is None:
+            possible_lemmas = []
+        if rel2xx is None:
+            rel2xx = {}
+
+        self.possible_lemmas = set(possible_lemmas)
+        self.rel2xx = rel2xx

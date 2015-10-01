@@ -9,7 +9,8 @@ from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
 from panoptes.ling.tree.deep.direction import DeepDirection
-from panoptes.mind.idea import Clause, Identity, Noun, View, idea_from_view
+from panoptes.mind.idea import Clause, ClauseView, Identity, Noun, NounView, \
+    idea_from_view
 
 
 class DeepReference(object):
@@ -104,10 +105,10 @@ class Memory(object):
         self.ideas.append(idea)
         return x
 
-    def resolve_one(self, view):
+    def resolve_one_noun(self, view):
         for i in xrange(len(self.ideas) - 1, -1, -1):
             idea = self.ideas[i]
-            if idea.matches(view, self.place_kinds):
+            if idea.matches_noun_view(view, self.place_kinds):
                 return [i]
 
         idea = idea_from_view(view)
@@ -115,8 +116,8 @@ class Memory(object):
         return [x]
 
     def decode_proper_noun(self, deep_ref, from_xx, to_xx):
-        view = View(name=deep_ref.arg.name)
-        return self.resolve_one(view)
+        view = NounView(name=deep_ref.arg.name)
+        return self.resolve_one_noun(view)
 
     def decode_common_noun(self, deep_ref, from_xx, to_xx):
         n = deep_ref.arg
@@ -146,8 +147,8 @@ class Memory(object):
             x = self.add_idea(idea)
             return [x]
 
-        view = View(kind=n.noun)
-        return self.resolve_one(view)
+        view = NounView(kind=n.noun)
+        return self.resolve_one_noun(view)
 
     def decode_content_clause(self, deep_ref, from_xx, to_xx):
         c = deep_ref.arg

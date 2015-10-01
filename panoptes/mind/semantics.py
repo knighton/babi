@@ -207,7 +207,24 @@ class GiveQuestion(ClauseMeaning):
         else:
             assert False
 
-        # TODO
+        view = ClauseView(possible_lemmas=self.lemmas, rel2xx=rel2xx)
+        x = memory.resolve_one_clause(view)
+        if x is None:
+            return Response('dunno')
+
+        c = memory.ideas[x]
+        xx = c.rel2xx[want_rel]
+        if len(xx) != 1:
+            return None
+
+        x, = xx
+        n = memory.ideas[x]
+        if n.name:
+            return Response(n.name)
+        elif n.kind:
+            return Response(n.kind)
+        else:
+            return Response('wtf')
 
 
 class SemanticsManager(object):
