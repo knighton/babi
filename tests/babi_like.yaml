@@ -17,3 +17,39 @@
         out: dungeon
       - in: Where is the ball?
         out: dungeon
+  - name: task5_give
+    pairs:
+      - in: Fred gave the football to Jeff.
+      - in: What did Fred give to Jeff?
+        out: football
+      - in: Who gave the football to Jeff?
+        out: Fred
+
+# doesn't recognize tag = TO
+#      - in: To whom did Fred give the football?
+#        out: Jeff
+
+# stranded preposition
+#      - in: Who did Fred give the football to?
+#        out: Jeff
+
+# "receive" not supported yet
+#  - name: task5_receive
+#      - in: Fred gave the football to Jeff.
+#      - in: What did Jeff receive?
+#        out: football
+#      - in: What did Jeff receive from Fred?
+#        out: football
+
+  - name: task8
+    pairs:
+      - in: John picked up the football there.
+      - in: What is John carrying?
+        out: football
+      - in: John travelled to the bedroom.
+      - in: John picked up the apple there.
+      - in: What is John carrying?
+        out: football,apple
+      - in: John dropped the football.
+      - in: What is John carrying?
+        out: apple
