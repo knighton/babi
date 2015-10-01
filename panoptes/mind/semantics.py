@@ -90,7 +90,7 @@ class Bring(ClauseMeaning):
 class Drop(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.INFO
-        self.lemmas = ['drop', 'put']
+        self.lemmas = ['discard', 'drop', 'leave', 'put']
         self.signatures = [
             [Relation.AGENT, Relation.TARGET, Relation.PLACE],
             [Relation.AGENT, Relation.TARGET, Relation.TO_LOCATION],
@@ -111,7 +111,7 @@ class Drop(ClauseMeaning):
 class Give(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.INFO
-        self.lemmas = ['give', 'hand']
+        self.lemmas = ['give', 'hand', 'pass']
         self.signatures = [
             [Relation.AGENT, Relation.TO_RECIPIENT, Relation.TARGET],
         ]
