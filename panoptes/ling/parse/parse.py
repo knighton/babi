@@ -35,6 +35,23 @@ class Parse(object):
             if token.tag == 'XX':
                 return None
 
+        # Handle verb args descended from an aux relation.
+        for t in self.tokens:
+            dep, up = t.up
+            if up is None:
+                continue
+            up_dep, up_up = up.up
+            if up_up is None:
+                continue
+            if up_dep != 'aux':
+                continue
+            for i, (_, child) in enumerate(up.downs):
+                if child.index == t.index:
+                    del up.downs[i]
+                    break
+            t.up = (dep, up_up)
+            up_up.downs.append((dep, t))
+
         # Handle advmod descending from a noun (relative clauses?), when at
         # least in bAbi it is always descended from the verb.
         for t in self.tokens:
