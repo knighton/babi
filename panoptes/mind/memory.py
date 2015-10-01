@@ -124,10 +124,6 @@ class Memory(object):
 
         return None
 
-    def decode_proper_noun(self, deep_ref, from_xx, to_xx):
-        view = NounView(name=deep_ref.arg.name)
-        return self.resolve_one_noun(view)
-
     def decode_common_noun(self, deep_ref, from_xx, to_xx):
         n = deep_ref.arg
         assert not n.possessor
@@ -193,7 +189,18 @@ class Memory(object):
         return []
 
     def decode_personal_pronoun(self, deep_ref, from_xx, to_xx):
+        p = deep_ref.arg
+
+        if p.is_interrogative():
+            who = Noun.make_who()
+            x = self.add_idea(who)
+            return [x]
+
         return []
+
+    def decode_proper_noun(self, deep_ref, from_xx, to_xx):
+        view = NounView(name=deep_ref.arg.name)
+        return self.resolve_one_noun(view)
 
     def decode(self, deep_ref, from_xx, to_xx):
         """

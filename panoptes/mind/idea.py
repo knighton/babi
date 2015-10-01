@@ -107,6 +107,12 @@ class Noun(Idea):
     def matches_clause_view(self, view):
         return False
 
+    @staticmethod
+    def make_who():
+        return Noun(identity=Identity.REQUESTED, name=None, gender=None,
+                    is_animate=None, selector=None, kind='person', rel2xx=None,
+                    location=None, carrying=None)
+
 
 class NounView(object):
     def __init__(self, name=None, kind=None):
