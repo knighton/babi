@@ -69,10 +69,19 @@ class Memory(object):
         return deepcopy(self)
 
     def load_checkpoint(self, checkpoint):
+        """
+        This doesn't work!
+
         for attr in dir(checkpoint):
             if attr.startswith('__'):
                 continue
             setattr(self, attr, getattr(checkpoint, attr))
+        """
+        self.ideas = checkpoint.ideas
+        self.type2decode = checkpoint.type2decode
+        self.next_clause_id = checkpoint.next_clause_id
+        self.place_rels = checkpoint.place_rels
+        self.place_kinds = checkpoint.place_kinds
 
     def show(self):
         print '=' * 80
