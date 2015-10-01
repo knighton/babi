@@ -40,7 +40,7 @@ def dump_ideas(ideas):
 class Go(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.INFO
-        self.lemmas = set(['go', 'journey', 'move', 'travel'])
+        self.lemmas = ['go', 'journey', 'move', 'travel']
         self.signatures = [
             [Relation.AGENT, Relation.PLACE],
             [Relation.AGENT, Relation.TO_LOCATION],
@@ -63,7 +63,7 @@ class Go(ClauseMeaning):
 class PickUp(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.INFO
-        self.lemmas = set(['get', 'grab', 'pick'])
+        self.lemmas = ['get', 'grab', 'pick']
         self.signatures = [
             [Relation.AGENT, Relation.TARGET, None],
             [Relation.AGENT, Relation.TARGET, Relation.PLACE],
@@ -84,7 +84,7 @@ class PickUp(ClauseMeaning):
 class Bring(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.INFO
-        self.lemmas = set(['take'])
+        self.lemmas = ['take']
         self.signatures = [
             [Relation.AGENT, Relation.TARGET, Relation.PLACE],
             [Relation.AGENT, Relation.TARGET, Relation.TO_LOCATION],
@@ -105,7 +105,7 @@ class Bring(ClauseMeaning):
 class Drop(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.INFO
-        self.lemmas = set(['drop', 'put'])
+        self.lemmas = ['drop', 'put']
         self.signatures = [
             [Relation.AGENT, Relation.TARGET, Relation.PLACE],
             [Relation.AGENT, Relation.TARGET, Relation.TO_LOCATION],
@@ -123,10 +123,28 @@ class Drop(ClauseMeaning):
         return Response()
 
 
-class WhereIs(ClauseMeaning):
+class Give(ClauseMeaning):
+    def __init__(self):
+        self.purpose = Purpose.INFO
+        self.lemmas = ['give', 'hand']
+        self.signatures = [
+            [Relation.AGENT, Relation.TO_RECIPIENT, Relation.TARGET],
+        ]
+
+    def run(self, c, ideas, (give_xx, recv_xx, what_xx)):
+        if len(give_xx) != 1:
+            return None
+
+        if len(recv_xx) != 1:
+            return None
+
+        return Response()
+
+
+class AgentPlaceQuestion(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.WH_Q
-        self.lemmas = set(['be'])
+        self.lemmas = ['be']
         self.signatures = [
             [Relation.AGENT, Relation.PLACE],
         ]
@@ -153,6 +171,60 @@ class WhereIs(ClauseMeaning):
             assert False
 
 
+class GiveQuestion(ClauseMeaning):
+    def __init__(self):
+        self.purpose = Purpose.WH_Q
+        self.lemmas = ['give', 'hand']
+        self.signatures = [
+            [Relation.AGENT, Relation.TO_RECIPIENT,  Relation.TARGET],
+        ]
+
+    def run(self, c, ideas, (give_xx, recv_xx, what_xx)):
+        if len(give_xx) != 1:
+            return None
+
+        if len(recv_xx) != 1:
+            return None
+
+        if len(what_xx) != 1:
+            return None
+
+        giver = ideas[give_xx[0]]
+        receiver = ideas[recv_xx[0]]
+        what = ideas[what_xx[0]]
+
+        q_count = \
+            giver.identity == Identity.REQUESTED + \
+            receiver.identity == Identity.REQUESTED + \
+            what.identity == Identity.REQUESTED
+
+        if q_count != 1:
+            return None
+
+        if giver.identity == Identity.REQUESTED:
+            rel2xx = {
+                Relation.TO_RECIPIENT: recv_xx,
+                Relation.TARGET: what_xx,
+            }
+            want_rel = Relation.AGENT
+        elif receiver.identity == Identity.REQUESTED:
+            rel2xx = {
+                Relation.AGENT: give_xx,
+                Relation.TARGET: what_xx,
+            }
+            want_rel = Relation.TO_RECIPIENT
+        elif what.identity == Identity.REQUSTED:
+            rel2xx = {
+                Relation.AGENT: give_xx,
+                Relation.TO_RECIPIENT: recv_xx,
+            }
+            want_rel = Relation.TARGET
+        else:
+            assert False
+
+        # TODO
+
+
 class SemanticsManager(object):
     def __init__(self):
         self.vv = [
@@ -160,7 +232,9 @@ class SemanticsManager(object):
             PickUp(),
             Bring(),
             Drop(),
-            WhereIs(),
+            Give(),
+            AgentPlaceQuestion(),
+            GiveQuestion(),
         ]
 
         self.purpose_lemma2xx = defaultdict(list)
