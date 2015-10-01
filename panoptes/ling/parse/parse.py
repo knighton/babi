@@ -51,6 +51,7 @@ class Parse(object):
                     break
             t.up = (dep, up_up)
             up_up.downs.append((dep, t))
+            up_up.downs = sorted(up_up.downs, key=lambda (a, b): b)
 
         # Handle advmod descending from a noun (relative clauses?), when at
         # least in bAbi it is always descended from the verb.
@@ -70,6 +71,7 @@ class Parse(object):
                     break
             t.up = dep, up.up[1]
             t.up[1].downs.append((dep, t))
+            t.up[1].downs = sorted(t.up[1].downs, key=lambda (a, b): b)
 
         return self
 
