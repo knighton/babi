@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
-from panoptes.mind.idea import Identity
+from panoptes.mind.idea import ClauseView, Identity
 
 
 class Response(object):
@@ -179,9 +179,9 @@ class GiveQuestion(ClauseMeaning):
         what = memory.ideas[what_xx[0]]
 
         q_count = \
-            giver.identity == Identity.REQUESTED + \
-            receiver.identity == Identity.REQUESTED + \
-            what.identity == Identity.REQUESTED
+            (giver.identity == Identity.REQUESTED) + \
+            (receiver.identity == Identity.REQUESTED) + \
+            (what.identity == Identity.REQUESTED)
 
         if q_count != 1:
             return None
