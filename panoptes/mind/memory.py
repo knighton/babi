@@ -4,6 +4,7 @@ from panoptes.ling.glue.inflection import Declension
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
 from panoptes.ling.tree.common.util.selector import Correlative
+from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun
 from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
@@ -50,10 +51,11 @@ class Memory(object):
         self.ideas = []
 
         self.type2decode = {
-            ProperNoun: self.decode_proper_noun,
             DeepCommonNoun: self.decode_common_noun,
             DeepContentClause: self.decode_content_clause,
             DeepDirection: self.decode_direction,
+            PersonalPronoun: self.decode_personal_pronoun,
+            ProperNoun: self.decode_proper_noun,
         }
 
         self.next_clause_id = 0
@@ -177,6 +179,9 @@ class Memory(object):
         return [x]
 
     def decode_direction(self, deep_ref, from_xx, to_xx):
+        return []
+
+    def decode_personal_pronoun(self, deep_Ref, from_xx, to_xx):
         return []
 
     def decode(self, deep_ref, from_xx, to_xx):
