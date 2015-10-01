@@ -1,4 +1,5 @@
 from copy import deepcopy
+import json
 
 from panoptes.ling.glue.inflection import Declension
 from panoptes.ling.glue.purpose import Purpose
@@ -115,6 +116,14 @@ class Memory(object):
         x = self.add_idea(idea)
         return [x]
 
+    def resolve_one_clause(self, view):
+        for i in xrange(len(self.ideas) - 1, -1, -1):
+            idea = self.ideas[i]
+            if idea.matches_clause_view(view):
+                return i
+
+        return None
+
     def decode_proper_noun(self, deep_ref, from_xx, to_xx):
         view = NounView(name=deep_ref.arg.name)
         return self.resolve_one_noun(view)
@@ -127,15 +136,6 @@ class Memory(object):
             Correlative.DIST,
             Correlative.INTR
         ]
-        d = n.selector.dump()
-        del d['correlative']
-        if d != {
-            'n_min': 'SING',
-            'n_max': 'SING',
-            'of_n_min': 'SING',
-            'of_n_max': 'SING',
-        }:
-            return []
 
         assert not n.number
         assert not n.attributes
@@ -146,6 +146,16 @@ class Memory(object):
                         kind=n.noun)
             x = self.add_idea(idea)
             return [x]
+
+        d = n.selector.dump()
+        del d['correlative']
+        if d != {
+            'n_min': 'SING',
+            'n_max': 'SING',
+            'of_n_min': 'SING',
+            'of_n_max': 'SING',
+        }:
+            return []
 
         view = NounView(kind=n.noun)
         return self.resolve_one_noun(view)

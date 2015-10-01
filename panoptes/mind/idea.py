@@ -167,15 +167,18 @@ class Clause(Idea):
         return False
 
     def matches_clause_view(self, view):
-        if self.verb.lemma not in self.possible_lemmas:
+        if self.purpose != Purpose.INFO:
             return False
 
-        for rel, xx in view.rel2xx.iteritems():
+        if self.verb.lemma not in view.possible_lemmas:
+            return False
+
+        for rel, want_xx in view.rel2xx.iteritems():
             if rel not in self.rel2xx:
                 continue
 
             my_xx = self.rel2xx[rel]
-            if xx != my_xx:
+            if want_xx != my_xx:
                 return False
 
         return True
