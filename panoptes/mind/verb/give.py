@@ -86,7 +86,7 @@ class GiveQuestion(ClauseMeaning):
         x, = xx
         n = memory.ideas[x]
         if n.name:
-            return Response(n.name)
+            return Response(' '.join(n.name))
         elif n.kind:
             return Response(n.kind)
         else:
