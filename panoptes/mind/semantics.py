@@ -15,26 +15,11 @@ class ClauseMeaning(object):
     Implements a clause.
     """
 
-    def handle(self, c, ideas, xxx):
+    def handle(self, c, memory, xxx):
         """
         (Clause, list of Ideas, idea indexes per arg) -> Response or None
         """
         raise NotImplementedError
-
-
-def dump_ideas(ideas):
-    import json
-
-    print '>' * 80
-    print '>' * 80
-    print
-
-    for i, idea in enumerate(ideas):
-        print '\t\t[%d]' % i
-        print json.dumps(idea.dump(), indent=4, sort_keys=True)
-
-    print
-    print '>' * 80
 
 
 class Go(ClauseMeaning):
@@ -46,16 +31,16 @@ class Go(ClauseMeaning):
             [Relation.AGENT, Relation.TO_LOCATION],
         ]
 
-    def handle(self, c, ideas, (agent_xx, to_xx)):
+    def handle(self, c, memory, (agent_xx, to_xx)):
         if len(to_xx) != 1:
             return None
 
         to_x, = to_xx
         for x in agent_xx:
-            agent = ideas[x]
+            agent = memory.ideas[x]
             agent.location = to_x
             for x2 in agent.carrying:
-                ideas[x2].location = to_x
+                memory.ideas[x2].location = to_x
 
         return Response()
 
@@ -69,12 +54,12 @@ class PickUp(ClauseMeaning):
             [Relation.AGENT, Relation.TARGET, Relation.PLACE],
         ]
 
-    def handle(self, c, ideas, (agent_xx, target_xx, at_xx)):
+    def handle(self, c, memory, (agent_xx, target_xx, at_xx)):
         if len(agent_xx) != 1:
             return None
 
         x, = agent_xx
-        agent = ideas[x]
+        agent = memory.ideas[x]
         for x in target_xx:
             agent.carrying.append(x)
 
@@ -90,13 +75,13 @@ class Bring(ClauseMeaning):
             [Relation.AGENT, Relation.TARGET, Relation.TO_LOCATION],
         ]
 
-    def handle(self, c, ideas, (agent_xx, target_xx, to_xx)):
+    def handle(self, c, memory, (agent_xx, target_xx, to_xx)):
         if len(to_xx) != 1:
             return None
 
         to_x, = to_xx
         for x in target_xx:
-            target = ideas[x]
+            target = memory.ideas[x]
             target.location = to_x
 
         return Response()
@@ -111,13 +96,13 @@ class Drop(ClauseMeaning):
             [Relation.AGENT, Relation.TARGET, Relation.TO_LOCATION],
         ]
 
-    def handle(self, c, ideas, (agent_xx, target_xx, to_xx)):
+    def handle(self, c, memory, (agent_xx, target_xx, to_xx)):
         if len(to_xx) != 1:
             return None
 
         to_x, = to_xx
         for x in target_xx:
-            target = ideas[x]
+            target = memory.ideas[x]
             target.location = to_x
 
         return Response()
@@ -131,7 +116,7 @@ class Give(ClauseMeaning):
             [Relation.AGENT, Relation.TO_RECIPIENT, Relation.TARGET],
         ]
 
-    def run(self, c, ideas, (give_xx, recv_xx, what_xx)):
+    def handle(self, c, memory, (give_xx, recv_xx, what_xx)):
         if len(give_xx) != 1:
             return None
 
@@ -149,15 +134,15 @@ class AgentPlaceQuestion(ClauseMeaning):
             [Relation.AGENT, Relation.PLACE],
         ]
 
-    def handle(self, c, ideas, (agent_xx, loc_xx)):
+    def handle(self, c, memory, (agent_xx, loc_xx)):
         if len(agent_xx) != 1:
             return None
 
         if len(loc_xx) != 1:
             return None
 
-        agent = ideas[agent_xx[0]]
-        place = ideas[loc_xx[0]]
+        agent = memory.ideas[agent_xx[0]]
+        place = memory.ideas[loc_xx[0]]
 
         if agent.identity == Identity.REQUESTED:
             return None
@@ -165,7 +150,7 @@ class AgentPlaceQuestion(ClauseMeaning):
             x = agent.location
             if x is None:
                 return Response('dunno')
-            loc = ideas[x]
+            loc = memory.ideas[x]
             return Response(loc.kind)
         else:
             assert False
@@ -179,7 +164,7 @@ class GiveQuestion(ClauseMeaning):
             [Relation.AGENT, Relation.TO_RECIPIENT,  Relation.TARGET],
         ]
 
-    def run(self, c, ideas, (give_xx, recv_xx, what_xx)):
+    def handle(self, c, memory, (give_xx, recv_xx, what_xx)):
         if len(give_xx) != 1:
             return None
 
@@ -189,9 +174,9 @@ class GiveQuestion(ClauseMeaning):
         if len(what_xx) != 1:
             return None
 
-        giver = ideas[give_xx[0]]
-        receiver = ideas[recv_xx[0]]
-        what = ideas[what_xx[0]]
+        giver = memory.ideas[give_xx[0]]
+        receiver = memory.ideas[recv_xx[0]]
+        what = memory.ideas[what_xx[0]]
 
         q_count = \
             giver.identity == Identity.REQUESTED + \
@@ -226,7 +211,9 @@ class GiveQuestion(ClauseMeaning):
 
 
 class SemanticsManager(object):
-    def __init__(self):
+    def __init__(self, memory):
+        self.memory = memory
+
         self.vv = [
             Go(),
             PickUp(),
@@ -242,7 +229,7 @@ class SemanticsManager(object):
             for lemma in v.lemmas:
                 self.purpose_lemma2xx[(v.purpose, lemma)].append(i)
 
-    def handle(self, c, ideas):
+    def handle(self, c):
         xx = self.purpose_lemma2xx[(c.purpose, c.verb.lemma)]
         if not xx:
             return None
@@ -266,7 +253,7 @@ class SemanticsManager(object):
                 if not ok:
                     continue
 
-                r = v.handle(c, ideas, xxx)
+                r = v.handle(c, self.memory, xxx)
                 if r:
                     return r
 

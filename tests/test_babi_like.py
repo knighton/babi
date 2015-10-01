@@ -24,7 +24,7 @@ def main():
             if want_out:
                 want_out = want_out.decode('utf-8')
             print PRE, 'WANT OUT (%s)' % want_out
-            got_out = agent.put(uid, in_s).text
+            got_out = agent.put(uid, in_s).out
             print PRE, 'GOT OUT (%s)' % got_out
             assert want_out == got_out
 
