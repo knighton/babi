@@ -116,6 +116,12 @@ RELATION_TEXT = """
       - over INERT
       - above INERT
 
+  - relation: FROM_SOURCE
+    core: OBLIQUE
+    order: 30
+    preps:
+      - from INERT
+
   - relation: DURING
     core: OBLIQUE
     order: 50
