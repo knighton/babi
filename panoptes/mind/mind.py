@@ -1,5 +1,5 @@
 from panoptes.mind.memory import Memory
-from panoptes.mind.semantics import SemanticsManager
+from panoptes.mind.verb.manager import VerbSemanticsManager
 from panoptes.mind.user import UserManager
 
 
@@ -12,7 +12,7 @@ class Mind(object):
     def __init__(self):
         self.memory = Memory()
         self.user_mgr = UserManager(self.memory)
-        self.semantics_mgr = SemanticsManager(self.memory)
+        self.semantics_mgr = VerbSemanticsManager(self.memory)
 
     def new_user(self):
         return self.user_mgr.new()
