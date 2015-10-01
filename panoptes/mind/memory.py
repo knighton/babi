@@ -1,44 +1,22 @@
 
 
 
-class DeepReference(object):
-    """
-    Used in resolving DeepArguments.
-    """
-
-    def __init__(self, owning_clause_id, is_subj, arg):
-        # We need to know if referents are from the same clause in order to
-        # handle reflexives.
-        self.owning_clause_id = owning_clause_id
-
-        # Whether subject or not.  Needed for personal pronouns (I vs me).
-        self.is_subj = is_subj
-
-        # The actual argument. 
-        self.arg = arg
 
 
-class MemoryReference(object):
-    """
-    Used in expressing MemoryItems.
-    """
-
-    def __init__(self, owning_clause_id, is_subj, xx):
-        # Reflexives are intra-clause (eg, "You know you know yourself").
-        self.owning_clause_id = owning_clause_id
-
-        # Affects case (eg, "I" vs "me").
-        self.is_subj = is_subj
-
-        # Nonempty list of sorted, unique memory item indexes (eg, "no one" is a
-        # common noun where the correlative is NEG).
-        self.xx = xx
 
 
-class Memory(object):
-    def __init__(self):
-        self.items = []
 
+
+
+
+
+
+
+
+
+
+
+"""
     def are_singular(self, xx):
         if len(xx) != 1:
             return False
@@ -100,18 +78,4 @@ class Memory(object):
             assert False
 
         return xxx
-
-    def decode_proper_noun(self, deep_ref, from_xx, to_xx):
-        arg = deep_ref.arg
-
-        xx = self.name2xx[arg.name]
-
-        if not xx:
-            item = person_from_name(arg.name)
-            x = self.add_item(item)
-            xx = [x]
-
-        return xx
-
-    def decode(self, dsen, from_xx, to_xx):
-        XXX
+"""
