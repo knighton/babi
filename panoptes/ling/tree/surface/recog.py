@@ -573,4 +573,6 @@ class ParseToSurface(object):
         end_punct = self.end_punct_clf.classify(parse.tokens[-1].text)
 
         for clause in self.recognize_clause(parse.root, is_root_clause=True):
+            if '?' in end_punct and clause.verb.is_imperative():
+                continue
             yield SurfaceSentence(clause, end_punct)
