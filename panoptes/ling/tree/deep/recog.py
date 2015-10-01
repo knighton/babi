@@ -90,7 +90,7 @@ class SurfaceToDeep(object):
         if front_argx:
             assert front_argx + 1 == subj_argx
 
-        if not front_argx:
+        if front_argx is None:
             return hallu_preps_vargs, subj_argx
 
         fronted_prep, fronted_arg = hallu_preps_vargs[front_argx]
