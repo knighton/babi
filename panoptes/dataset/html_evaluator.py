@@ -11,22 +11,31 @@ class HtmlEvaluator(Evaluator):
 <head>
     <style type="text/css">
 body {
-    background: #ace;
+    background: #69c;
 }
 #page {
+    padding: 10px;
     margin-left: auto;
     margin-right: auto;
     margin-top: 100px;
     margin-bottom: 100px;
     width: 800px;
-    background: #bdf;
 }
 .episode {
     margin: 10px;
     padding: 10px;
+    background: #def;
+    border: 2px solid white;
+    border-radius: 2px;
+}
+.episode_title {
+    padding: 10px;
+    font-weight: bold;
+    width: 100%;
+    text-align: center;
 }
 .correct {
-    background: white;
+    background: #8f8;
 }
 .wrong {
     background: #fcc;
@@ -35,12 +44,13 @@ body {
 </head>
 <body>
     <div id="page">
-""")
+""".strip())
 
-    def dump_episode_head(self, episode_index, out):
+    def dump_episode_head(self, episode_index, correct, total, out):
         out.write("""
         <div class="episode">
-""")
+            <div class="episode_title">Episode %d (%d / %d)</div>
+""" % (episode_index + 1, correct, total))
 
     def dump_episode_foot(self, out):
         out.write("""
@@ -55,23 +65,33 @@ body {
 """)
 
     def evaluate_episode(self, agent, episode_index, episode, out):
-        self.dump_episode_head(episode_index, out)
+        correct = 0
+        total = 0
         agent.reset()
         uid = agent.new_user()
+        lines = []
         for in_s, want_out in episode.pairs:
             delib = agent.put(uid, in_s)
             line = '%d %d %d %s ' % (
                 len(delib.recognized.parses), len(delib.recognized.ssens),
                 len(delib.recognized.dsens), in_s.encode('utf-8'))
             if want_out or delib.out:
-                if want_out != delib.out:
-                    line += 'want "%s" got "%s"' % (want_out, delib.out)
-                    line = '<span class="wrong">%s</span>' % line
-                else:
+                if want_out == delib.out:
                     line += '"%s"' % want_out
                     line = '<span class="correct">%s</span>' % line
+                    correct += 1
+                else:
+                    line += 'want "%s" got "%s"' % (want_out, delib.out)
+                    line = '<span class="wrong">%s</span>' % line
+                total += 1
             line += '<br>\n'
+            lines.append(line)
+
+        self.dump_episode_head(episode_index, correct, total, out)
+
+        for line in lines:
             out.write(line)
+
         self.dump_episode_foot(out)
 
     def evaluate_task(self, agent, task, episodes_per_task, out):
