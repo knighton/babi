@@ -63,11 +63,13 @@ class Go(ClauseMeaning):
         self.purpose = Purpose.INFO
         self.lemmas = ['go', 'journey', 'move', 'travel']
         self.signatures = [
-            [Relation.AGENT, Relation.PLACE],
-            [Relation.AGENT, Relation.TO_LOCATION],
+            [Relation.AGENT, Relation.PLACE,       Relation.AFTER],
+            [Relation.AGENT, Relation.PLACE,       None],
+            [Relation.AGENT, Relation.TO_LOCATION, Relation.AFTER],
+            [Relation.AGENT, Relation.TO_LOCATION, None],
         ]
 
-    def handle(self, c, memory, (agent_xx, to_xx)):
+    def handle(self, c, memory, (agent_xx, to_xx, after_xx)):
         if len(to_xx) != 1:
             return None
 
