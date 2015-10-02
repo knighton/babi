@@ -47,8 +47,9 @@ class VerbExtractor(object):
         # Find all words that make up the verb.
         tt = [root_token]
         for rel, t in root_token.downs:
-            if rel in ['neg']:
-                tt.append(t)
+            if rel == 'neg':
+                if t.text == 'not':
+                    tt.append(t)
             elif rel in ['aux', 'auxpass']:
                 t.text = self.maybe_annotate_as_aux(t.text)
                 tt.append(t)
@@ -436,7 +437,7 @@ class ParseToSurface(object):
             if rel == 'neg':
                 if t.text == 'no':
                     adverbs.append(t.text)
-                    continue
+                continue
 
             if rel == 'advmod':
                 if t.text == 'longer':
