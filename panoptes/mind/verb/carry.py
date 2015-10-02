@@ -14,11 +14,16 @@ class Bring(ClauseMeaning):
         ]
 
     def handle(self, c, memory, (agent_xx, target_xx, to_xx)):
+        if len(agent_xx) != 1:
+            return None
+
         if len(to_xx) != 1:
             return None
 
+        agent = memory.ideas[agent_xx[0]]
         to_x, = to_xx
         for x in target_xx:
+            agent.carrying.append(x)
             target = memory.ideas[x]
             target.location = to_x
 
