@@ -9,7 +9,7 @@
       - in: John moved to the dungeon.
       - in: Where is John?
         out: dungeon
-  - name: task2
+  - name: task2_sane
     pairs:
       - in: John picked up the ball.
       - in: John moved to the dungeon.
@@ -17,6 +17,14 @@
         out: dungeon
       - in: Where is the ball?
         out: dungeon
+  - name: task2_insane
+    pairs:
+      - in: John went to the kitchen.
+      - in: Mary travelled to the garden.
+      - in: John picked up the football there.
+      - in: John dropped the football.
+      - in: Where is the football?
+        out: garden  # actually, it's "kitchen"
   - name: task5_give
     pairs:
       - in: Fred gave the football to Jeff.
