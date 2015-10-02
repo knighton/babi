@@ -30,32 +30,35 @@ class VerbSemanticsManager(object):
             for lemma in v.lemmas:
                 self.purpose_lemma2xx[(v.purpose, lemma)].append(i)
 
-    def handle(self, c):
-        xx = self.purpose_lemma2xx[(c.purpose, c.verb.lemma)]
-        if not xx:
-            return None
+    def try_meaning(self, meaning, c):
+        for rels in meaning.signatures:
+            # Relations must match.
+            if sorted(filter(bool, rels)) != sorted(c.rel2xx):
+                continue
 
-        for x in xx:
-            v = self.vv[x]
-            for rels in v.signatures:
-                xxx = []
-                ok = True
-                for rel in rels:
-                    if rel is None:
-                        xxx.append(None)
-                        continue
-
-                    xx = c.rel2xx.get(rel)
-                    if xx is None:
-                        ok = False
-                        break
-
-                    xxx.append(xx)
-                if not ok:
+            # Collect args of each relation, in signature order.
+            xxx = []
+            for rel_or_none in rels:
+                if rel_or_none is None:
+                    xxx.append(None)
                     continue
 
-                r = v.handle(c, self.memory, xxx)
-                if r:
-                    return r
+                xx = c.rel2xx[rel_or_none]
+                xxx.append(xx)
+
+            # Try to execute it.
+            r = meaning.handle(c, self.memory, xxx)
+            if r:
+                return r
+
+        return None
+
+    def handle(self, c):
+        xx = self.purpose_lemma2xx[(c.purpose, c.verb.lemma)]
+        for x in xx:
+            meaning = self.vv[x]
+            r = self.try_meaning(meaning, c)
+            if r:
+                return r
 
         return None
