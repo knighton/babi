@@ -5,6 +5,50 @@ from panoptes.dataset.evaluator import Evaluator
 
 
 class HtmlEvaluator(Evaluator):
+    def dump_overview_head(self, out):
+        out.write("""
+<html>
+<head>
+    <style type="text/css">
+body {
+    background: #69c;
+}
+#page {
+    padding: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 100px;
+    margin-bottom: 100px;
+    width: 800px;
+}
+.episode {
+    margin: 10px;
+    padding: 10px;
+    background: #def;
+    border: 2px solid white;
+    border-radius: 2px;
+}
+.episode_title {
+    font-weight: bold;
+    width: 100%;
+    text-align: center;
+}
+    </style>
+</head>
+<body>
+    <div id="page">
+        <div class="episode">
+            <div class="episode_title">Overview</div>
+""".strip())
+
+    def dump_overview_foot(self, out):
+        out.write("""
+        </div>
+    </div>
+</body>
+</html>
+""".strip())
+
     def dump_task_head(self, out):
         out.write("""
 <html>
@@ -29,7 +73,6 @@ body {
     border-radius: 2px;
 }
 .episode_title {
-    padding: 10px;
     font-weight: bold;
     width: 100%;
     text-align: center;
@@ -94,24 +137,50 @@ body {
 
         self.dump_episode_foot(out)
 
+        return correct, total
+
     def evaluate_task(self, agent, task, episodes_per_task, out):
-        self.dump_task_head(out)
-        if episodes_per_task is None:
-            episodes = task.episodes
-        else:
-            episodes = task.episodes[:episodes_per_task]
-        for i, episode in enumerate(episodes):
-            self.evaluate_episode(agent, i, episode, out)
-        self.dump_task_foot(out)
+        try:
+            self.dump_task_head(out)
+            if episodes_per_task is None:
+                episodes = task.episodes
+            else:
+                episodes = task.episodes[:episodes_per_task]
+            correct = 0
+            total = 0
+            for i, episode in enumerate(episodes):
+                sub_correct, sub_total = \
+                    self.evaluate_episode(agent, i, episode, out)
+                correct += sub_correct
+                total += sub_total
+            self.dump_task_foot(out)
+            return correct, total
+        except:
+            return 0, 1
 
     def evaluate(self, agent, dataset, episodes_per_task=None):
         root = 'data/evaluation/%s/' % dataset.name
         if os.path.exists(root):
             shutil.rmtree(root)
         os.makedirs(root)
-        print 'wtf', len(dataset.tasks)
         dataset.overview()
+        results = []
         for i, task in enumerate(dataset.tasks):
             fn = root + '%02d_%s.html' % (i + 1, task.name)
             with open(fn, 'wb') as out:
-                self.evaluate_task(agent, task, episodes_per_task, out)
+                correct, total = \
+                    self.evaluate_task(agent, task, episodes_per_task, out)
+                results.append((correct, total))
+
+        fn = root + 'overview.html'
+        with open(fn, 'wb') as out:
+            self.dump_overview_head(out)
+            out.write('<table>')
+            for i, ((correct, total), task) in \
+                    enumerate(zip(results, dataset.tasks)):
+                pct = 100.0 * correct / total
+                line = '<tr><td>%d.</td><td>%.2f%%</td><td>%d</td><td>%d</td><td>%s</td></tr>' % \
+                    (i + 1, pct, correct, total, task.name)
+                out.write(line)
+            out.write('</table>')
+            self.dump_overview_foot(out)
