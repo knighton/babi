@@ -27,6 +27,10 @@ class Parser(object):
         print 'done'
 
     def parse(self, text):
+        # spaCy doesn't like "following" used as a preposition, so we use a
+        # similar word instead.  Oh well.
+        text = text.replace('Following', 'After')
+
         tokens = self.nlp(text, parse=True)
         words = truecase(tokens)
 
