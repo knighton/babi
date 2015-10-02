@@ -35,6 +35,38 @@ class AgentPlaceQuestion(ClauseMeaning):
             assert False
 
 
+class AgentPlaceBeforeQuestion(ClauseMeaning):
+    def __init__(self):
+        self.purpose = Purpose.WH_Q
+        self.lemmas = ['be']
+        self.signatures = [
+            [Relation.AGENT, Relation.PLACE, Relation.BEFORE],
+        ]
+
+    def handle(self, c, memory, (what_xx, where_xx, before_xx)):
+        if len(what_xx) != 1:
+            return None
+
+        if len(where_xx) != 1:
+            return None
+
+        if len(before_xx) != 1:
+            return None
+
+        what = memory.ideas[what_xx[0]]
+        where = memory.ideas[where_xx[0]]
+        before_x, = before_xx
+
+        if what.identity == Identity.REQUESTED:
+            return None
+        elif where.identity == Identity.REQUESTED:
+            x = what.location_history.location_before(before_x)
+            idea = memory.ideas[x]
+            return Response(idea.kind)
+        else:
+            assert False
+
+
 class AgentIn(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.INFO
