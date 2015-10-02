@@ -35,6 +35,26 @@ class Parse(object):
             if token.tag == 'XX':
                 return None
 
+        # Handle verb args descended from an advmod relation.
+        #
+        #   "Mary went back to the garden"
+        for t in self.tokens:
+            up_dep, parent = t.up
+            if parent is None:
+                continue
+            parent_up_dep, grandparent = parent.up
+            if grandparent is None:
+                continue
+            if parent_up_dep != 'advmod':
+                continue
+            for i, (_, child) in enumerate(parent.downs):
+                if child.index == t.index:
+                    del parent.downs[i]
+                    break
+            parent.up = (up_dep, grandparent)
+            grandparent.downs.append((up_dep, t))
+            grandparent.downs.sort(key=lambda (dep, child): child.index)
+
         # Handle verb args descended from an aux relation.
         for t in self.tokens:
             dep, up = t.up
