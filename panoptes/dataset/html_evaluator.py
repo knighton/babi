@@ -33,6 +33,9 @@ body {
     width: 100%;
     text-align: center;
 }
+td {
+    padding: 5px;
+}
     </style>
 </head>
 <body>
@@ -179,8 +182,15 @@ body {
             for i, ((correct, total), task) in \
                     enumerate(zip(results, dataset.tasks)):
                 pct = 100.0 * correct / total
-                line = '<tr><td>%d.</td><td>%.2f%%</td><td>%d</td><td>%d</td><td>%s</td></tr>' % \
-                    (i + 1, pct, correct, total, task.name)
+                line = """
+                    <tr>
+                        <td style="text-align: right">%d.</td>
+                        <td style="text-align: right">%.2f%%</td>
+                        <td style="text-align: right">%d</td>
+                        <td style="text-align: right">%d</td>
+                        <td>%s</td>
+                    </tr>
+                """ % (i + 1, pct, correct, total, task.name)
                 out.write(line)
             out.write('</table>')
             self.dump_overview_foot(out)
