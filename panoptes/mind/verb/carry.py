@@ -30,9 +30,9 @@ class Drop(ClauseMeaning):
         self.purpose = Purpose.INFO
         self.lemmas = ['discard', 'drop', 'leave', 'put']
         self.signatures = [
-            [Relation.AGENT, Relation.TARGET, None],
             [Relation.AGENT, Relation.TARGET, Relation.PLACE],
             [Relation.AGENT, Relation.TARGET, Relation.TO_LOCATION],
+            [Relation.AGENT, Relation.TARGET, None],
         ]
 
     def handle(self, c, memory, (agent_xx, target_xx, to_xx)):
@@ -81,18 +81,27 @@ class PickUp(ClauseMeaning):
         self.purpose = Purpose.INFO
         self.lemmas = ['get', 'grab', 'pick']
         self.signatures = [
-            [Relation.AGENT, Relation.TARGET, None],
             [Relation.AGENT, Relation.TARGET, Relation.PLACE],
+            [Relation.AGENT, Relation.TARGET, None],
         ]
 
     def handle(self, c, memory, (agent_xx, target_xx, at_xx)):
         if len(agent_xx) != 1:
             return None
 
+        if at_xx and len(at_xx) != 1:
+            return None
+
+        if at_xx:
+            at_x, = at_xx
+        else:
+            at_x = None
         x, = agent_xx
         agent = memory.ideas[x]
         for x in target_xx:
             agent.carrying.append(x)
+            if at_x is not None:
+                memory.ideas[x].location = at_x
 
         return Response()
 
