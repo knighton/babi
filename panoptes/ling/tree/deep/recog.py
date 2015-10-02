@@ -189,7 +189,7 @@ class SurfaceToDeep(object):
                         rels_vargs = zip(rels, deeps)
                         r = DeepContentClause(
                             status, purpose, is_intense, c.verb.intrinsics,
-                            rels_vargs, subj_argx)
+                            c.adverbs, rels_vargs, subj_argx)
                         rr.append(r)
         return rr
 

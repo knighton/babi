@@ -116,7 +116,7 @@ def transform(orig_preps_vargs, subj_index, is_imperative, argx_to_front,
 
 
 class DeepContentClause(DeepArgument):
-    def __init__(self, status, purpose, is_intense, verb, rels_vargs,
+    def __init__(self, status, purpose, is_intense, verb, adverbs, rels_vargs,
                  subj_index):
         self.status = status
         assert Status.is_valid(self.status)
@@ -129,6 +129,10 @@ class DeepContentClause(DeepArgument):
 
         self.verb = verb
         assert isinstance(self.verb, DeepVerb)
+
+        self.adverbs = adverbs
+        for s in self.adverbs:
+            assert isinstance(s, basestring)
 
         self.rels_vargs = rels_vargs
         assert isinstance(self.rels_vargs, list)
@@ -193,6 +197,7 @@ class DeepContentClause(DeepArgument):
             'purpose': Purpose.to_str[self.purpose],
             'is_intense': self.is_intense,
             'verb': self.verb.dump(),
+            'adverbs': self.adverbs,
             'rels_vargs': rels_vargs,
             'subj_index': self.subj_index,
         }
@@ -278,9 +283,9 @@ class DeepContentClause(DeepArgument):
         # Get the complementizer.
         complementizer = STATUS2COMPLEMENTIZER[self.status]
 
-        adverbs = []
         return SurfaceContentClause(
-            complementizer, surface_verb, adverbs, preps_surfs, vmain_index)
+            complementizer, surface_verb, self.adverbs, preps_surfs,
+            vmain_index)
 
     # --------------------------------------------------------------------------
     # Static.
@@ -290,9 +295,10 @@ class DeepContentClause(DeepArgument):
         status = Status.from_str[d['status']]
         purpose = Purpose.from_str[d['purpose']]
         is_intense = d['is_intense']
+        verb = DeepVerb.load(d['verb'])
+        adverbs = d['adverbs']
 
         rels_vargs = []
-        verb = DeepVerb.load(d['verb'])
         for rel, arg in d['rels_vargs']:
             rel = Relation.from_str[rel]
             arg = loader.load(arg)
@@ -300,5 +306,5 @@ class DeepContentClause(DeepArgument):
 
         subj_index = d['subj_index']
 
-        return DeepContentClause(status, purpose, is_intense, verb, rels_vargs,
-                                 subj_index)
+        return DeepContentClause(
+            status, purpose, is_intense, verb, adverbs, rels_vargs, subj_index)
