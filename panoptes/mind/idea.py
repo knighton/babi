@@ -86,6 +86,9 @@ class Noun(Idea):
         }
 
     def matches_noun_view(self, view, place_kinds):
+        if self.identity == Identity.REQUESTED:
+            return False
+
         match = False
 
         if view.name and self.name:
