@@ -137,6 +137,13 @@ RELATION_TEXT = """
       - before FINITE_CLAUSE
       - before INERT
 
+  - relation: AFTER
+    core: OBLIQUE
+    order: 50
+    preps:
+      - after FINITE_CLAUSE
+      - after INERT
+
   - relation: BECAUSE
     core: OBLIQUE
     order: 100
