@@ -427,10 +427,21 @@ class ParseToSurface(object):
         """
         varg_root_indexes = []
         ppp_nnn = []
+        adverbs = []
         for rel, t in root_token.downs:
             if rel not in ('nsubj', 'nsubjpass', 'agent', 'dobj', 'dative',
-                           'expl', 'attr', 'advmod', 'prep', 'compound'):
+                           'expl', 'attr', 'advmod', 'prep', 'compound', 'neg'):
                 continue
+
+            if rel == 'neg':
+                if t.text == 'no':
+                    adverbs.append(t.text)
+                    continue
+
+            if rel == 'advmod':
+                if t.text == 'longer':
+                    adverbs.append(t.text)
+                    continue
 
             if rel == 'agent':
                 prep = 'by',
@@ -475,7 +486,7 @@ class ParseToSurface(object):
             return None
         subj_argx, vmain_index = r
 
-        return subj_argx, vmain_index, ppp_nnn
+        return subj_argx, vmain_index, ppp_nnn, adverbs
 
     def conjs_from_verb(self, v):
         """
@@ -544,7 +555,7 @@ class ParseToSurface(object):
             r = self.extract_verb_args(root_token, verb_span_pair)
             if r is None:
                 continue
-            subj_argx, vmain_index, ppp_nnn = r
+            subj_argx, vmain_index, ppp_nnn, adverbs = r
 
             if subj_argx is None:
                 vv = filter(lambda v: v.is_imperative(), vv)
@@ -559,7 +570,8 @@ class ParseToSurface(object):
                         new_v = deepcopy(v)
                         new_v.conj = conj
                         c = SurfaceContentClause(
-                            complementizer, new_v, deepcopy(pp_nn), vmain_index)
+                            complementizer, new_v, adverbs, deepcopy(pp_nn),
+                            vmain_index)
                         cc.append(c)
         return cc
 

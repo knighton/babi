@@ -278,8 +278,9 @@ class DeepContentClause(DeepArgument):
         # Get the complementizer.
         complementizer = STATUS2COMPLEMENTIZER[self.status]
 
+        adverbs = []
         return SurfaceContentClause(
-            complementizer, surface_verb, preps_surfs, vmain_index)
+            complementizer, surface_verb, adverbs, preps_surfs, vmain_index)
 
     # --------------------------------------------------------------------------
     # Static.

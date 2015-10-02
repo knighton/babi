@@ -20,7 +20,7 @@ COMPLEMENTIZER2WORD = {
 
 
 class SurfaceContentClause(SurfaceArgument):
-    def __init__(self, complementizer, verb, preps_vargs, vmain_index):
+    def __init__(self, complementizer, verb, adverbs, preps_vargs, vmain_index):
         # Complementizer.
         #
         # If we are the content of a relative clause, can only be ZERO.
@@ -28,6 +28,9 @@ class SurfaceContentClause(SurfaceArgument):
 
         # SurfaceVerb.  Some of its fields are tield to other parameters.
         self.verb = verb  # SurfaceVerb.
+
+        # List of adverbs.
+        self.adverbs = adverbs
 
         # List of (prep, verb argument).
         #
@@ -57,6 +60,9 @@ class SurfaceContentClause(SurfaceArgument):
         assert Complementizer.is_valid(self.complementizer)
 
         assert isinstance(self.verb, SurfaceVerb)
+
+        for s in self.adverbs:
+            assert isinstance(s, basestring)
 
         missing_args = 0
         for p, n in self.preps_vargs:
@@ -149,6 +155,7 @@ class SurfaceContentClause(SurfaceArgument):
             'type': 'SurfaceContentClause',
             'complementizer': Complementizer.to_str[self.complementizer],
             'verb': self.verb.dump(),
+            'adverbs': self.adverbs,
             'preps_vargs': preps_vargs,
             'vmain_index': self.vmain_index,
         }
@@ -250,7 +257,8 @@ class SurfaceContentClause(SurfaceArgument):
                 arg = loader.load(arg)
             preps_vargs.append((prep, arg))
 
+        adverbs = d['adverbs']
         vmain_index = d['vmain_index']
 
         return SurfaceContentClause(
-            complementizer, verb, preps_vargs, vmain_index)
+            complementizer, verb, adverbs, preps_vargs, vmain_index)
