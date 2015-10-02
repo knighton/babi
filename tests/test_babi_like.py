@@ -19,14 +19,23 @@ def main():
         print PRE, name
         for pair in j['pairs']:
             in_s = pair['in'].decode('utf-8')
-            print PRE, 'IN', in_s
+            print PRE, 'IN = (%s)' % in_s
+
             want_out = pair.get('out')
+
             if want_out:
                 want_out = want_out.decode('utf-8')
-            print PRE, 'WANT OUT (%s)' % want_out
+                print PRE, 'WANT OUT = (%s)' % want_out
+
             got_out = agent.put(uid, in_s).out
-            print PRE, 'GOT OUT (%s)' % got_out
-            assert want_out == got_out
+            if got_out:
+                print PRE, 'GOT OUT = (%s)' % got_out
+
+            try:
+                assert want_out == got_out
+            except:
+                print 'died', want_out, '!=', got_out
+                raise
 
 
 if __name__ == '__main__':

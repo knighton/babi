@@ -1,3 +1,6 @@
+html:
+	python -m tests.babi_html
+
 babi_mini:
 	python -m tests.babi_mini
 

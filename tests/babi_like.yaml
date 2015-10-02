@@ -41,6 +41,10 @@
 #      - in: What did Jeff receive from Fred?
 #        out: football
 
+#  - name: task7
+#      - in: Mary got the milk there.
+#      - in: How many objects is Mary carrying?
+#        out: one
   - name: task8
     pairs:
       - in: John picked up the football there.
@@ -59,5 +63,13 @@
       - in: Is Mary in the office?
         out: "yes"
       - in: Mary went back to the garden.
+      - in: Is Mary in the office?
+        out: "no"
+  - name: task9_no_longer
+    pairs:
+      - in: Mary journeyed to the office.
+      - in: Is Mary in the office?
+        out: "yes"
+      - in: Mary is no longer in the office.
       - in: Is Mary in the office?
         out: "no"

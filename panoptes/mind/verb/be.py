@@ -34,6 +34,30 @@ class AgentPlaceQuestion(ClauseMeaning):
             assert False
 
 
+class AgentIn(ClauseMeaning):
+    def __init__(self):
+        self.purpose = Purpose.INFO
+        self.lemmas = ['be']
+        self.signatures = [
+            [Relation.AGENT, Relation.IN],
+        ]
+
+    def handle(self, c, memory, (agent_xx, place_xx)):
+        if len(agent_xx) != 1:
+            return None
+
+        if len(place_xx) != 1:
+            return None
+
+        agent = memory.ideas[agent_xx[0]]
+        place_x, = place_xx
+        if c.adverbs == ['no', 'longer']:
+            agent.location = -1
+            return Response()
+        else:
+            return None
+
+
 class AgentInQuestion(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.TF_Q
@@ -43,7 +67,6 @@ class AgentInQuestion(ClauseMeaning):
         ]
 
     def handle(self, c, memory, (agent_xx, place_xx)):
-        print 'AgentInQuestion'
         if len(agent_xx) != 1:
             return None
 
