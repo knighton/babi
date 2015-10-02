@@ -1,9 +1,10 @@
 from copy import deepcopy
 import json
 
-from panoptes.ling.glue.inflection import Declension
+from panoptes.ling.glue.inflection import Declension, Gender
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
+from panoptes.ling.morph.gender import GenderClassifier
 from panoptes.ling.tree.common.util.selector import Correlative
 from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun
 from panoptes.ling.tree.common.proper_noun import ProperNoun
@@ -69,6 +70,8 @@ class Memory(object):
 
         self.place_kinds = set()
 
+        self.gender_clf = GenderClassifier()
+
     def make_checkpoint(self):
         return deepcopy(self)
 
@@ -86,6 +89,7 @@ class Memory(object):
         self.next_clause_id = checkpoint.next_clause_id
         self.place_rels = checkpoint.place_rels
         self.place_kinds = checkpoint.place_kinds
+        self.gender_clf = checkpoint.gender_clf
 
     def show(self):
         print '=' * 80
@@ -107,9 +111,11 @@ class Memory(object):
         return x
 
     def resolve_one_noun(self, view):
+        print 'RESOLVE ONE NOUN', view.dump()
         for i in xrange(len(self.ideas) - 1, -1, -1):
             idea = self.ideas[i]
             if idea.matches_noun_view(view, self.place_kinds):
+                print 'mATCHED', i
                 return [i]
 
         idea = idea_from_view(view)
@@ -153,7 +159,11 @@ class Memory(object):
         }:
             return []
 
-        view = NounView(kind=n.noun)
+        if n.noun == 'person':
+            gender = None
+        else:
+            gender = Gender.NEUTER
+        view = NounView(kind=n.noun, gender=gender)
         return self.resolve_one_noun(view)
 
     def decode_content_clause(self, deep_ref, from_xx, to_xx):
@@ -190,17 +200,30 @@ class Memory(object):
         return []
 
     def decode_personal_pronoun(self, deep_ref, from_xx, to_xx):
-        p = deep_ref.arg
+        d = deep_ref.arg.declension
 
-        if p.is_interrogative():
+        if d == Declension.WHO1:
+            who = Noun.make_who()
+            x = self.add_idea(who)
+            return [x]
+        elif d == Declension.WHO2:
             who = Noun.make_who()
             x = self.add_idea(who)
             return [x]
 
-        return []
+        if d == Declension.HE:
+            view = NounView(gender=Gender.MALE)
+        elif d == Declension.SHE:
+            view = NounView(gender=Gender.FEMALE)
+        else:
+            return []
+
+        return resolve_one_nun(view)
 
     def decode_proper_noun(self, deep_ref, from_xx, to_xx):
-        view = NounView(name=deep_ref.arg.name)
+        name = deep_ref.arg.name
+        gender = self.gender_clf.classify(name)
+        view = NounView(name=name, gender=gender, kind='person')
         return self.resolve_one_noun(view)
 
     def decode(self, deep_ref, from_xx, to_xx):

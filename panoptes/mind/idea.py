@@ -89,23 +89,23 @@ class Noun(Idea):
         if self.identity == Identity.REQUESTED:
             return False
 
-        match = False
+        # Otherwise we'll match indiscriminately.
+        if view.name != self.name:
+            return False
 
-        if view.name and self.name:
-            if view.name == self.name:
-                match = True
-            else:
+        if view.gender and self.gender:
+            if view.gender != self.gender:
                 return False
 
         if view.kind and self.kind:
             if view.kind == self.kind:
-                match = True
+                pass
             elif view.kind == 'place' and self.kind in place_kinds:
-                match = True
+                pass
             else:
                 return False
 
-        return match
+        return True
 
     def matches_clause_view(self, view):
         return False
@@ -118,20 +118,22 @@ class Noun(Idea):
 
 
 class NounView(object):
-    def __init__(self, name=None, kind=None):
+    def __init__(self, name=None, gender=None, kind=None):
         self.name = name
+        self.gender = gender
         self.kind = kind
 
     def dump(self):
         return {
             'name': self.name,
+            'gender': Gender.to_str[self.gender],
             'kind': self.kind,
         }
 
 
 def idea_from_view(view):
     print 'IDEA FROM VIEW', view.dump()
-    return Noun(name=view.name, kind=view.kind)
+    return Noun(name=view.name, gender=view.gender, kind=view.kind)
 
 
 class Clause(Idea):

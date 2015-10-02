@@ -6,7 +6,11 @@ class GenderClassifier(object):
     Works amazingly well.
     """
 
-    def classify(self, s):
+    def classify(self, ss):
+        if not ss:
+            return Gender.MALE
+
+        s = ss[-1]
         if not s:
             return Gender.MALE
 
