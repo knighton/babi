@@ -29,7 +29,7 @@ body {
     background: white;
 }
 .wrong {
-    background: #fdd;
+    background: #fcc;
 }
     </style>
 </head>
@@ -60,12 +60,12 @@ body {
         uid = agent.new_user()
         for in_s, want_out in episode.pairs:
             delib = agent.put(uid, in_s)
-            line = '%d %d %d %s' % (
+            line = '%d %d %d %s ' % (
                 len(delib.recognized.parses), len(delib.recognized.ssens),
                 len(delib.recognized.dsens), in_s.encode('utf-8'))
             if want_out or delib.out:
                 if want_out != delib.out:
-                    line += ' want "%s" got "%s"' % (want_out, delib.out)
+                    line += 'want "%s" got "%s"' % (want_out, delib.out)
                     line = '<span class="wrong">%s</span>' % line
                 else:
                     line += '"%s"' % want_out
