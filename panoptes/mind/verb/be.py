@@ -1,6 +1,7 @@
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
 from panoptes.mind.idea import Identity
+from panoptes.mind.location import At, NotAt
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
 
@@ -25,7 +26,7 @@ class AgentPlaceQuestion(ClauseMeaning):
         if agent.identity == Identity.REQUESTED:
             return None
         elif place.identity == Identity.REQUESTED:
-            x = agent.location
+            x = agent.location_history.current_location()
             if x is None:
                 return Response('dunno')
             loc = memory.ideas[x]
@@ -52,10 +53,16 @@ class AgentIn(ClauseMeaning):
         agent = memory.ideas[agent_xx[0]]
         place_x, = place_xx
         if c.adverbs == ['no', 'longer']:
-            agent.location = -1
+            loc = NotAt(place_x)
+            agent.location_history.update_location(loc)
             return Response()
+
+        if c.verb.polarity.tf:
+            loc = At(place_x)
         else:
-            return None
+            loc = NotAt(place_x)
+        agent.location_history.update_location(loc)
+        return Response()
 
 
 class AgentInQuestion(ClauseMeaning):
@@ -75,9 +82,10 @@ class AgentInQuestion(ClauseMeaning):
 
         agent = memory.ideas[agent_xx[0]]
         place_x, = place_xx
-        if agent.location is None:
+        r = agent.location_history.is_at_location(place_x)
+        if r is None:
             return Response('dunno')
-        elif agent.location == place_x:
+        elif r:
             return Response('yes')
         else:
             return Response('no')

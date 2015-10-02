@@ -5,6 +5,7 @@ from panoptes.ling.glue.relation import Relation
 from panoptes.ling.tree.common.util.selector import Selector
 from panoptes.ling.tree.deep.content_clause import Status
 from panoptes.ling.verb.verb import DeepVerb
+from panoptes.mind.location import LocationHistory
 
 
 class Idea(object):
@@ -24,7 +25,7 @@ Identity = enum('Identity = GIVEN REQUESTED')
 class Noun(Idea):
     def __init__(self, identity=Identity.GIVEN, name=None, gender=None,
                  is_animate=None, selector=None, kind=None, rel2xx=None,
-                 location=None, carrying=None):
+                 carrying=None):
         if rel2xx is None:
             rel2xx = {}
         if carrying is None:
@@ -61,13 +62,12 @@ class Noun(Idea):
             for x in xx:
                 assert isinstance(x, int)
 
-        self.location = location
-        if self.location is not None:
-            assert isinstance(self.location, int)
-
         self.carrying = carrying
         for x in self.carrying:
             assert isinstance(x, int)
+
+        self.location_history = LocationHistory()
+
 
     def dump(self):
         rel2xx = {}
@@ -81,8 +81,8 @@ class Noun(Idea):
             'selector': self.selector.dump() if self.selector else None,
             'kind': self.kind,
             'rel2xx': rel2xx,
-            'location': self.location,
             'carrying': self.carrying,
+            'location_history': self.location_history.dump(),
         }
 
     def matches_noun_view(self, view, place_kinds):
@@ -115,7 +115,7 @@ class Noun(Idea):
     def make_who():
         return Noun(identity=Identity.REQUESTED, name=None, gender=None,
                     is_animate=None, selector=None, kind='person', rel2xx=None,
-                    location=None, carrying=None)
+                    carrying=None)
 
 
 class NounView(object):

@@ -1,6 +1,7 @@
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
 from panoptes.mind.idea import Identity
+from panoptes.mind.location import At
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
 
@@ -25,7 +26,8 @@ class Bring(ClauseMeaning):
         for x in target_xx:
             agent.carrying.append(x)
             target = memory.ideas[x]
-            target.location = to_x
+            loc = At(to_x)
+            target.location_history.update_location(loc)
 
         return Response()
 
@@ -53,7 +55,8 @@ class Drop(ClauseMeaning):
             to_x, = to_xx
             for x in target_xx:
                 target = memory.ideas[x]
-                target.location = to_x
+                loc = At(to_x)
+                target.location_history.update_location(loc)
 
         return Response()
 
@@ -76,9 +79,11 @@ class Go(ClauseMeaning):
         to_x, = to_xx
         for x in agent_xx:
             agent = memory.ideas[x]
-            agent.location = to_x
+            loc = At(to_x)
+            agent.location_history.update_location(loc)
             for x2 in agent.carrying:
-                memory.ideas[x2].location = to_x
+                loc = At(to_x)
+                memory.ideas[x2].location_history.update_location(loc)
 
         return Response()
 
@@ -108,7 +113,8 @@ class PickUp(ClauseMeaning):
         for x in target_xx:
             agent.carrying.append(x)
             if at_x is not None:
-                memory.ideas[x].location = at_x
+                loc = At(at_x)
+                memory.ideas[x].location_history.update_location(loc)
 
         return Response()
 
