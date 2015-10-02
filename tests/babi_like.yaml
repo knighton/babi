@@ -24,7 +24,14 @@
       - in: John picked up the football there.
       - in: John dropped the football.
       - in: Where is the football?
-        out: garden  # actually, it's "kitchen"
+        out: garden  # actually, it's "kitchen" in the dataset.
+  - name: task3
+    pairs:
+      - in: John picked up the apple.
+      - in: John went to the store.
+      - in: Then John went to the beach.
+      - in: Where was the apple before the beach?
+        out: store
   - name: task5_give
     pairs:
       - in: Fred gave the football to Jeff.
