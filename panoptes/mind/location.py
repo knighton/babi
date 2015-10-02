@@ -67,6 +67,11 @@ class LocationHistory(object):
 
         Update our location.
         """
+        if self.history:
+            h = self.history[-1]
+            if h.dump() == location.dump():
+                return
+
         self.history.append(location)
 
     def is_at_location(self, x):
