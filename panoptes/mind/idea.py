@@ -133,9 +133,11 @@ def idea_from_view(view):
 
 class Clause(Idea):
     def __init__(self, status=Status.ACTUAL, purpose=Purpose.INFO,
-                 is_intense=False, verb=None, rel2xx=None):
+                 is_intense=False, verb=None, adverbs=None, rel2xx=None):
         if rel2xx is None:
             rel2xx = {}
+        if adverbs is None:
+            adverbs = []
 
         self.status = status
         assert Status.is_valid(self.status)
@@ -149,6 +151,10 @@ class Clause(Idea):
         self.verb = verb
         if self.verb:
             assert isinstance(self.verb, DeepVerb)
+
+        self.adverbs = adverbs
+        for s in self.adverbs:
+            assert isinstance(s, basestring)
 
         self.rel2xx = rel2xx
         for rel, xx in self.rel2xx.iteritems():

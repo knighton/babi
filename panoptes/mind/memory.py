@@ -180,7 +180,8 @@ class Memory(object):
             rel2xx[rel] = xx
 
         # The rest are unchanged in the conversion to memory.
-        idea = Clause(c.status, c.purpose, c.is_intense, c.verb, rel2xx)
+        idea = Clause(c.status, c.purpose, c.is_intense, c.verb, c.adverbs,
+                      rel2xx)
 
         x = self.add_idea(idea)
         return [x]
