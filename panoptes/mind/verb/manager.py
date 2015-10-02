@@ -1,6 +1,8 @@
 from collections import defaultdict
 
-from panoptes.mind.verb.carry import Bring, Drop, Go, PickUp, AgentPlaceQuestion
+from panoptes.mind.verb.be import AgentPlaceQuestion, AgentInQuestion
+from panoptes.mind.verb.carry import Bring, Drop, Go, PickUp, \
+    CarryingWhatQuestion
 from panoptes.mind.verb.give import Give, GiveQuestion
 
 
@@ -9,11 +11,14 @@ class VerbSemanticsManager(object):
         self.memory = memory
 
         self.vv = [
+            AgentPlaceQuestion(),
+            AgentInQuestion(),
+
             Bring(),
             Drop(),
             Go(),
             PickUp(),
-            AgentPlaceQuestion(),
+            CarryingWhatQuestion(),
 
             Give(),
             GiveQuestion(),
