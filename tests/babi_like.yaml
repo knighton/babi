@@ -53,3 +53,11 @@
       - in: John dropped the football.
       - in: What is John carrying?
         out: apple
+  - name: task9_simple
+    pairs:
+      - in: Mary journeyed to the office.
+      - in: Is Mary in the office?
+        out: "yes"
+      - in: Mary went back to the garden.
+      - in: Is Mary in the office?
+        out: "no"
