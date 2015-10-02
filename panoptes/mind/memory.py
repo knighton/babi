@@ -218,7 +218,7 @@ class Memory(object):
         else:
             return []
 
-        return resolve_one_nun(view)
+        return self.resolve_one_noun(view)
 
     def decode_proper_noun(self, deep_ref, from_xx, to_xx):
         name = deep_ref.arg.name

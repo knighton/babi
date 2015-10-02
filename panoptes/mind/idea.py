@@ -90,8 +90,9 @@ class Noun(Idea):
             return False
 
         # Otherwise we'll match indiscriminately.
-        if view.name != self.name:
-            return False
+        if view.name:
+            if view.name != self.name:
+                return False
 
         if view.gender and self.gender:
             if view.gender != self.gender:
