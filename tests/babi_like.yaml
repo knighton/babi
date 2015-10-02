@@ -53,7 +53,7 @@
 #      - in: Mary got the milk there.
 #      - in: How many objects is Mary carrying?
 #        out: one
-  - name: task8
+  - name: task8_basic
     pairs:
       - in: John picked up the football there.
       - in: What is John carrying?
@@ -65,6 +65,16 @@
       - in: John dropped the football.
       - in: What is John carrying?
         out: apple
+  - name: task8_take
+    pairs:
+      - in: Mary went to the kitchen.
+      - in: Daniel took the football there.
+      - in: What is Daniel carrying?
+        out: football
+      - in: Daniel dropped the football.
+      - in: Sandra grabbed the milk there.
+      - in: What is Daniel carrying?
+        out: nothing
   - name: task9_simple
     pairs:
       - in: Mary journeyed to the office.
