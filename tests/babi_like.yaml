@@ -109,3 +109,31 @@
       - in: Following that she went back to the kitchen.
       - in: Where is Mary?
         out: kitchen
+  - name: task11_another_after
+    pairs:
+      - in: Sandra went back to the bedroom.
+      - in: After that she journeyed to the office.
+      - in: Where is Sandra?
+        out: office
+  - name: task11_verify_coreference_works
+    pairs:
+      - in: Sandra moved to the garden.
+      - in: After that she moved to the office.
+      - in: Where is Sandra?
+        out: office
+      - in: Mary went back to the hallway.
+      - in: Then she went back to the bathroom.
+      - in: Where is Sandra?
+        out: office
+      - in: Sandra went back to the bedroom.
+      - in: After that she journeyed to the office.
+      - in: Where is Sandra?
+        out: office
+      - in: Sandra moved to the bathroom.
+      - in: After that she journeyed to the bedroom.
+      - in: Where is Sandra?
+        out: bedroom
+      - in: John went to the office.
+      - in: Afterwards he moved to the bedroom.
+      - in: Where is Sandra?
+        out: bedroom
