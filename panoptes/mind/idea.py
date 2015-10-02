@@ -9,14 +9,14 @@ from panoptes.mind.location import LocationHistory
 
 
 class Idea(object):
-    def relevance(self, view):
-        """
-        Gloss -> float in [0.0, 1.0]
-
-        Returns how well the view matches this object.  Used for reference
-        resolution.
-        """
+    def dump(self):
         raise NotImplementedError
+
+    def matches_noun_view(self, view, ideas, place_kinds):
+        return False
+
+    def matches_clause_view(self, view):
+        return False
 
 
 Identity = enum('Identity = GIVEN REQUESTED')
@@ -74,6 +74,7 @@ class Noun(Idea):
         for rel, xx in self.rel2xx.iteritems():
             rel2xx[Relation.to_str[rel]] = xx
         return {
+            'type': 'Noun',
             'identity': Identity.to_str[self.identity],
             'name': self.name,
             'gender': Gender.to_str[self.gender] if self.gender else None,
@@ -85,7 +86,7 @@ class Noun(Idea):
             'location_history': self.location_history.dump(),
         }
 
-    def matches_noun_view(self, view, place_kinds):
+    def matches_noun_view(self, view, ideas, place_kinds):
         if self.identity == Identity.REQUESTED:
             return False
 
@@ -108,14 +109,34 @@ class Noun(Idea):
 
         return True
 
-    def matches_clause_view(self, view):
-        return False
-
     @staticmethod
     def make_who():
         return Noun(identity=Identity.REQUESTED, name=None, gender=None,
                     is_animate=None, selector=None, kind='person', rel2xx=None,
                     carrying=None)
+
+
+class NounReverb(Idea):
+    """
+    Points back to an earlier idea.
+
+    We create a new object for each new reference to the same earlier object in
+    order for coreference resolution to work, which often depends on how "hot"
+    references are.
+    """
+
+    def __init__(self, x):
+        self.x = x
+
+    def dump(self):
+        return {
+            'type': 'NounReverb',
+            'x': self.x,
+        }
+
+    def matches_noun_view(self, view, ideas, place_kinds):
+        n = ideas[self.x]
+        return n.matches_noun_view(view, ideas, place_kinds)
 
 
 class NounView(object):
@@ -174,15 +195,13 @@ class Clause(Idea):
         for rel, xx in self.rel2xx.iteritems():
             rel2xx[Relation.to_str[rel]] = xx
         return {
+            'type': 'Clause',
             'status': Status.to_str[self.status],
             'purpose': Purpose.to_str[self.purpose],
             'is_intense': self.is_intense,
             'verb': self.verb.dump() if self.verb else None,
             'rel2xx': rel2xx,
         }
-
-    def matches_noun_view(self, view, place_kinds):
-        return False
 
     def matches_clause_view(self, view):
         if self.purpose != Purpose.INFO:

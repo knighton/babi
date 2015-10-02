@@ -12,7 +12,7 @@ from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
 from panoptes.ling.tree.deep.direction import DeepDirection
 from panoptes.mind.idea import Clause, ClauseView, Identity, Noun, NounView, \
-    idea_from_view
+    NounReverb, idea_from_view
 
 
 class DeepReference(object):
@@ -110,13 +110,22 @@ class Memory(object):
         self.ideas.append(idea)
         return x
 
+    def go_to_the_source(self, x):
+        while True:
+            idea = self.ideas[x]
+            if not isinstance(idea, NounReverb):
+                break
+            x = idea.x
+        return x
+
     def resolve_one_noun(self, view):
-        print 'RESOLVE ONE NOUN', view.dump()
         for i in xrange(len(self.ideas) - 1, -1, -1):
             idea = self.ideas[i]
-            if idea.matches_noun_view(view, self.place_kinds):
-                print 'mATCHED', i
-                return [i]
+            if idea.matches_noun_view(view, self.ideas, self.place_kinds):
+                idea = NounReverb(i)
+                x = self.add_idea(idea)
+                x = self.go_to_the_source(x)
+                return [x]
 
         idea = idea_from_view(view)
         x = self.add_idea(idea)
