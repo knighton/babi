@@ -61,6 +61,8 @@ class AgentPlaceBeforeQuestion(ClauseMeaning):
             return None
         elif where.identity == Identity.REQUESTED:
             x = what.location_history.location_before(before_x)
+            if x is None:
+                return Response('dunno')
             idea = memory.ideas[x]
             return Response(idea.kind)
         else:
