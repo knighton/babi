@@ -91,3 +91,21 @@
       - in: Mary is no longer in the office.
       - in: Is Mary in the office?
         out: "no"
+  - name: task11_he
+    pairs:
+      - in: John journeyed to the hallway.
+      - in: After that he journeyed to the garden.
+      - in: Where is John?
+        out: garden
+  - name: task11_she
+    pairs:
+      - in: Mary moved to the office.
+      - in: Then she moved to the bedroom.
+      - in: Where is Mary?
+        out: bedroom
+  - name: task11_following
+    pairs:
+      - in: Mary travelled to the bathroom.
+      - in: Following that she went back to the kitchen.
+      - in: Where is Mary?
+        out: kitchen
