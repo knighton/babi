@@ -30,18 +30,25 @@ class Drop(ClauseMeaning):
         self.purpose = Purpose.INFO
         self.lemmas = ['discard', 'drop', 'leave', 'put']
         self.signatures = [
+            [Relation.AGENT, Relation.TARGET, None],
             [Relation.AGENT, Relation.TARGET, Relation.PLACE],
             [Relation.AGENT, Relation.TARGET, Relation.TO_LOCATION],
         ]
 
     def handle(self, c, memory, (agent_xx, target_xx, to_xx)):
-        if len(to_xx) != 1:
+        if to_xx and len(to_xx) != 1:
             return None
 
-        to_x, = to_xx
-        for x in target_xx:
-            target = memory.ideas[x]
-            target.location = to_x
+        for x in agent_xx:
+            agent = memory.ideas[x]
+            agent.carrying = filter(
+                lambda n: n not in target_xx, agent.carrying)
+
+        if to_xx:
+            to_x, = to_xx
+            for x in target_xx:
+                target = memory.ideas[x]
+                target.location = to_x
 
         return Response()
 
@@ -90,31 +97,38 @@ class PickUp(ClauseMeaning):
         return Response()
 
 
-class AgentPlaceQuestion(ClauseMeaning):
+class CarryingWhatQuestion(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.WH_Q
-        self.lemmas = ['be']
+        self.lemmas = ['carry']
         self.signatures = [
-            [Relation.AGENT, Relation.PLACE],
+            [Relation.AGENT, Relation.TARGET],
         ]
 
-    def handle(self, c, memory, (agent_xx, loc_xx)):
+    def handle(self, c, memory, (agent_xx, what_xx)):
         if len(agent_xx) != 1:
             return None
 
-        if len(loc_xx) != 1:
+        if len(what_xx) != 1:
             return None
 
         agent = memory.ideas[agent_xx[0]]
-        place = memory.ideas[loc_xx[0]]
+        what = memory.ideas[what_xx[0]]
 
         if agent.identity == Identity.REQUESTED:
             return None
-        elif place.identity == Identity.REQUESTED:
-            x = agent.location
-            if x is None:
-                return Response('dunno')
-            loc = memory.ideas[x]
-            return Response(loc.kind)
+        elif what.identity == Identity.REQUESTED:
+            pass
         else:
             assert False
+
+        rr = []
+        for x in agent.carrying:
+            n = memory.ideas[x]
+            rr.append(n.kind)
+
+        if rr:
+            s = ','.join(rr)
+            return Response(s)
+        else:
+            return Response('nothing')
