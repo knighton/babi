@@ -169,3 +169,12 @@
       - in: Afterwards he moved to the bedroom.
       - in: Where is Sandra?
         out: bedroom
+  - name: task19
+    pairs:
+      - in: The garden is west of the bathroom.
+      - in: The bedroom is north of the hallway.
+      - in: The office is south of the hallway.
+      - in: The bathroom is north of the bedroom.
+      - in: The kitchen is east of the bedroom.
+      - in: How do you go from the bathroom to the hallway?
+        out: s,s
