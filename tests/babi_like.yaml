@@ -80,10 +80,11 @@
 #      - in: What did Jeff receive from Fred?
 #        out: football
 
-#  - name: task7
-#      - in: Mary got the milk there.
-#      - in: How many objects is Mary carrying?
-#        out: one
+  - name: task7
+    pairs:
+      - in: Mary got the milk there.
+      - in: How many objects is Mary carrying?
+        out: one
   - name: task8_basic
     pairs:
       - in: John picked up the football there.
