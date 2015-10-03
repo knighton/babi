@@ -158,6 +158,20 @@ def idea_from_view(view):
     return Noun(name=view.name, gender=view.gender, kind=view.kind)
 
 
+class Direction(Idea):
+    def __init__(self, which, of_x):
+        self.which = which
+        self.of_x = of_x
+
+    def dump(self):
+        return {
+            'type': 'Direction',
+            'which': self.which,
+            'of_x': self.of_x,
+        }
+
+
+
 class Clause(Idea):
     def __init__(self, status=Status.ACTUAL, purpose=Purpose.INFO,
                  is_intense=False, verb=None, adverbs=None, rel2xx=None):

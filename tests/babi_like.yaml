@@ -32,6 +32,24 @@
       - in: Then John went to the beach.
       - in: Where was the apple before the beach?
         out: store
+  - name: task4_one
+    pairs:
+      - in: The bedroom is west of the kitchen.
+      - in: The hallway is west of the bedroom.
+      - in: What is west of the kitchen?
+        out: bedroom
+  - name: task4_two
+    pairs:
+      - in: The hallway is south of the bedroom.
+      - in: The kitchen is north of the bedroom.
+      - in: What is north of the bedroom?
+        out: kitchen
+#  - name: task4_one
+#    pairs:
+#      - in: The hallway is east of the bathroom.
+#      - in: The bedroom is west of the bathroom.
+#      - in: What is the bathroom east of?
+#        out: bedroom
   - name: task5_give
     pairs:
       - in: Fred gave the football to Jeff.

@@ -11,8 +11,9 @@ from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
 from panoptes.ling.tree.deep.direction import DeepDirection
+from panoptes.mind.graph import Graph
 from panoptes.mind.idea import Clause, ClauseView, Identity, Noun, NounView, \
-    NounReverb, idea_from_view
+    NounReverb, idea_from_view, Direction
 
 
 class DeepReference(object):
@@ -72,6 +73,8 @@ class Memory(object):
 
         self.gender_clf = GenderClassifier()
 
+        self.graph = Graph()
+
     def make_checkpoint(self):
         return deepcopy(self)
 
@@ -90,6 +93,7 @@ class Memory(object):
         self.place_rels = checkpoint.place_rels
         self.place_kinds = checkpoint.place_kinds
         self.gender_clf = checkpoint.gender_clf
+        self.graph = checkpoint.graph
 
     def show(self):
         print '=' * 80
@@ -206,7 +210,16 @@ class Memory(object):
         return [x]
 
     def decode_direction(self, deep_ref, from_xx, to_xx):
-        return []
+        sub_deep_ref = DeepReference(
+            owning_clause_id=deep_ref.owning_clause_id, is_subj=False,
+            arg=deep_ref.arg.of)
+        sub_xx = self.decode(sub_deep_ref, from_xx, to_xx)
+        rr = []
+        for sub_x in sub_xx:
+            dr = Direction(deep_ref.arg.which, sub_x)
+            x = self.add_idea(dr)
+            rr.append(x)
+        return rr
 
     def decode_personal_pronoun(self, deep_ref, from_xx, to_xx):
         d = deep_ref.arg.declension

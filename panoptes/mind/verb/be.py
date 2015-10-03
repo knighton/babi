@@ -1,8 +1,76 @@
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
-from panoptes.mind.idea import Identity
+from panoptes.mind.idea import Direction, Identity, Noun
 from panoptes.mind.location import At, NotAt
 from panoptes.mind.verb.base import ClauseMeaning, Response
+
+
+class AgentIsTarget(ClauseMeaning):
+    def __init__(self):
+        self.purpose = Purpose.INFO
+        self.lemmas = ['be']
+        self.signatures = [
+            [Relation.AGENT, Relation.TARGET],
+        ]
+
+    def handle(self, c, memory, (agent_xx, target_xx)):
+        if len(agent_xx) != 1:
+            return None
+
+        if len(target_xx) != 1:
+            return None
+
+        agent = memory.ideas[agent_xx[0]]
+        target = memory.ideas[target_xx[0]]
+        if isinstance(agent, Noun) and isinstance(target, Direction):
+            memory.graph.link(agent_xx[0], target.which, target.of_x)
+            return Response()
+        else:
+            return None
+
+
+class AgentTargetQuestion(ClauseMeaning):
+    def __init__(self):
+        self.purpose = Purpose.WH_Q
+        self.lemmas = ['be']
+        self.signatures = [
+            [Relation.AGENT, Relation.TARGET],
+        ]
+
+    def handle(self, c, memory, (agent_xx, target_xx)):
+        if len(agent_xx) != 1:
+            return None
+
+        if len(target_xx) != 1:
+            return None
+
+        agent_x, = agent_xx
+        agent = memory.ideas[agent_x]
+        target_x, = target_xx
+        target = memory.ideas[target_x]
+        if isinstance(agent, Direction) and isinstance(target, Noun):
+            if target.identity == Identity.REQUESTED:
+                xx = memory.graph.what_is_direction_of(agent.of_x, agent.which)
+                rr = []
+                for x in xx:
+                    idea = memory.ideas[x]
+                    if idea.name:
+                        r = ' '.join(idea.name)
+                    elif idea.kind:
+                        r = idea.kind
+                    else:
+                        return None
+                    rr.append(r)
+
+                if not rr:
+                    return Response('nothing')
+
+                r = ','.join(rr)
+                return Response(r)
+            else:
+                return None
+        else:
+            return None
 
 
 class AgentPlaceQuestion(ClauseMeaning):
