@@ -189,7 +189,7 @@ class ParseToSurface(object):
 
         number = Number(None)
 
-        correlative = Correlative.INTR
+        correlative = Correlative.INDEF
         count_restriction = self.det_pronoun_mgr.cor2res_gno[correlative][0]
         selector = Selector.from_correlative(correlative, count_restriction)
         assert selector
