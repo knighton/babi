@@ -50,12 +50,12 @@
       - in: The bedroom is south of the kitchen.
       - in: What is south of the kitchen?
         out: bedroom
-#  - name: task4_stranded_prep
-#    pairs:
-#      - in: The hallway is east of the bathroom.
-#      - in: The bedroom is west of the bathroom.
-#      - in: What is the bathroom east of?
-#        out: bedroom
+  - name: task4_stranded_prep
+    pairs:
+      - in: The hallway is east of the bathroom.
+      - in: The bedroom is west of the bathroom.
+      - in: What is the bathroom east of?
+        out: bedroom
   - name: task5_give
     pairs:
       - in: Fred gave the football to Jeff.
