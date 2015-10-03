@@ -1,6 +1,6 @@
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
-from panoptes.mind.idea import Identity
+from panoptes.mind.idea import Query
 from panoptes.mind.location import At
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
@@ -169,9 +169,9 @@ class CarryingWhatQuestion(ClauseMeaning):
         agent = memory.ideas[agent_xx[0]]
         what = memory.ideas[what_xx[0]]
 
-        if agent.identity == Identity.REQUESTED:
+        if agent.query == Query.IDENTITY:
             return None
-        elif what.identity == Identity.REQUESTED:
+        elif what.query == Query.IDENTITY:
             pass
         else:
             assert False

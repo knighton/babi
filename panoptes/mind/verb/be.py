@@ -1,6 +1,6 @@
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
-from panoptes.mind.idea import Direction, Identity, Noun
+from panoptes.mind.idea import Direction, Query, Noun
 from panoptes.mind.location import At, NotAt
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
@@ -49,7 +49,7 @@ class AgentTargetQuestion(ClauseMeaning):
         target_x, = target_xx
         target = memory.ideas[target_x]
         if isinstance(agent, Direction) and isinstance(target, Noun):
-            if target.identity == Identity.REQUESTED:
+            if target.query == Query.IDENTITY:
                 xx = memory.graph.look_toward_direction(agent.of_x, agent.which)
                 rr = []
                 for x in xx:
@@ -71,7 +71,7 @@ class AgentTargetQuestion(ClauseMeaning):
                 return None
         elif isinstance(agent, Noun) and isinstance(target, Direction):
             of = memory.ideas[target.of_x]
-            if of.identity == Identity.REQUESTED:
+            if of.query == Query.IDENTITY:
                 xx = memory.graph.look_from_direction(agent_x, target.which)
                 rr = []
                 for x in xx:
@@ -113,9 +113,9 @@ class AgentPlaceQuestion(ClauseMeaning):
         agent = memory.ideas[agent_xx[0]]
         place = memory.ideas[loc_xx[0]]
 
-        if agent.identity == Identity.REQUESTED:
+        if agent.query == Query.IDENTITY:
             return None
-        elif place.identity == Identity.REQUESTED:
+        elif place.query == Query.IDENTITY:
             x = agent.location_history.current_location()
             if x is None:
                 return Response('dunno')
@@ -147,9 +147,9 @@ class AgentPlaceBeforeQuestion(ClauseMeaning):
         where = memory.ideas[where_xx[0]]
         before_x, = before_xx
 
-        if what.identity == Identity.REQUESTED:
+        if what.query == Query.IDENTITY:
             return None
-        elif where.identity == Identity.REQUESTED:
+        elif where.query == Query.IDENTITY:
             x = what.location_history.location_before(before_x)
             if x is None:
                 return Response('dunno')

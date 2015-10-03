@@ -1,6 +1,6 @@
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
-from panoptes.mind.idea import ClauseView, Identity
+from panoptes.mind.idea import ClauseView, Query
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
 
@@ -44,27 +44,25 @@ class GiveQuestion(ClauseMeaning):
         receiver = memory.ideas[recv_xx[0]]
         what = memory.ideas[what_xx[0]]
 
-        q_count = \
-            (giver.identity == Identity.REQUESTED) + \
-            (receiver.identity == Identity.REQUESTED) + \
-            (what.identity == Identity.REQUESTED)
+        q_count = bool(giver.query) + bool(receiver.query) + \
+            bool(what.query)
 
         if q_count != 1:
             return None
 
-        if giver.identity == Identity.REQUESTED:
+        if giver.query == Query.IDENTITY:
             rel2xx = {
                 Relation.TO_RECIPIENT: recv_xx,
                 Relation.TARGET: what_xx,
             }
             want_rel = Relation.AGENT
-        elif receiver.identity == Identity.REQUESTED:
+        elif receiver.query == Query.IDENTITY:
             rel2xx = {
                 Relation.AGENT: give_xx,
                 Relation.TARGET: what_xx,
             }
             want_rel = Relation.TO_RECIPIENT
-        elif what.identity == Identity.REQUESTED:
+        elif what.query == Query.IDENTITY:
             rel2xx = {
                 Relation.AGENT: give_xx,
                 Relation.TO_RECIPIENT: recv_xx,

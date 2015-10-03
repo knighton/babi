@@ -12,7 +12,7 @@ from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
 from panoptes.ling.tree.deep.direction import DeepDirection
 from panoptes.mind.graph import Graph
-from panoptes.mind.idea import Clause, ClauseView, Identity, Noun, NounView, \
+from panoptes.mind.idea import Clause, ClauseView, Query, Noun, NounView, \
     NounReverb, idea_from_view, Direction
 
 
@@ -149,15 +149,14 @@ class Memory(object):
         assert n.selector.correlative in [
             Correlative.DEF,
             Correlative.DIST,
-            Correlative.INTR
+            Correlative.INTR,
         ]
 
-        assert not n.number
         assert not n.attributes
         assert not n.rels_nargs
 
         if n.selector.correlative == Correlative.INTR:
-            idea = Noun(identity=Identity.REQUESTED, selector=n.selector,
+            idea = Noun(query=Query.IDENTITY, selector=n.selector,
                         kind=n.noun)
             x = self.add_idea(idea)
             return [x]

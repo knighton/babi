@@ -19,11 +19,14 @@ class Idea(object):
         return False
 
 
-Identity = enum('Identity = GIVEN REQUESTED')
+# What we are looking up, if anything.
+#
+# If query is None, the Idea is data.
+Query = enum('Query = CARDINALITY IDENTITY')
 
 
 class Noun(Idea):
-    def __init__(self, identity=Identity.GIVEN, name=None, gender=None,
+    def __init__(self, query=None, name=None, gender=None,
                  is_animate=None, selector=None, kind=None, rel2xx=None,
                  carrying=None):
         if rel2xx is None:
@@ -31,8 +34,9 @@ class Noun(Idea):
         if carrying is None:
             carrying = []
 
-        self.identity = identity
-        assert Identity.is_valid(self.identity)
+        self.query = query
+        if self.query:
+            assert Query.is_valid(self.query)
 
         self.name = name
         if self.name is not None:
@@ -75,7 +79,7 @@ class Noun(Idea):
             rel2xx[Relation.to_str[rel]] = xx
         return {
             'type': 'Noun',
-            'identity': Identity.to_str[self.identity],
+            'query': Query.to_str[self.query],
             'name': self.name,
             'gender': Gender.to_str[self.gender] if self.gender else None,
             'is_animate': self.is_animate,
@@ -87,7 +91,7 @@ class Noun(Idea):
         }
 
     def matches_noun_view(self, view, ideas, place_kinds):
-        if self.identity == Identity.REQUESTED:
+        if self.query:
             return False
 
         # Otherwise we'll match indiscriminately.
@@ -111,7 +115,7 @@ class Noun(Idea):
 
     @staticmethod
     def make_who():
-        return Noun(identity=Identity.REQUESTED, name=None, gender=None,
+        return Noun(query=Query.IDENTITY, name=None, gender=None,
                     is_animate=None, selector=None, kind='person', rel2xx=None,
                     carrying=None)
 
