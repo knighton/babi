@@ -85,6 +85,43 @@ class Parse(object):
             grandparent.downs.append((rel, t))
             grandparent.downs.sort(key=lambda (dep, child): child.index)
 
+        # Break up compounds of the form (determiner) (noun) (direction) (PP).
+        #
+        #   "What is the bathroom east of?"
+        for t in self.tokens:
+            rel, parent = t.up
+            if parent is None:
+                continue
+            if rel != 'compound':
+                continue
+            parent_rel, grandparent = parent.up
+            if grandparent is None:
+                continue
+
+            # Some generic relation for nouns that won't break surface recog.
+            guess_rel = 'nsubj'
+
+            # Give the child of the "compound" relation to its grandparent.
+            for i, (_, child) in enumerate(parent.downs):
+                if child.index == t.index:
+                    del parent.downs[i]
+                    break
+            t.up = (guess_rel, grandparent)
+            grandparent.downs.append((guess_rel, t))
+            grandparent.downs.sort(key=lambda (dep, child): child.index)
+
+            # Reassign its parent's det to it.
+            det = None
+            for i, (rel, down) in enumerate(parent.downs):
+                if rel == 'det':
+                    det = down
+                    del parent.downs[i]
+                    break
+            if not det:
+                continue
+            t.downs.append(('det', det))
+            t.downs.sort(key=lambda (dep, child): child.index)
+
         # Prepositional phrase attachment: should be owned by another arg.
         #
         #   "The hallway is south of the bedroom."
