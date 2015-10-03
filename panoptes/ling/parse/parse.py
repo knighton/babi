@@ -128,8 +128,11 @@ class Parse(object):
         for i in xrange(len(self.tokens) - 1):
             this = self.tokens[i]
             right = self.tokens[i + 1]
-            if not (this.tag == 'NN' and right.tag == 'IN'):
+            directions = ['north', 'south', 'east', 'west']
+            if not (this.text in directions and right.tag == 'IN'):
                 continue
+            if this.tag != 'NN':
+                this.tag = 'NN'
 
             if right.text != 'of':
                 continue
