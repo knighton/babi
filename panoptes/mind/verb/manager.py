@@ -3,7 +3,7 @@ from collections import defaultdict
 from panoptes.mind.verb.be import AgentIsTarget, AgentTargetQuestion, \
     AgentPlaceBeforeQuestion, AgentPlaceQuestion, AgentIn, AgentInQuestion
 from panoptes.mind.verb.carry import Bring, CarryingWhatQuestion, Drop, PickUp
-from panoptes.mind.verb.go import GoTo, GoToAfter, GoToAt
+from panoptes.mind.verb.go import GoTo, GoToAfter, GoToAt, HowGoFromToQuestion
 from panoptes.mind.verb.give import Give, GiveQuestion
 
 
@@ -19,11 +19,13 @@ class VerbSemanticsManager(object):
             AgentIn(),
             AgentInQuestion(),
 
-            Bring(),
-            Drop(),
             GoTo(),
             GoToAfter(),
             GoToAt(),
+            HowGoFromToQuestion(),
+
+            Bring(),
+            Drop(),
             PickUp(),
             CarryingWhatQuestion(),
 

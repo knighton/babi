@@ -62,3 +62,26 @@ class Graph(object):
             if link_direction == direction:
                 rr.append(to_x)
         return rr
+
+    def sub_decide_path(self, from_x, to_x, visited):
+        if from_x == to_x:
+            return []
+
+        node = self.get(from_x)
+        best_path = None
+        for direction, next_x in node.links:
+            if next_x in visited:
+                continue
+            path = self.sub_decide_path(
+                next_x, to_x, visited + [from_x])
+            if path is None:
+                continue
+            path = [direction] + path
+            if best_path is None or len(path) < len(best_path):
+                best_path = path
+        return best_path
+
+    def decide_path(self, from_x, to_x):
+        path = self.sub_decide_path(from_x, to_x, [])
+        path = map(lambda s: self.direction2inverse[s], path)
+        return path
