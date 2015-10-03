@@ -97,6 +97,20 @@ class SurfaceCommonNoun(SurfaceArgument):
                 count += 1
         assert count in (0, 1)
 
+    def is_sentient(self):
+        """
+        -> bool
+
+        Our personhood matters to the relative pronouns of our child relative
+        clauses.
+
+        Noun is always present when the object has children.
+
+        Eg, "the dog [that] saw you" but "the boy [who] saw you"
+        """
+        assert self.noun
+        return is_noun_sentient(self.noun)
+
     # --------------------------------------------------------------------------
     # From base.
 
@@ -153,19 +167,19 @@ class SurfaceCommonNoun(SurfaceArgument):
     # --------------------------------------------------------------------------
     # From surface.
 
-    def is_sentient(self):
-        """
-        -> bool
+    def has_hole(self):
+        for p, n in self.preps_nargs:
+            if not n:
+                return True
+        return False
 
-        Our personhood matters to the relative pronouns of our child relative
-        clauses.
+    def put_fronted_arg_back(self, what):
+        for i, (p, n) in enumerate(self.preps_nargs):
+            if not n:
+                self.preps_nargs[i][1] = what
+                return
 
-        Noun is always present when the object has children.
-
-        Eg, "the dog [that] saw you" but "the boy [who] saw you"
-        """
-        assert self.noun
-        return is_noun_sentient(self.noun)
+        assert False
 
     def decide_conjugation(self, state, idiolect, context):
         return self.say_head(state, idiolect, context).conjugation

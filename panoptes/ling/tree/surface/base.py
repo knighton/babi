@@ -81,6 +81,29 @@ class SurfaceArgument(BaseArgument):
     An argument in surface structure.
     """
 
+    def has_hole(self):
+        """
+        -> bool
+
+        Whether we contain a hole left by an internal that was fronted,  Used by
+        deep recog.  Only possible with 'complex' arguments like noun phrases.
+
+        Example: "What are you east of?"
+        """
+        return False
+
+    def put_fronted_arg_back(self, n):
+        """
+        ->
+
+        Put an internal that was extracted to be the fronted argument back into
+        its original position.  Used by deep recog.  Only call this if
+        has_hole() is True.
+
+        Example: "What are you east of?" -> east of [what]
+        """
+        assert False
+
     def decide_conjugation(self, state, idiolect, context):
         """
         SayState, Idiolect, SayContext -> Conjugation or None

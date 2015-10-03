@@ -26,6 +26,13 @@ class SurfaceDirection(SurfaceArgument):
     # --------------------------------------------------------------------------
     # From surface.
 
+    def has_hole(self):
+        return not self.of
+
+    def put_fronted_arg_back(self, of):
+        assert not self.of
+        self.of = of
+
     def decide_conjugation(self, state, idiolect, context):
         return Conjugation.S3
 
