@@ -4,6 +4,7 @@ from panoptes.ling.glue.grammatical_number import N2, N3, N5, \
     nx_le_nx_is_possible, nx_to_nx
 from panoptes.ling.glue.inflection import Conjugation, N2_TO_CONJ
 from panoptes.ling.glue.magic_token import POSSESSIVE_MARK
+from panoptes.ling.tree.common.number import Number
 from panoptes.ling.tree.common.util.selector import Selector
 from panoptes.ling.tree.surface.base import SayContext, SurfaceArgument
 
@@ -61,8 +62,8 @@ class SurfaceCommonNoun(SurfaceArgument):
         # grammatical clues about number above.
         self.number = number
         if self.number:
-            assert False  # NOTE: not in demo.
-            assert self.selector.accepts_count_or_amount(self.number)
+            assert isinstance(self.number, Number)
+            #assert self.selector.accepts_count_or_amount(self.number)  TODO
 
         # List of restrictive or descriptive attributes.
         self.attributes = attributes

@@ -21,7 +21,6 @@ class DeepCommonNoun(DeepArgument):
         assert isinstance(self.selector, Selector)
 
         self.number = number
-        assert not self.number  # NOTE: not in demo.
 
         self.attributes = attributes
         assert isinstance(self.attributes, list)

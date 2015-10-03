@@ -9,6 +9,7 @@ from panoptes.ling.glue.magic_token import A_OR_AN
 from panoptes.ling.glue.purpose import EndPunctClassifier
 from panoptes.ling.parse.parse import Parse
 from panoptes.ling.tree.common.existential_there import ExistentialThere
+from panoptes.ling.tree.common.number import Number
 from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun, \
     PersonalPronounCase
 from panoptes.ling.tree.common.proper_noun import ProperNoun
@@ -171,6 +172,31 @@ class ParseToSurface(object):
         p_n = (None, ExistentialThere())
         return [p_n]
 
+    def recog_how_many_nn(self, root_token, noun, n2):
+        many = None
+        for rel, child in root_token.downs:
+            if rel == 'amod' and child.text in ('few', 'many'):
+                    many = child
+                    break
+
+        if not many:
+            return []
+
+        how = None
+        for rel, child in many.downs:
+            if rel == 'advmod' and child.text == 'how':
+                how = child
+
+        number = Number(None)
+
+        correlative = Correlative.INTR
+        count_restriction = self.det_pronoun_mgr.cor2res_gno[correlative][0]
+        selector = Selector.from_correlative(correlative, count_restriction)
+        assert selector
+
+        n = SurfaceCommonNoun(selector=selector, number=number, noun=noun)
+        return [(None, n)]
+
     def recog_dt_nn(self, root_token, noun, gram_n2):
         deps_childs = filter(lambda (d, c): d == 'det', root_token.downs)
 
@@ -229,7 +255,8 @@ class ParseToSurface(object):
         return pp_nn
 
     def recog_common_noun(self, root_token, noun, n2):
-        pp_nn = self.recog_dt_nn(root_token, noun, n2)
+        pp_nn = self.recog_how_many_nn(root_token, noun, n2)
+        pp_nn += self.recog_dt_nn(root_token, noun, n2)
         pp_nn += self.recog_posdet_nn(root_token, noun, n2)
         pp_nn += self.recog_shortcut(root_token)
         return pp_nn
