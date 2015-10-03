@@ -84,7 +84,7 @@ class English(object):
 
         keys = set()
         keys_ssens = []
-        for parse in self.text_to_parse.parse(text):
+        for parse in parses:
             for ssen in self.parse_to_surface.recog(parse):
                 key = json.dumps(ssen.dump(), indent=4, sort_keys=True)
                 if key in keys:
