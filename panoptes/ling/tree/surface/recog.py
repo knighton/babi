@@ -243,8 +243,13 @@ class ParseToSurface(object):
         if dep != 'prep':
             return []
 
-        if len(child.downs) != 1:
+        if child.text != 'of':
             return []
+
+        # Eg, "what is the castle [east of _]?"
+        if len(child.downs) != 1:
+            n = SurfaceDirection(root_token.text, None)
+            return [(None, n)]
 
         dep, child = child.downs[0]
 
