@@ -146,6 +146,9 @@ class SurfaceCommonNoun(SurfaceArgument):
         if self.selector.is_interrogative():
             return True
 
+        if self.number and self.number.is_interrogative():
+            return True
+
         if self.possessor:
             if self.possessor.is_interrogative():
                 return True
