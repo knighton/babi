@@ -85,6 +85,32 @@ class Parse(object):
             grandparent.downs.append((rel, t))
             grandparent.downs.sort(key=lambda (dep, child): child.index)
 
+        # Prepositional phrase attachment: should be owned by another arg.
+        #
+        #   "The hallway is south of the bedroom."
+        for i in xrange(len(self.tokens) - 1):
+            this = self.tokens[i]
+            right = self.tokens[i + 1]
+            if not (this.tag == 'NN' and right.tag == 'IN'):
+                continue
+
+            if right.text != 'of':
+                continue
+
+            rel, parent = right.up
+            if parent.index == this.index:
+                continue
+
+            for i, (_, child) in enumerate(parent.downs):
+                if child.index == right.index:
+                    del parent.downs[i]
+                    break
+
+            right.up = (rel, this)
+
+            this.downs.append((rel, right))
+            this.downs.sort(key=lambda (rel, child): child.index)
+
         # Prepositional phrase attachment: should be its own arg.
         #
         #   "Where was the apple before the beach?"
