@@ -35,7 +35,57 @@ class Parse(object):
             if token.tag == 'XX':
                 return None
 
-        # Prepositional phrase attachment.
+        # We don't like adverbial phrases.  We do like prepositional phrases as
+        # verb arguments.
+        #
+        #   "Mary went back to the garden."
+        #
+        # Got
+        #
+        #   went -> back -> to -> garden -> the
+        #
+        # Want
+        #
+        #   * went -> back
+        #   * went -> to -> garden -> the
+        for t in self.tokens:
+            # We want to transform
+            #
+            #   verb -advmod-> adverb -prep-> prep
+            #
+            # into
+            #
+            #   verb -advmod-> adverb
+            #   verb -prep-> prep
+
+            # Do the checks.
+            if t.tag != 'IN':
+                continue
+            rel, parent = t.up
+            if rel != 'prep':
+                continue
+            if parent is None:
+                continue
+            if parent.tag != 'RB':
+                continue
+            parent_rel, grandparent = parent.up
+            if parent_rel != 'advmod':
+                continue
+            if grandparent is None:
+                continue
+            if not grandparent.tag.startswith('V'):
+                continue
+
+            # Do the tree surgery.
+            for i, (_, child) in enumerate(parent.downs):
+                if child.index == t.index:
+                    del parent.downs[i]
+                    break
+            t.up = (rel, grandparent)
+            grandparent.downs.append((rel, t))
+            grandparent.downs.sort(key=lambda (dep, child): child.index)
+
+        # Prepositional phrase attachment: should be its own arg.
         #
         #   "Where was the apple before the beach?"
         for t in self.tokens:
@@ -57,26 +107,6 @@ class Parse(object):
                     break
             parent.up = (rel, grandparent)
             grandparent.downs.append((rel, t))
-            grandparent.downs.sort(key=lambda (dep, child): child.index)
-
-        # Handle verb args descended from an advmod relation.
-        #
-        #   "Mary went back to the garden."
-        for t in self.tokens:
-            up_dep, parent = t.up
-            if parent is None:
-                continue
-            parent_up_dep, grandparent = parent.up
-            if grandparent is None:
-                continue
-            if parent_up_dep != 'advmod':
-                continue
-            for i, (_, child) in enumerate(parent.downs):
-                if child.index == t.index:
-                    del parent.downs[i]
-                    break
-            parent.up = (up_dep, grandparent)
-            grandparent.downs.append((up_dep, t))
             grandparent.downs.sort(key=lambda (dep, child): child.index)
 
         # Handle verb args descended from an aux relation.
@@ -122,6 +152,7 @@ class Parse(object):
     def dump(self):
         print 'Parse {'
 
+        print '   ',
         for t in self.tokens:
             print '%d=%s/%s' % (t.index, t.text, t.tag),
         print
@@ -132,6 +163,6 @@ class Parse(object):
             return ' '.join(map(str, [rel, parent]))
 
         for t in self.tokens:
-            print fix(t.up), '->', t.index, '->', map(fix, t.downs)
+            print '   ', fix(t.up), '->', t.index, '->', map(fix, t.downs)
 
         print '}'
