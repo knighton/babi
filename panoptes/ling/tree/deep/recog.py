@@ -36,7 +36,7 @@ class SurfaceToDeep(object):
         self.relation_mgr = relation_mgr
         assert isinstance(self.relation_mgr, RelationManager)
 
-        self.type2do = {
+        self.type2recog = {
             'SurfaceCommonNoun': self.recog_common_noun,
             'SurfaceDirection': self.recog_surface_direction,
         }
@@ -97,20 +97,21 @@ class SurfaceToDeep(object):
 
         rr = hallu_preps_vargs[:front_argx]
         rr.append(hallu_preps_vargs[subj_argx])
-        found = False
+        used_fronted = False
         for i in xrange(subj_argx + 1, len(hallu_preps_vargs)):
             prep, arg = hallu_preps_vargs[i]
             if arg:
-                rr.append([prep, arg])
-                continue
-
-            arg = fronted_arg
-            stranded_prep = prep
-            prep = self.decide_prep(fronted_prep, stranded_prep)
+                if arg.has_hole():
+                    arg.put_fronted_arg_back(fronted_arg)
+                    used_fronted = True
+            else:
+                assert not used_fronted
+                arg = fronted_arg
+                stranded_prep = prep
+                prep = self.decide_prep(fronted_prep, stranded_prep)
             rr.append([prep, arg])
-            found = True
 
-        if not found:
+        if not used_fronted:
             rr.append([fronted_prep, fronted_arg])
 
         return rr, subj_argx - 1
@@ -126,7 +127,7 @@ class SurfaceToDeep(object):
             return [arg]
 
         key = arg.__class__.__name__
-        return self.type2do[key](arg)
+        return self.type2recog[key](arg)
 
     def recog_content_clause(self, c, context):
         """
