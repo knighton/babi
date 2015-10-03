@@ -431,15 +431,13 @@ class ParseToSurface(object):
         adverbs = []
         for rel, t in root_token.downs:
             if rel not in ('nsubj', 'nsubjpass', 'agent', 'dobj', 'dative',
-                           'expl', 'attr', 'advmod', 'prep', 'compound', 'neg'):
-                continue
-
-            if rel == 'neg':
-                if t.text == 'no':
-                    adverbs.append(t.text)
+                           'expl', 'attr', 'advmod', 'prep', 'compound'):
                 continue
 
             if rel == 'advmod':
+                for rel, down in t.downs:
+                    if down.text == 'no':
+                        adverbs.append(down.text)
                 if t.text == 'longer':
                     adverbs.append(t.text)
                     continue
