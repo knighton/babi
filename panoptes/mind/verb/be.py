@@ -50,7 +50,29 @@ class AgentTargetQuestion(ClauseMeaning):
         target = memory.ideas[target_x]
         if isinstance(agent, Direction) and isinstance(target, Noun):
             if target.identity == Identity.REQUESTED:
-                xx = memory.graph.what_is_direction_of(agent.of_x, agent.which)
+                xx = memory.graph.look_toward_direction(agent.of_x, agent.which)
+                rr = []
+                for x in xx:
+                    idea = memory.ideas[x]
+                    if idea.name:
+                        r = ' '.join(idea.name)
+                    elif idea.kind:
+                        r = idea.kind
+                    else:
+                        return None
+                    rr.append(r)
+
+                if not rr:
+                    return Response('nothing')
+
+                r = ','.join(rr)
+                return Response(r)
+            else:
+                return None
+        elif isinstance(agent, Noun) and isinstance(target, Direction):
+            of = memory.ideas[target.of_x]
+            if of.identity == Identity.REQUESTED:
+                xx = memory.graph.look_from_direction(agent_x, target.which)
                 rr = []
                 for x in xx:
                     idea = memory.ideas[x]

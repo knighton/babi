@@ -46,8 +46,16 @@ class Graph(object):
         to_node = self.get(to_x)
         to_node.add_link(inverse_direction, from_x)
 
-    def what_is_direction_of(self, from_x, direction):
+    def look_toward_direction(self, from_x, direction):
         direction = self.direction2inverse[direction]
+        node = self.get(from_x)
+        rr = []
+        for link_direction, to_x in node.links:
+            if link_direction == direction:
+                rr.append(to_x)
+        return rr
+
+    def look_from_direction(self, from_x, direction):
         node = self.get(from_x)
         rr = []
         for link_direction, to_x in node.links:
