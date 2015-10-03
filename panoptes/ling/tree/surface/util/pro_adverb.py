@@ -4,7 +4,7 @@ from panoptes.etc.dicts import v2k_from_k2vv, v2kk_from_k2v
 from panoptes.etc.enum import enum
 from panoptes.ling.glue.grammatical_number import N2, nx_to_nx
 from panoptes.ling.glue.inflection import N2_TO_CONJ
-from panoptes.ling.glue.magic_token import PLACE_PREP, TIME_PREP
+from panoptes.ling.glue.magic_token import PLACE_PREP, TIME_PREP, WAY_PREP
 from panoptes.ling.tree.common.util.selector import Correlative, \
     CountRestriction, Selector
 from panoptes.ling.tree.surface.base import SayResult
@@ -137,6 +137,7 @@ class ProAdverbManager(object):
         self.noun2hallucinate_prep = {
             'place': (PLACE_PREP,),
             'time':  (TIME_PREP,),
+            'way': (WAY_PREP,),
         }
 
         # Correlative -> (count restriction if possible, grammatical number

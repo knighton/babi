@@ -65,7 +65,6 @@ GO_LEMMAS = ['go', 'journey', 'move', 'travel']
 
 
 def go_common(c, memory, agent_xx, to_xx):
-    print 'EVAL', 'handle go', agent_xx, to_xx
     if len(to_xx) != 1:
         return None
 
@@ -151,6 +150,17 @@ class PickUp(ClauseMeaning):
         return Response()
 
 
+def str_from_int(n):
+    return {
+        0: 'none',
+        1: 'one',
+        2: 'two',
+        3: 'three',
+        4: 'four',
+        5: 'five',
+    }[n]
+
+
 class CarryingWhatQuestion(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.WH_Q
@@ -169,9 +179,9 @@ class CarryingWhatQuestion(ClauseMeaning):
         agent = memory.ideas[agent_xx[0]]
         what = memory.ideas[what_xx[0]]
 
-        if agent.query == Query.IDENTITY:
+        if agent.query:
             return None
-        elif what.query == Query.IDENTITY:
+        elif what.query in (Query.CARDINALITY, Query.IDENTITY):
             pass
         else:
             assert False
@@ -181,8 +191,13 @@ class CarryingWhatQuestion(ClauseMeaning):
             n = memory.ideas[x]
             rr.append(n.kind)
 
-        if rr:
-            s = ','.join(rr)
-            return Response(s)
+        if what.query == Query.CARDINALITY:
+            s = str_from_int(len(rr))
+        elif what.query == Query.IDENTITY:
+            if rr:
+                s = ','.join(rr)
+            else:
+                s = 'nothing'
         else:
-            return Response('nothing')
+            assert False
+        return Response(s)

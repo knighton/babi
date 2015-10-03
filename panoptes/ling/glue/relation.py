@@ -2,7 +2,7 @@ from collections import defaultdict
 import yaml
 
 from panoptes.etc.enum import enum
-from panoptes.ling.glue.magic_token import PLACE_PREP, TIME_PREP
+from panoptes.ling.glue.magic_token import PLACE_PREP, TIME_PREP, WAY_PREP
 
 
 RELATION_TEXT = """
@@ -65,6 +65,12 @@ RELATION_TEXT = """
     order: 10
     preps:
       - <TIME_PREP> INERT
+
+  - relation: WAY
+    core: OBLIQUE
+    order: 10
+    preps:
+      - <WAY_PREP> INERT
 
   - relation: OF
     core: OBLIQUE
@@ -151,7 +157,11 @@ RELATION_TEXT = """
       - because of INERT
       - because FINITE_CLAUSE
       - since FINITE_CLAUSE
-""".replace('<PLACE_PREP>', PLACE_PREP).replace('<TIME_PREP>', TIME_PREP)
+"""
+
+RELATION_TEXT = RELATION_TEXT.replace('<PLACE_PREP>', PLACE_PREP)
+RELATION_TEXT = RELATION_TEXT.replace('<TIME_PREP>', TIME_PREP)
+RELATION_TEXT = RELATION_TEXT.replace('<WAY_PREP>', WAY_PREP)
 
 
 def make_relation_enum(relation_text):

@@ -13,11 +13,24 @@ class Give(ClauseMeaning):
         ]
 
     def handle(self, c, memory, (give_xx, recv_xx, what_xx)):
-        if len(give_xx) != 1:
-            return None
-
         if len(recv_xx) != 1:
             return None
+
+        for give_x in give_xx:
+            giver = memory.ideas[give_x]
+            giver.carrying = filter(lambda x: x not in what_xx, giver.carrying)
+
+        for recv_x in recv_xx:
+            receiver = memory.ideas[recv_x]
+            receiver.carrying += what_xx
+
+            xx = []
+            seen = set()
+            for x in receiver.carrying:
+                if x in seen:
+                    continue
+                xx.append(x)
+            receiver.carrying = xx
 
         return Response()
 

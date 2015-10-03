@@ -145,15 +145,23 @@ class Memory(object):
 
     def decode_common_noun(self, deep_ref, from_xx, to_xx):
         n = deep_ref.arg
+
         assert not n.possessor
+        assert not n.attributes
+        assert not n.rels_nargs
+
+        if n.number and n.number.is_interrogative():
+            assert n.selector.correlative == Correlative.INDEF
+            idea = Noun(query=Query.CARDINALITY, selector=n.selector,
+                        kind=n.noun)
+            x = self.add_idea(idea)
+            return [x]
+
         assert n.selector.correlative in [
             Correlative.DEF,
             Correlative.DIST,
             Correlative.INTR,
         ]
-
-        assert not n.attributes
-        assert not n.rels_nargs
 
         if n.selector.correlative == Correlative.INTR:
             idea = Noun(query=Query.IDENTITY, selector=n.selector,
