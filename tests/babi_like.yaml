@@ -56,6 +56,12 @@
       - in: The bedroom is west of the bathroom.
       - in: What is the bathroom east of?
         out: bedroom
+  - name: task4_another_stranded
+    pairs:
+      - in: The hallway is west of the bedroom.
+      - in: The bedroom is west of the bathroom.
+      - in: What is the bedroom east of?
+        out: hallway
   - name: task5_give
     pairs:
       - in: Fred gave the football to Jeff.
