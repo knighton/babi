@@ -4,7 +4,7 @@ from panoptes.ling.glue.inflection import InflectionManager
 from panoptes.ling.glue.purpose import PurposeManager
 from panoptes.ling.glue.relation import RelationManager
 from panoptes.ling.join.joiner import Joiner
-from panoptes.ling.morph.plural import PluralManager
+from panoptes.ling.morph.plural.plural import PluralManager
 from panoptes.ling.parse.parser import Parser as TextToParse
 from panoptes.ling.tree.deep.base import TransformState
 from panoptes.ling.tree.deep.recog import SurfaceToDeep

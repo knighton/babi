@@ -1,4 +1,4 @@
-from panoptes.ling.morph.plural import PluralManager
+from panoptes.ling.morph.plural.plural import PluralManager
 
 
 def main():
