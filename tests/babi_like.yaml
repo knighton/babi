@@ -169,7 +169,7 @@
       - in: Afterwards he moved to the bedroom.
       - in: Where is Sandra?
         out: bedroom
-  - name: task19
+  - name: task19_normal
     pairs:
       - in: The garden is west of the bathroom.
       - in: The bedroom is north of the hallway.
@@ -178,3 +178,12 @@
       - in: The kitchen is east of the bedroom.
       - in: How do you go from the bathroom to the hallway?
         out: s,s
+  - name: task19_misparsed
+    pairs:
+      - in: The hallway is south of the bathroom.
+      - in: The kitchen is west of the garden.
+      - in: The kitchen is south of the bedroom.
+      - in: The office is north of the bedroom.
+      - in: The bedroom is east of the bathroom.
+      - in: How do you go from the kitchen to the bathroom?
+        out: n,w
