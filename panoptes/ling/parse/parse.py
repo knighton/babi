@@ -85,6 +85,41 @@ class Parse(object):
             grandparent.downs.append((rel, t))
             grandparent.downs.sort(key=lambda (dep, child): child.index)
 
+        # Usually, preps don't descend from other preps.  If spacy gives us
+        # that, attach the child prep to its grandparent instead.
+        for t in self.tokens:
+            # Transform
+            #
+            #   verb -prep-> IN-1 -prep-> IN-2
+            #
+            # into
+            #
+            #   verb -prep-> IN-1
+            #   verb -prep-> IN-2
+            if t.tag != 'IN':
+                continue
+            rel, parent = t.up
+            if rel != 'prep':
+                continue
+            if parent is None:
+                continue
+            if parent.tag != 'IN':
+                continue
+            parent_rel, grandparent = parent.up
+            if grandparent is None:
+                continue
+            if parent_rel != 'prep':
+                continue
+
+            # Do the surgery.
+            for i, (_, child) in enumerate(parent.downs):
+                if child.index == t.index:
+                    del parent.downs[i]
+                    break
+            t.up = (rel, grandparent)
+            grandparent.downs.append((rel, t))
+            grandparent.downs.sort(key=lambda (dep, child): child.index)
+
         # Break up compounds of the form (determiner) (noun) (direction) (PP).
         #
         #   "What is the bathroom east of?"
