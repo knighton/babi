@@ -1,3 +1,4 @@
+-1000000 negative one million
 -5 negative five
 -4 negative four
 -1 negative one
@@ -18,4 +19,5 @@
 1000 one thousand
 99999 ninety nine thousand nine hundred ninety nine
 100000 one hundred thousand
+1100010 one million one hundred thousand ten
 1234567 one million two hundred thirty four thousand five hundred sixty seven
