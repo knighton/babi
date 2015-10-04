@@ -151,7 +151,7 @@ class ReceiveQuestion(ClauseMeaning):
         # give_to_recip_xx = recv_xx
         if receiver.query == Query.IDENTITY:
             give_rel2xx = {
-                Relation.TARGET: target_xx,
+                Relation.TARGET: what_xx,
             }
             if source:
                 give_rel2xx[Relation.AGENT] = source_xx
