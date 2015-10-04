@@ -248,3 +248,13 @@ class ClauseView(object):
 
         self.possible_lemmas = set(possible_lemmas)
         self.rel2xx = rel2xx
+
+    def dump(self):
+        rel2xx = {}
+        for rel, xx in self.rel2xx.iteritems():
+            rel = Relation.to_str[rel]
+            rel2xx[rel] = xx
+        return {
+            'possible_lemmas': sorted(self.possible_lemmas),
+            'rel2xx': rel2xx,
+        }
