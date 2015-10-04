@@ -11,6 +11,7 @@ from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
 from panoptes.ling.tree.deep.direction import DeepDirection
+from panoptes.ling.tree.deep.logic import DeepAnd
 from panoptes.mind.graph import Graph
 from panoptes.mind.idea import Clause, ClauseView, Query, Noun, NounView, \
     NounReverb, idea_from_view, Direction
@@ -55,6 +56,7 @@ class Memory(object):
         self.ideas = []
 
         self.type2decode = {
+            DeepAnd: self.decode_and,
             DeepCommonNoun: self.decode_common_noun,
             DeepContentClause: self.decode_content_clause,
             DeepDirection: self.decode_direction,
@@ -142,6 +144,15 @@ class Memory(object):
                 return i
 
         return None
+
+    def decode_and(self, deep_ref, from_xx, to_xx):
+        xx = []
+        for a in deep_ref.arg.aa:
+            sub_deep_ref = DeepReference(
+                owning_clause_id=deep_ref.owning_clause_id,
+                is_subj=deep_ref.is_subj, arg=a)
+            xx += self.decode(sub_deep_ref, from_xx, to_xx)
+        return sorted(set(xx))
 
     def decode_common_noun(self, deep_ref, from_xx, to_xx):
         n = deep_ref.arg

@@ -8,6 +8,7 @@ from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
 from panoptes.ling.tree.deep.content_clause import DeepContentClause, Status
 from panoptes.ling.tree.deep.direction import DeepDirection
+from panoptes.ling.tree.deep.logic import DeepAnd
 from panoptes.ling.tree.deep.sentence import DeepSentence
 from panoptes.ling.tree.surface.sentence import SurfaceSentence
 from panoptes.ling.verb.verb import ModalFlavor, Voice
@@ -37,9 +38,23 @@ class SurfaceToDeep(object):
         assert isinstance(self.relation_mgr, RelationManager)
 
         self.type2recog = {
+            'SurfaceAnd': self.recog_and,
             'SurfaceCommonNoun': self.recog_common_noun,
             'SurfaceDirection': self.recog_surface_direction,
         }
+
+    def recog_and(self, n):
+        nnn = []
+        for a in n.aa:
+            nn = self.recog_arg(a)
+            nnn.append(nn)
+
+        rr = []
+        for nn in product(*nnn):
+            r = DeepAnd(nn)
+            rr.append(r)
+
+        return rr
 
     def recog_common_noun(self, n):
         if n.possessor:

@@ -19,6 +19,7 @@ from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
 from panoptes.ling.tree.surface.content_clause import Complementizer, \
     SurfaceContentClause
 from panoptes.ling.tree.surface.direction import SurfaceDirection
+from panoptes.ling.tree.surface.logic import SurfaceAnd
 from panoptes.ling.tree.surface.sentence import SurfaceSentence
 from panoptes.ling.verb.annotation import annotate_as_aux
 from panoptes.ling.verb.verb import ModalFlavor
@@ -387,19 +388,41 @@ class ParseToSurface(object):
 
         Returns None if we reject (do not recognize as an arg) the arg.
         """
-        f = self.tag2recognize_arg.get(root_token.tag)
-        if f:
-            return f(root_token)
+        while True:
+            f = self.tag2recognize_arg.get(root_token.tag)
+            if f:
+                rr = f(root_token)
+                break
 
-        f = self.tag2recognize_prep_arg.get(root_token.tag)
-        if f:
-            return f(root_token)
+            f = self.tag2recognize_prep_arg.get(root_token.tag)
+            if f:
+                rr = f(root_token)
+                break
 
-        if root_token.tag in self.invalid_verb_arg_root_tags:
-            return []
+            if root_token.tag in self.invalid_verb_arg_root_tags:
+                rr = []
+                break
 
-        print 'Unknown tag:', root_token.tag
-        assert False
+            print 'Unknown tag:', root_token.tag
+            assert False
+
+        if not rr:
+            return rr
+
+        for rel, child in root_token.downs:
+            if rel == 'conj':
+                # TODO: generalize this later.
+                other_pp_nn = self.recognize_verb_arg(child)
+                if not other_pp_nn:
+                    return other_pp_nn
+                rr2 = []
+                for prep, n in rr:
+                    for other_prep, other_n in other_pp_nn:
+                        r2 = prep, SurfaceAnd([n, other_n])
+                        rr2.append(r2)
+                return rr2
+
+        return rr
 
     def find_subject(self, verb_span_pair, varg_root_indexes):
         """
