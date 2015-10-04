@@ -73,6 +73,12 @@
         out: Jeff
       - in: Who gave the football?
         out: Fred
+  - name: task5_pass
+    pairs:
+      - in: Jeff passed the apple to Fred.
+      - in: Jeff went back to the hallway.
+      - in: What did Jeff give to Fred?
+        out: apple
 # doesn't recognize tag = TO
 #      - in: To whom did Fred give the football?
 #        out: Jeff

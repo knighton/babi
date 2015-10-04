@@ -38,7 +38,7 @@ class Give(ClauseMeaning):
 class GiveQuestion(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.WH_Q
-        self.lemmas = ['give', 'hand']
+        self.lemmas = ['give', 'hand', 'pass']
         self.signatures = [
             [Relation.AGENT, Relation.TO_RECIPIENT, Relation.TARGET],
             [Relation.AGENT, None,                  Relation.TARGET],
