@@ -181,6 +181,12 @@
       - in: Sandra and Mary journeyed to the bedroom.
       - in: Where is Mary?
         out: bedroom
+  - name: task13
+    pairs:
+      - in: John and Mary went back to the hallway.
+      - in: Then they went to the bathroom.
+      - in: Where is John?
+        out: bathroom
   - name: task19_normal
     pairs:
       - in: The garden is west of the bathroom.
