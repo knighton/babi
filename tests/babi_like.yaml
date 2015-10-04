@@ -82,12 +82,13 @@
 # doesn't recognize tag = TO
 #      - in: To whom did Fred give the football?
 #        out: Jeff
-#  - name: task5_receive
-#      - in: Fred gave the football to Jeff.
-#      - in: What did Jeff receive?
-#        out: football
-#      - in: What did Jeff receive from Fred?
-#        out: football
+  - name: task5_receive
+    pairs:
+      - in: Fred gave the football to Jeff.
+      - in: What did Jeff receive?
+        out: football
+      - in: What did Jeff receive from Fred?
+        out: football
   - name: task7
     pairs:
       - in: Mary got the milk there.

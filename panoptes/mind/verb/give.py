@@ -4,10 +4,13 @@ from panoptes.mind.idea import ClauseView, Query
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
 
+GIVE_LEMMAS = ['give', 'hand', 'pass']
+
+
 class Give(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.INFO
-        self.lemmas = ['give', 'hand', 'pass']
+        self.lemmas = GIVE_LEMMAS
         self.signatures = [
             [Relation.AGENT, Relation.TO_RECIPIENT, Relation.TARGET],
         ]
@@ -38,7 +41,7 @@ class Give(ClauseMeaning):
 class GiveQuestion(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.WH_Q
-        self.lemmas = ['give', 'hand', 'pass']
+        self.lemmas = GIVE_LEMMAS
         self.signatures = [
             [Relation.AGENT, Relation.TO_RECIPIENT, Relation.TARGET],
             [Relation.AGENT, None,                  Relation.TARGET],
@@ -106,4 +109,81 @@ class GiveQuestion(ClauseMeaning):
         elif n.kind:
             return Response(n.kind)
         else:
-            return Response('wtf')
+            return Response('cat got my tongue')
+
+
+RECEIVE_LEMMAS = ['receive']
+
+
+class ReceiveQuestion(ClauseMeaning):
+    def __init__(self):
+        self.purpose = Purpose.WH_Q
+        self.lemmas = RECEIVE_LEMMAS
+        self.signatures = [
+            [Relation.AGENT, Relation.TARGET, Relation.FROM_SOURCE],
+            [Relation.AGENT, Relation.TARGET, None],
+        ]
+
+    def handle(self, c, memory, (recv_xx, what_xx, source_xx)):
+        if len(recv_xx) != 1:
+            return None
+
+        if source_xx and len(source_xx) != 1:
+            return None
+
+        receiver = memory.ideas[recv_xx[0]]
+        what = memory.ideas[what_xx[0]]
+        source = memory.ideas[source_xx[0]] if source_xx else None
+
+        q_count = 0
+        if receiver.query:
+            q_count += 1
+        if what.query:
+            q_count += 1
+        if source and source.query:
+            q_count += 1
+
+        if q_count != 1:
+            return None
+
+        if receiver.query == Query.IDENTITY:
+            rel2xx = {
+                Relation.TARGET: target_xx,
+            }
+            if source:
+                rel2xx[Relation.FROM_SOURCE] = source_xx
+            want_rel = Relation.AGENT
+        elif what.query == Query.IDENTITY:
+            rel2xx = {
+                Relation.AGENT: recv_xx,
+            }
+            if source:
+                rel2xx[Relation.FROM] = source_xx
+            want_rel = Relation.TARGET
+        elif source and source.query == Query.IDENTITY:
+            rel2xx = {
+                Relation.AGENT: recv_xx,
+                Relation.TARGET: what_xx,
+            }
+            want_rel = Relation.FROM
+        else:
+            assert False
+
+        view = ClauseView(possible_lemmas=self.lemmas, rel2xx=rel2xx)
+        x = memory.resolve_one_clause(view)
+        if x is None:
+            return Response('dunno')
+
+        c = memory.ideas[x]
+        xx = c.rel2xx[want_rel]
+        if len(xx) != 1:
+            return None
+
+        x, = xx
+        n = memory.ideas[x]
+        if n.name:
+            return Respnose(' '.join(n.name))
+        elif n.kind:
+            return Response(n.kind)
+        else:
+            return Response('cat got my tongue')
