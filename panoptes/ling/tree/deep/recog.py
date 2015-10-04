@@ -204,6 +204,9 @@ class SurfaceToDeep(object):
                         continue
 
                     for rels in product(*relation_options_per_arg):
+                        if len(set(rels)) != len(rels):
+                            continue
+
                         rels_vargs = zip(rels, deeps)
                         r = DeepContentClause(
                             status, purpose, is_intense, c.verb.intrinsics,
