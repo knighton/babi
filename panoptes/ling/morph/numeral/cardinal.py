@@ -1,15 +1,13 @@
 import math
 
 from panoptes.ling.morph.numeral.base import NumeralManager
-from panoptes.ling.morph.numeral.util import make_special_mapping
 
 
 class CardinalManager(object):
     def __init__(self):
-        self.special_n2s, self.special_s2n = make_special_mapping(0, """
-            zero one two three four five six seven eight nine ten eleven twelve
-            thirteen fourteen fifteen sixteen seventeen eighteen
-            nineteen""".split())
+        self.one_names = """zero one two three four five six seven eight nine
+            ten eleven twelve thirteen fourteen fifteen sixteen seventeen
+            eighteen nineteen""".split()
 
         self.ten_names = [None, None] + """twenty thirty fourty fifty sixty
             seventy eighty ninety""".split()
@@ -31,7 +29,7 @@ class CardinalManager(object):
         rr = []
 
         if 100 <= n:
-            s = self.special_n2s[n / 100]
+            s = self.one_names[n / 100]
             rr.append(s)
             rr.append('hundred')
             n %= 100
@@ -42,14 +40,14 @@ class CardinalManager(object):
             n %= 10
 
         if n:
-            s = self.special_n2s[n]
+            s = self.one_names[n]
             rr.append(s)
 
         return rr
 
     def say_as_words(self, n):
         if n == 0:
-            s = self.special_n2s[n]
+            s = self.one_names[n]
             return [s]
 
         rr = []
