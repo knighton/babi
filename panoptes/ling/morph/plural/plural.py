@@ -124,6 +124,15 @@ class PluralManager(object):
         return PluralManager(cat2sings, rules, nonsuffixable_sing2plur,
                              capitalized_sing2plur)
 
+    @staticmethod
+    def default():
+        d = 'panoptes/ling/morph/plural/'
+        cat_f = d + 'categories.yaml'
+        rule_f = d + 'rules.txt'
+        nonsuffixable_f = d + 'nonsuffixable.txt'
+        cap_f = d + 'capitalized.txt'
+        return PluralManager.from_files(cat_f, rule_f, nonsuffixable_f, cap_f)
+
     def __init__(self, cat2sings, rules, nonsuffixable_sing2plur,
                  capitalized_sing2plur):
         sings_set = set()

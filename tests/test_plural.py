@@ -2,12 +2,7 @@ from panoptes.ling.morph.plural import PluralManager
 
 
 def main():
-    d = 'panoptes/config/plural/'
-    cat_f = d + 'categories.yaml'
-    rule_f = d + 'rules.txt'
-    nonsuffix_f = d + 'nonsuffixable.txt'
-    cap_f = d + 'capitalized.txt'
-    mgr = PluralManager.from_files(cat_f, rule_f, nonsuffix_f, cap_f)
+    mgr = PluralManager.default()
     assert mgr.to_plural('cat') == 'cats'
     assert mgr.to_plural('box') == 'boxes'
     assert mgr.to_plural('ox') == 'oxen'

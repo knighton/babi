@@ -38,13 +38,7 @@ class English(object):
 
         inflection_mgr = InflectionManager()
         personal_mgr = PersonalManager(inflection_mgr)
-
-        cat_f = 'panoptes/config/plural/categories.yaml'
-        rule_f = 'panoptes/config/plural/rules.txt'
-        nonsuffixable_f = 'panoptes/config/plural/nonsuffixable.txt'
-        cap_f = 'panoptes/config/plural/capitalized.txt'
-        plural_mgr = PluralManager.from_files(
-            cat_f, rule_f, nonsuffixable_f, cap_f)
+        plural_mgr = PluralManager.default()
 
         self.say_state = SayState(
             det_pronoun_mgr, inflection_mgr, personal_mgr, plural_mgr,
