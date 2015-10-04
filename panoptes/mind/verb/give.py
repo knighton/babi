@@ -40,36 +40,40 @@ class GiveQuestion(ClauseMeaning):
         self.purpose = Purpose.WH_Q
         self.lemmas = ['give', 'hand']
         self.signatures = [
-            [Relation.AGENT, Relation.TO_RECIPIENT,  Relation.TARGET],
+            [Relation.AGENT, Relation.TO_RECIPIENT, Relation.TARGET],
+            [Relation.AGENT, None,                  Relation.TARGET],
         ]
 
     def handle(self, c, memory, (give_xx, recv_xx, what_xx)):
         if len(give_xx) != 1:
             return None
 
-        if len(recv_xx) != 1:
+        if recv_xx and len(recv_xx) != 1:
             return None
 
         if len(what_xx) != 1:
             return None
 
         giver = memory.ideas[give_xx[0]]
-        receiver = memory.ideas[recv_xx[0]]
+        receiver = memory.ideas[recv_xx[0]] if recv_xx else None
         what = memory.ideas[what_xx[0]]
 
-        q_count = bool(giver.query) + bool(receiver.query) + \
-            bool(what.query)
+        q_count = int(bool(giver.query))
+        if receiver:
+            q_count += bool(receiver.query)
+        q_count += bool(what.query)
 
         if q_count != 1:
             return None
 
         if giver.query == Query.IDENTITY:
             rel2xx = {
-                Relation.TO_RECIPIENT: recv_xx,
                 Relation.TARGET: what_xx,
             }
+            if receiver:
+                rel2xx[Relation.TO_RECIPIENT] = recv_xx
             want_rel = Relation.AGENT
-        elif receiver.query == Query.IDENTITY:
+        elif receiver and receiver.query == Query.IDENTITY:
             rel2xx = {
                 Relation.AGENT: give_xx,
                 Relation.TARGET: what_xx,
@@ -78,8 +82,9 @@ class GiveQuestion(ClauseMeaning):
         elif what.query == Query.IDENTITY:
             rel2xx = {
                 Relation.AGENT: give_xx,
-                Relation.TO_RECIPIENT: recv_xx,
             }
+            if receiver:
+                rel2xx[Relation.TO_RECIPIENT] = recv_xx
             want_rel = Relation.TARGET
         else:
             assert False
