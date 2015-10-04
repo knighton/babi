@@ -4,7 +4,7 @@ import json
 from panoptes.ling.glue.inflection import Declension, Gender
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
-from panoptes.ling.morph.gender import GenderClassifier
+from panoptes.ling.morph.gender.gender import GenderClassifier
 from panoptes.ling.tree.common.util.selector import Correlative
 from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun
 from panoptes.ling.tree.common.proper_noun import ProperNoun
