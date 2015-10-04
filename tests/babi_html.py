@@ -11,7 +11,7 @@ def main():
 
     ev = HtmlEvaluator()
 
-    ev.evaluate(agent, babi, episodes_per_task=None)
+    ev.evaluate(agent, babi, episodes_per_task=None, die_on_error=False)
 
 
 if __name__ == '__main__':

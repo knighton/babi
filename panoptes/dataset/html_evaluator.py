@@ -142,7 +142,7 @@ body {
 
         return correct, total
 
-    def evaluate_task(self, agent, task, episodes_per_task, out):
+    def evaluate_task(self, agent, task, episodes_per_task, out, die_on_error):
         try:
             self.dump_task_head(out)
             if episodes_per_task is None:
@@ -159,9 +159,12 @@ body {
             self.dump_task_foot(out)
             return correct, total
         except:
+            if die_on_error:
+                raise
             return 0, 1
 
-    def evaluate(self, agent, dataset, episodes_per_task=None):
+    def evaluate(self, agent, dataset, episodes_per_task=None,
+                 die_on_error=False):
         root = 'data/evaluation/%s/' % dataset.name
         if os.path.exists(root):
             shutil.rmtree(root)
@@ -172,7 +175,8 @@ body {
             fn = root + '%02d_%s.html' % (i + 1, task.name)
             with open(fn, 'wb') as out:
                 correct, total = \
-                    self.evaluate_task(agent, task, episodes_per_task, out)
+                    self.evaluate_task(
+                        agent, task, episodes_per_task, out, die_on_error)
                 results.append((correct, total))
 
         fn = root + 'overview.html'
