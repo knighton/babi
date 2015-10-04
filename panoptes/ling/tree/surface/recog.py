@@ -507,6 +507,10 @@ class ParseToSurface(object):
             elif t.tag == 'IN':
                 prep = t.text,
                 if len(t.downs) != 1:
+                    p = t.text,
+                    pp_nn = [(p, None)]
+                    ppp_nnn.append(pp_nn)
+                    varg_root_indexes.append(t.index)
                     continue
                 rel, down = t.downs[0]
                 assert rel == 'pobj'
