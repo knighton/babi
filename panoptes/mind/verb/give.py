@@ -146,36 +146,39 @@ class ReceiveQuestion(ClauseMeaning):
         if q_count != 1:
             return None
 
+        # give_agent_xx = source_xx
+        # give_target_xx = what_xx
+        # give_to_recip_xx = recv_xx
         if receiver.query == Query.IDENTITY:
-            rel2xx = {
+            give_rel2xx = {
                 Relation.TARGET: target_xx,
             }
             if source:
-                rel2xx[Relation.FROM_SOURCE] = source_xx
-            want_rel = Relation.AGENT
+                give_rel2xx[Relation.AGENT] = source_xx
+            give_want_rel = Relation.TO_RECIPIENT
         elif what.query == Query.IDENTITY:
-            rel2xx = {
-                Relation.AGENT: recv_xx,
+            give_rel2xx = {
+                Relation.TO_RECIPIENT: recv_xx,
             }
             if source:
-                rel2xx[Relation.FROM] = source_xx
-            want_rel = Relation.TARGET
+                give_rel2xx[Relation.AGENT] = source_xx
+            give_want_rel = Relation.TARGET
         elif source and source.query == Query.IDENTITY:
-            rel2xx = {
-                Relation.AGENT: recv_xx,
+            give_rel2xx = {
                 Relation.TARGET: what_xx,
+                Relation.TO_RECIPIENT: recv_xx,
             }
-            want_rel = Relation.FROM
+            give_want_rel = Relation.AGENT
         else:
             assert False
 
-        view = ClauseView(possible_lemmas=self.lemmas, rel2xx=rel2xx)
+        view = ClauseView(possible_lemmas=GIVE_LEMMAS, rel2xx=give_rel2xx)
         x = memory.resolve_one_clause(view)
         if x is None:
             return Response('dunno')
 
         c = memory.ideas[x]
-        xx = c.rel2xx[want_rel]
+        xx = c.rel2xx[give_want_rel]
         if len(xx) != 1:
             return None
 
