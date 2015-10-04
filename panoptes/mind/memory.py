@@ -137,6 +137,22 @@ class Memory(object):
         x = self.add_idea(idea)
         return [x]
 
+    def resolve_plural_noun(self, view):
+        rr = []
+        for i in xrange(len(self.ideas) - 1, -1, -1):
+            idea = self.ideas[i]
+            if idea.matches_noun_view(view, self.ideas, self.place_kinds):
+                idea = NounReverb(i)
+                x = self.add_idea(idea)
+                x = self.go_to_the_source(x)
+                rr.append(x)
+                if 1 < len(rr):
+                    return rr
+
+        idea = idea_from_view(view)
+        x = self.add_idea(idea)
+        return [x]
+
     def resolve_one_clause(self, view):
         for i in xrange(len(self.ideas) - 1, -1, -1):
             idea = self.ideas[i]
@@ -209,6 +225,8 @@ class Memory(object):
             is_subj = i == c.subj_index
             deep_ref = DeepReference(clause_id, is_subj, varg)
             xx = self.decode(deep_ref, from_xx, to_xx)
+            if xx is None:
+                return None
 
             # Learn "places".
             if rel in self.place_rels:
@@ -218,6 +236,7 @@ class Memory(object):
                         continue
                     self.place_kinds.add(idea.kind)
 
+            assert xx
             rel2xx[rel] = xx
 
         # The rest are unchanged in the conversion to memory.
@@ -250,13 +269,19 @@ class Memory(object):
             who = Noun.make_who()
             x = self.add_idea(who)
             return [x]
-
-        if d == Declension.HE:
-            view = NounView(gender=Gender.MALE)
+        elif d == Declension.YOU:
+            return to_xx
+        elif d == Declension.HE:
+            view = NounView(gender=Gender.MALE, kind='person')
         elif d == Declension.SHE:
-            view = NounView(gender=Gender.FEMALE)
+            view = NounView(gender=Gender.FEMALE, kind='person')
+        elif d == Declension.THEY2:
+            view = NounView(kind='person')
+            return self.resolve_plural_noun(view)
         else:
-            return []
+            print 'Unhandled declension, bailing on this dsen:', \
+                Declension.to_str[d]
+            return None
 
         return self.resolve_one_noun(view)
 

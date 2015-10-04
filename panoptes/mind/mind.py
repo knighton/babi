@@ -22,12 +22,18 @@ class Mind(object):
 
         from_xx = map(self.user_mgr.get, from_uids)
         to_xx = map(self.user_mgr.get, to_uids)
-        x, = self.memory.decode_dsen(dsen, from_xx, to_xx)
+        xx = self.memory.decode_dsen(dsen, from_xx, to_xx)
 
+        if not xx:
+            self.memory.load_checkpoint(checkpoint)
+            return None
+
+        x, = xx
         c = self.memory.ideas[x]
         r = self.semantics_mgr.handle(c)
 
         if not r:
             self.memory.load_checkpoint(checkpoint)
+            return None
 
         return r
