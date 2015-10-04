@@ -125,6 +125,7 @@ class SurfaceToDeep(object):
                 arg = fronted_arg
                 stranded_prep = prep
                 prep = self.decide_prep(fronted_prep, stranded_prep)
+                used_fronted = True
             rr.append([prep, arg])
 
         if not used_fronted:
