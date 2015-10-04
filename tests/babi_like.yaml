@@ -69,14 +69,13 @@
         out: football
       - in: Who gave the football to Jeff?
         out: Fred
-
+      - in: Who did Fred give the football to?
+        out: Jeff
 # doesn't recognize tag = TO
 #      - in: To whom did Fred give the football?
 #        out: Jeff
 
 # stranded preposition
-#      - in: Who did Fred give the football to?
-#        out: Jeff
 
 # "receive" not supported yet
 #  - name: task5_receive
