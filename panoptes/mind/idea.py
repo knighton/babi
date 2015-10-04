@@ -79,7 +79,7 @@ class Noun(Idea):
             rel2xx[Relation.to_str[rel]] = xx
         return {
             'type': 'Noun',
-            'query': Query.to_str[self.query],
+            'query': Query.to_str[self.query] if self.query else None,
             'name': self.name,
             'gender': Gender.to_str[self.gender] if self.gender else None,
             'is_animate': self.is_animate,
@@ -152,7 +152,7 @@ class NounView(object):
     def dump(self):
         return {
             'name': self.name,
-            'gender': Gender.to_str[self.gender],
+            'gender': Gender.to_str[self.gender] if self.gender else None,
             'kind': self.kind,
         }
 
