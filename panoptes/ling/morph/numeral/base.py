@@ -18,7 +18,7 @@ class NumeralManager(object):
         if verbo == NumeralVerbosity.DIGITS:
             words = False
         elif verbo == NumeralVerbosity.AUTO:
-            words = self.is_in_use_words_range(n):
+            words = self.is_in_use_words_range(n)
         elif verbo == NumeralVerbosity.WORDS:
             words = True
         else:

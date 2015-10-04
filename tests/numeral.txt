@@ -1,0 +1,21 @@
+-5 negative five
+-4 negative four
+-1 negative one
+0 zero
+1 one
+4 four
+5 five
+10 ten
+19 nineteen
+20 twenty
+29 twenty nine
+30 thirty
+31 thirty one
+99 ninety nine
+100 one hundred
+101 one hundred one
+999 nine hundred ninety nine
+1000 one thousand
+99999 ninety nine thousand nine hundred ninety nine
+100000 one hundred thousand
+1234567 one million two hundred thirty four thousand five hundred sixty seven
