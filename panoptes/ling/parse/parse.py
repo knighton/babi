@@ -35,6 +35,39 @@ class Parse(object):
             if token.tag == 'XX':
                 return None
 
+        # Sometimes when there's a stranded preposition at the end, the ending
+        # punctuation is made its child.  Annoying.
+        #
+        #   "What is the bedroom east of?"
+        while True:
+            if not self.tokens:
+                break
+
+            t = self.tokens[-1]
+            if t.tag != '.':
+                break
+
+            rel, orig_parent = t.up
+            if rel == 'punct':
+                break
+
+            prev_parent = None
+            parent = orig_parent
+            while parent:
+                prev_parent = parent
+                _, parent = parent.up
+            top_verb = prev_parent
+
+            for i, (_, child) in enumerate(orig_parent.downs):
+                if child.index == t.index:
+                    del orig_parent.downs[i]
+                    break
+            t.up = ('punct', top_verb)
+            top_verb.downs.append(('punct', t))
+            top_verb.downs.sort(key=lambda (dep, child): child.index)
+
+            break
+
         # We don't like adverbial phrases.  We do like prepositional phrases as
         # verb arguments.
         #
