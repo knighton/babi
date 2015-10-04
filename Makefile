@@ -1,17 +1,29 @@
-html:
-	python -m tests.babi_html
+# ------------------------------------------------------------------------------
+# Setup.
 
-babi_mini:
-	python -m tests.babi_mini
+setup:
+	virtualenv env --system-site-packages
+	. env/bin/activate
+	pip install -r requirements.txt
+	python -m spacy.en.download
+
+# ------------------------------------------------------------------------------
+# Evaluation.
 
 babi:
-	python -m tests.babi
+	time python -m tests.babi_html > data/babi_html.out
+
+english:
+	time python -m tests.test_english > data/test_english.out
+
+mind:
+	time python -m tests.test_babi_like > data/test_babi_like.out
+
+# ------------------------------------------------------------------------------
+# Views.
 
 console:
 	python -m scripts.console
-
-env:
-	virtualenv env --system-site-packages
 
 wc:
 	find . -type f -name "*.py" | grep -v ^\./env/ | grep -v ^\./data/ | xargs wc

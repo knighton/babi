@@ -19,6 +19,7 @@
                     is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - AGENT
@@ -52,6 +53,7 @@
                     is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - AGENT
@@ -85,6 +87,7 @@
                     is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - TARGET
@@ -118,6 +121,7 @@
                     is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - TO_RECIPIENT
@@ -160,6 +164,7 @@
                     is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - AGENT
@@ -211,6 +216,7 @@
                     is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - AGENT
@@ -258,6 +264,7 @@
                     is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - AGENT
@@ -326,6 +333,7 @@
                     is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - AGENT
@@ -359,6 +367,7 @@
                     is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - AGENT
@@ -401,6 +410,7 @@
                     is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - AGENT
@@ -455,6 +465,7 @@
                     is_cond: true
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - AGENT
@@ -497,6 +508,7 @@
                     is_cond: true
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - AGENT
@@ -539,6 +551,7 @@
                     is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - AGENT
@@ -581,6 +594,7 @@
                     is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - AGENT
@@ -609,6 +623,7 @@
                     is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - AGENT
@@ -651,6 +666,7 @@
                     is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - AGENT
@@ -705,6 +721,7 @@
                     is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - AGENT
@@ -759,6 +776,7 @@
                     is_cond: false
                 verb_form: FINITE
                 is_pro_verb: false
+            adverbs: []
             rels_vargs:
               -
                   - AGENT
