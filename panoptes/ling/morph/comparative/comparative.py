@@ -1,3 +1,4 @@
+from collections import defaultdict
 import re
 import yaml
 
@@ -17,12 +18,12 @@ class ComparativeManager(object):
 
         self.exception_bases = set(map(lambda ss: ss[0], exception_triples))
 
-        self.exception_degree_base2s = {}
+        self.exception_degree_base2ss = defaultdict(list)
         degrees = [ComparativeDegree.BASE, ComparativeDegree.COMP,
                    ComparativeDegree.SUPER]
         for triple in exception_triples:
             for degree, word in zip(degrees, triple):
-                self.exception_degree_base2s[(degree, triple[0])] = word
+                self.exception_degree_base2ss[(degree, triple[0])].append(word)
 
         self.base_is_er_est = set(base_is_er_est)
         self.erable = set(erable)
@@ -99,7 +100,7 @@ class ComparativeManager(object):
         if len(base) == 1:
             return 'y'
 
-        if base[-1] in 'aeiouy':
+        if base[-2] in 'aeiouy':
             return 'y'
         else:
             return 'i'
@@ -113,9 +114,9 @@ class ComparativeManager(object):
             return base
 
         # Check exceptions.
-        s = self.exception_degree_base2s.get((degree, base))
-        if s:
-            return s
+        ss = self.exception_degree_base2ss.get((degree, base))
+        if ss:
+            return ss[0]
 
         if degree == ComparativeDegree.COMP:
             if base[-1] == 'y':
