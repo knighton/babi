@@ -190,7 +190,7 @@
       - in: Then they went to the bathroom.
       - in: Where is John?
         out: bathroom
-  - name: task18
+  - name: task18_normal
     pairs:
       - in: The suitcase fits inside the box.
       - in: The chocolate fits inside the box.
@@ -212,6 +212,11 @@
         out: "no"
       - in: Is the chocolate bigger than the box?
         out: "no"
+  - name: task18_misparsed
+    pairs:
+      - in: The suitcase fits inside the chest.
+      - in: Does the suitcase fit in the chest?
+        out: "yes"
   - name: task19_normal
     pairs:
       - in: The garden is west of the bathroom.
