@@ -68,6 +68,52 @@ class Parse(object):
 
             break
 
+        # Sometimes the parser puts the subject under an acomp for whatever
+        # reason.
+        #
+        #   "Is the chocolate bigger than the box?"
+        #
+        # Got
+        #
+        #   is -> bigger -> chocolate
+        #
+        # Want
+        #
+        #   is -> chocolate
+        #   is -> bigger
+        for t in self.tokens:
+            # We want to transform
+            #
+            #   verb -acomp-> JJR -nsubj-> anything
+            #
+            # into
+            #
+            #   verb -nsubj-> anything
+            #   verb -acomp-> JJR
+            rel, parent = t.up
+            if rel != 'nsubj':
+                continue
+            if parent is None:
+                continue
+            if parent.tag != 'JJR':
+                continue
+            parent_rel, grandparent = parent.up
+            if grandparent is None:
+                continue
+            if parent_rel != 'acomp':
+                continue
+            if not grandparent.tag.startswith('V'):
+                continue
+
+            # Tree surgery.
+            for i, (_, child) in enumerate(parent.downs):
+                if child.index == t.index:
+                    del parent.downs[i]
+                    break
+            t.up = (rel, grandparent)
+            grandparent.downs.append((rel, t))
+            grandparent.downs.sort(key=lambda (dep, child): child.index)
+
         # We don't like adverbial phrases.  We do like prepositional phrases as
         # verb arguments.
         #
