@@ -18,6 +18,20 @@ class Token(object):
         }
 
 
+def reassign_parent(node, new_parent):
+    rel, old_parent = node.up
+    if old_parent:
+        for i, (_, child) in enumerate(old_parent.downs):
+            if child.index == node.index:
+                del old_parent.downs[i]
+                break
+
+    node.up = rel, new_parent
+
+    new_parent.downs.append((rel, node))
+    new_parent.downs.sort(key=lambda (dep, child): child.index)
+
+
 class Parse(object):
     """
     A parse tree.
@@ -34,6 +48,58 @@ class Parse(object):
         for token in self.tokens:
             if token.tag == 'XX':
                 return None
+
+        # "Does (subject) (verb)"-style questions sometimes get parsed like the
+        # (verb) is a noun, compounded to the true subject.  Requires much
+        # fiddling to fix.
+        while True:
+            if self.root.text not in ['do', 'does', 'did']:
+                break
+
+            dobj = None
+            has_aux = False
+            for rel, child in self.root.downs:
+                if rel == 'dobj':
+                    dobj = child
+                elif rel == 'aux':
+                    has_aux = True
+            if not dobj:
+                break
+            if has_aux:
+                break
+            if dobj.tag != 'NN':
+                break
+
+            # Fuck you too!
+            self.root.up = 'aux', None
+            for i, (rel, child) in enumerate(self.root.downs):
+                if child.index == dobj.index:
+                    del self.root.downs[i]
+                    break
+            for rel, child in self.root.downs:
+                if rel == 'dobj':
+                    continue
+                reassign_parent(child, dobj)
+            reassign_parent(self.root, dobj)
+            dobj.tag = 'VB'
+            dobj.up = 'ROOT', None
+            self.root = dobj
+            compound = None
+            for i, (rel, child) in enumerate(self.root.downs):
+                if rel == 'compound':
+                    self.root.downs[i] = 'nsubj', child
+                    compound = child
+                    break
+            for i, (rel, child) in enumerate(self.root.downs):
+                if rel == 'det':
+                    del self.root.downs[i]
+                    if compound:
+                        compound.downs.append((rel, child))
+                        compound.downs.sort(
+                            key=lambda (dep, child): child.index)
+                    break
+
+            break
 
         # Sometimes when there's a stranded preposition at the end, the ending
         # punctuation is made its child.  Annoying.
