@@ -1,6 +1,7 @@
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
-from panoptes.mind.idea import Direction, Query, Noun
+from panoptes.ling.morph.comparative.comparative import ComparativePolarity
+from panoptes.mind.idea import Comparative, Direction, Query, Noun
 from panoptes.mind.location import At, NotAt
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
@@ -20,13 +21,23 @@ class AgentIsTarget(ClauseMeaning):
         if len(target_xx) != 1:
             return None
 
-        agent = memory.ideas[agent_xx[0]]
+        agent_x, = agent_xx
+        agent = memory.ideas[agent_x]
         target = memory.ideas[target_xx[0]]
-        if isinstance(agent, Noun) and isinstance(target, Direction):
-            memory.graph.link(agent_xx[0], target.which, target.of_x)
+        if isinstance(agent, Noun) and isinstance(target, Comparative):
+            if target.polarity == ComparativePolarity.POS and \
+                    target.adjective == 'big':
+                memory.graph.link(agent_x, 'bigger', target.than_x)
+                return Response()
+            else:
+                pass
+        elif isinstance(agent, Noun) and isinstance(target, Direction):
+            memory.graph.link(agent_x, target.which, target.of_x)
             return Response()
         else:
-            return None
+            pass
+
+        return None
 
 
 class AgentTargetQuestion(ClauseMeaning):
