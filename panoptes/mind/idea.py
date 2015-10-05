@@ -2,6 +2,7 @@ from panoptes.etc.enum import enum
 from panoptes.ling.glue.inflection import Gender
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
+from panoptes.ling.morph.comparative.comparative import ComparativePolarity
 from panoptes.ling.tree.common.util.selector import Selector
 from panoptes.ling.tree.deep.content_clause import Status
 from panoptes.ling.verb.verb import DeepVerb
@@ -174,6 +175,20 @@ class Direction(Idea):
             'of_x': self.of_x,
         }
 
+
+class Comparative(Idea):
+    def __init__(self, polarity, adjective, than_x):
+        self.polarity = polarity
+        self.adjective = adjective
+        self.than_x = than_x
+
+    def dump(self):
+        return {
+            'type': 'Comparative',
+            'polarity': ComparativePolarity.to_str[self.polarity],
+            'adjective': self.adjective,
+            'than_x': self.than_x,
+        }
 
 
 class Clause(Idea):

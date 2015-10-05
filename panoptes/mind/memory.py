@@ -9,12 +9,13 @@ from panoptes.ling.tree.common.util.selector import Correlative
 from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun
 from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
+from panoptes.ling.tree.deep.comparative import DeepComparative
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
 from panoptes.ling.tree.deep.direction import DeepDirection
 from panoptes.ling.tree.deep.logic import DeepAnd
 from panoptes.mind.graph import Graph
-from panoptes.mind.idea import Clause, ClauseView, Query, Noun, NounView, \
-    NounReverb, idea_from_view, Direction
+from panoptes.mind.idea import Clause, ClauseView, Comparative, Query, Noun, \
+    NounView, NounReverb, idea_from_view, Direction
 
 
 class DeepReference(object):
@@ -58,6 +59,7 @@ class Memory(object):
         self.type2decode = {
             DeepAnd: self.decode_and,
             DeepCommonNoun: self.decode_common_noun,
+            DeepComparative: self.decode_comparative,
             DeepContentClause: self.decode_content_clause,
             DeepDirection: self.decode_direction,
             PersonalPronoun: self.decode_personal_pronoun,
@@ -212,6 +214,19 @@ class Memory(object):
             gender = Gender.NEUTER
         view = NounView(kind=n.noun, gender=gender)
         return self.resolve_one_noun(view)
+
+    def decode_comparative(self, deep_ref, from_xx, to_xx):
+        sub_deep_ref = DeepReference(
+            owning_clause_id=deep_ref.owning_clause_id, is_subj=False,
+            arg=deep_ref.arg.than)
+        sub_xx = self.decode(sub_deep_ref, from_xx, to_xx)
+        rr = []
+        for sub_x in sub_xx:
+            deep = deep_ref.arg
+            comp = Comparative(deep.polarity, deep.adjective, sub_x)
+            x = self.add_idea(comp)
+            rr.append(x)
+        return rr
 
     def decode_content_clause(self, deep_ref, from_xx, to_xx):
         c = deep_ref.arg
