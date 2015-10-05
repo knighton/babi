@@ -1,6 +1,6 @@
 def each_suffix_shortest_first(s):
-    for i in xrange(len(s) + 1): 
-        yield s[len(s) - i:] 
+    for i in xrange(len(s) + 1):
+        yield s[len(s) - i:]
 
 
 class SuffixFanoutMap(object):

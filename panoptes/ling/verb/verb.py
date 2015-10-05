@@ -44,7 +44,7 @@ class Polarity(object):
 class Aspect(object):
     """
     Linguistic aspect (English).
-    
+
     Just enough to handle the different renderings, nothing more.
     """
 
@@ -432,7 +432,7 @@ class SurfaceVerb(object):
     def nonfinite_options(lemmas, is_pro_verb_options):
         aaa = list(SurfaceVerb.all_options(lemmas, is_pro_verb_options))
         aaa[6] = [ModalFlavor.INDICATIVE]
-        del aaa[8][0] 
+        del aaa[8][0]
         aaa[12] = [False]
         return aaa
 

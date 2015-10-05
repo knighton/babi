@@ -163,7 +163,7 @@ def make_flavor_cond2modals_moods(known_modals):
                     modal = None
                 else:
                     modal = text
-                    assert modal in known_modals 
+                    assert modal in known_modals
                     mood = Mood.NORMAL
                 key = (flavor, is_cond)
                 flavor_cond2modals_moods[key].append((modal, mood))
