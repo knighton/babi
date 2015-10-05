@@ -2,8 +2,11 @@ from panoptes.ling.tree.common.existential_there import ExistentialThere
 from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun
 from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
+from panoptes.ling.tree.deep.comparative import DeepComparative
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
+from panoptes.ling.tree.deep.direction import DeepDirection
 from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
+from panoptes.ling.tree.surface.comparative import SurfaceComparative
 from panoptes.ling.tree.surface.content_clause import SurfaceContentClause
 from panoptes.ling.tree.surface.direction import SurfaceDirection
 
@@ -21,8 +24,9 @@ class ArgLoader(object):
         classes = [
             # Deep.
             DeepCommonNoun,
+            DeepComparative,
             DeepContentClause,
-            # TODO: DeepDirection,
+            DeepDirection,
 
             # Common.
             ExistentialThere,
@@ -31,6 +35,7 @@ class ArgLoader(object):
 
             # Surface.
             SurfaceCommonNoun,
+            SurfaceComparative,
             SurfaceContentClause,
             SurfaceDirection,
         ]

@@ -6,6 +6,7 @@ from panoptes.ling.tree.base import ArgPosRestriction
 from panoptes.ling.tree.common.base import CommonArgument
 from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
+from panoptes.ling.tree.deep.comparative import DeepComparative
 from panoptes.ling.tree.deep.content_clause import DeepContentClause, Status
 from panoptes.ling.tree.deep.direction import DeepDirection
 from panoptes.ling.tree.deep.logic import DeepAnd
@@ -40,7 +41,8 @@ class SurfaceToDeep(object):
         self.type2recog = {
             'SurfaceAnd': self.recog_and,
             'SurfaceCommonNoun': self.recog_common_noun,
-            'SurfaceDirection': self.recog_surface_direction,
+            'SurfaceDirection': self.recog_direction,
+            'SurfaceComparative': self.recog_comparative,
         }
 
     def recog_and(self, n):
@@ -72,13 +74,25 @@ class SurfaceToDeep(object):
             rr.append(r)
         return rr
 
-    def recog_surface_direction(self, n):
+    def recog_direction(self, n):
         if n.of:
             ofs = self.recog_arg(n.of)
         else:
             ofs = []
 
         return map(lambda of: DeepDirection(n.which, of), ofs)
+
+    def recog_comparative(self, n):
+        if n.than:
+            thans = self.recog_arg(n.than)
+        else:
+            thans = []
+
+        rr = []
+        for than in thans:
+            r = DeepComparative(n.polarity, n.adjective, than)
+            rr.append(r)
+        return rr
 
     def decide_prep(self, fronted_prep, stranded_prep):
         """

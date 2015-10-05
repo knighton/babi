@@ -9,8 +9,7 @@ class DeepDirection(DeepArgument):
         assert isinstance(self.which, basestring)
 
         self.of = of
-        if self.of:
-            assert isinstance(self.of, DeepArgument)
+        assert isinstance(self.of, DeepArgument)
 
     # --------------------------------------------------------------------------
     # From base.
@@ -26,10 +25,7 @@ class DeepDirection(DeepArgument):
     # From deep.
 
     def to_surface(transform_state, say_state, idiolect):
-        if self.of:
-            of = self.of.to_surface(transform_state, say_state, idiolect)
-        else:
-            of = None
+        of = self.of.to_surface(transform_state, say_state, idiolect)
         return SurfaceDirection(self.which, of)
 
     # --------------------------------------------------------------------------
