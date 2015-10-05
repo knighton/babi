@@ -86,5 +86,7 @@ class Graph(object):
 
     def decide_path(self, from_x, to_x):
         path = self.sub_decide_path(from_x, to_x, [])
-        path = map(lambda s: self.direction2inverse[s], path)
-        return path
+        if not path:
+            return path
+
+        return map(lambda s: self.direction2inverse[s], path)
