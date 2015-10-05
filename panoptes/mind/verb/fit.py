@@ -55,7 +55,7 @@ class DoesItFitInside(ClauseMeaning):
         if len(rels) != 1:
             return Response('unclear')
 
-        rel = list(rels)[0]
+        rel = rels.pop()
         if rel == 'bigger':
             return Response('yes')
         else:

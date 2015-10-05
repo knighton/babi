@@ -40,6 +40,50 @@ class AgentIsTarget(ClauseMeaning):
         return None
 
 
+class AgentIsTargetQuestion(ClauseMeaning):
+    def __init__(self):
+        self.purpose = Purpose.TF_Q
+        self.lemmas = ['be']
+        self.signatures = [
+            [Relation.AGENT, Relation.TARGET],
+        ]
+
+    def handle(self, c, memory, (agent_xx, target_xx)):
+        if len(agent_xx) != 1:
+            return None
+
+        if len(target_xx) != 1:
+            return None
+
+        agent_x, = agent_xx
+        target_x, = target_xx
+
+        agent = memory.ideas[agent_x]
+        target = memory.ideas[target_x]
+
+        if isinstance(agent, Noun) and isinstance(target, Comparative):
+            if target.polarity == ComparativePolarity.POS and \
+                    target.adjective == 'big':
+                path = memory.graph.decide_path(target.than_x, agent_x)
+                if path is None:
+                    return Response('dunno')
+
+                if not path:
+                    return Response('what a stupid question')
+
+                rels = set(path)
+                if len(rels) != 1:
+                    return Response('unclear')
+
+                rel = rels.pop()
+                if rel == 'bigger':
+                    return Response('yes')
+                else:
+                    return Response('no')
+
+        return None
+
+
 class AgentTargetQuestion(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.WH_Q
