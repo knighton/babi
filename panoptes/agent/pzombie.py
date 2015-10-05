@@ -40,4 +40,6 @@ class PhilosophicalZombie(Agent):
             delib.out = r.text
             return delib
 
+        assert delib.out is not None
+
         return delib
