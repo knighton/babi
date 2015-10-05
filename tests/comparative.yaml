@@ -1,0 +1,34 @@
+  - name: exceptions
+    triples:
+      - [bad, worse, worst]
+      - [far, further, furthest]
+      - [good, better, best]
+      - [little, less, least]
+      - [shy, shyer, shyest]
+      - [well, better, best]
+  - name: base_form_is_er_est
+    triples:
+      - [bitter, bitterer, bitterest]
+      - [clever, more clever, most clever]
+      - [honest, more honest, most honest]
+      - [somber, more somber, most somber]
+  - name: actually_erable
+    triples:
+      - [bitter, bitterer, bitterest]
+      - [poor, poorer, poorest]
+      - [red, redder, reddest]
+  - name: actually_not_erable
+    triples:
+      - [current, more current, most current]
+      - [fun, more fun, most fun]
+      - [vast, more vast, most vast]
+  - name: normal_cases
+    triples:
+      - [big, bigger, biggest]
+      - [clear, clearer, clearest]
+      - [gay, gayer, gayest]
+      - [mighty, mightier, mightiest]
+      - [nuclear, more nuclear, most nuclear]
+      - [prolix, more prolix, most prolix]
+      - [rare, rarer, rarest]
+      - [wild, wilder, wildest]

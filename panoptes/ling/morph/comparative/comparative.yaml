@@ -1,0 +1,46 @@
+exceptions:
+  - good   better  best
+  - well   better  best
+  - bad    worse   worst
+  - ill    worse   worst
+  - shy    shyer   shyest
+  - far    farther farthest
+  - far    further furthest
+  - much   more    most
+  - many   more    most
+  - little less    least
+  - little littler littlest
+base_is_er_est:
+  - bitter
+  - clever
+  - dapper
+  - eager
+  - honest
+  - inner
+  - modest
+  - other
+  - outer
+  - premier
+  - proper
+  - rubber
+  - sheer
+  - somber
+  - super
+  - tender
+  - upper
+  - utter
+erable:
+  - bitter
+  - poor
+  - red
+not_erable:
+  - current
+  - due
+  - fun
+  - hostile
+  - okay
+  - only
+  - past
+  - sole
+  - stuck
+  - vast
