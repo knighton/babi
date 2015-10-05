@@ -21,7 +21,7 @@ def check(m, base, degree, want_derived):
         raise
 
     ok = False
-    degs_pols_bases = m.decode(want_derived[0], want_derived[1])
+    degs_pols_bases = m.decode(*want_ss)
     for deg, pol, got_base in degs_pols_bases:
         if deg == degree and pol == ComparativePolarity.POS and \
                 got_base == base:

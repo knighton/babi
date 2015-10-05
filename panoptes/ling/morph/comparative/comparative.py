@@ -20,11 +20,14 @@ class ComparativeManager(object):
         self.exception_bases = set(map(lambda ss: ss[0], exception_triples))
 
         self.exception_degree_base2ss = defaultdict(list)
+        self.exception_s2degrees_bases = defaultdict(list)
         degrees = [ComparativeDegree.BASE, ComparativeDegree.COMP,
                    ComparativeDegree.SUPER]
         for triple in exception_triples:
+            base = triple[0]
             for degree, word in zip(degrees, triple):
-                self.exception_degree_base2ss[(degree, triple[0])].append(word)
+                self.exception_degree_base2ss[(degree, base)].append(word)
+                self.exception_s2degrees_bases[word].append((degree, base))
 
         self.base_is_er_est = set(base_is_er_est)
         self.erable = set(erable)
@@ -164,7 +167,7 @@ class ComparativeManager(object):
 
         # Catch positive (base) forms with derived-looking endings (eg, modest,
         # clever, etc).
-        if word in self.base_er_est:
+        if word in self.base_is_er_est:
             return [(ComparativeDegree.BASE, word)]
 
         # -er and -est derivations work and reverse the same way.
@@ -212,7 +215,7 @@ class ComparativeManager(object):
         if adverb_degree == ComparativeDegree.BASE and \
                 polarity == ComparativePolarity.POS:
             degrees_bases = self.decode_er_est(word)
-            return zip(lambda (deg, base): (deg, polarity, base), degrees_bases)
+            return map(lambda (deg, base): (deg, polarity, base), degrees_bases)
 
         # Has an adverb, so the word is in its base form.
         return [(adverb_degree, polarity, word)]
