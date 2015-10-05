@@ -5,7 +5,7 @@ from panoptes.ling.glue.grammatical_number import N2, N3, N5, \
     nx_eq_nx_is_possible, nx_to_nxs
 from panoptes.ling.glue.idiolect import Idiolect
 from panoptes.ling.glue.inflection import Conjugation
-from panoptes.ling.glue.magic_token import A_OR_AN
+from panoptes.ling.glue.magic_token import A_OR_AN, TIME_PREP
 from panoptes.ling.glue.purpose import EndPunctClassifier
 from panoptes.ling.parse.parse import Parse
 from panoptes.ling.tree.common.existential_there import ExistentialThere
@@ -567,6 +567,11 @@ class ParseToSurface(object):
             if r is None:
                 continue
             pp_nn = r
+
+            if rel == 'npadvmod':
+                for i, (p, n) in enumerate(pp_nn):
+                    if not p:
+                        pp_nn[i] = (TIME_PREP,), n
 
             spoken_preps = [prep] * len(pp_nn)
             absorbed_preps, vargs = zip(*pp_nn) if pp_nn else ([], [])
