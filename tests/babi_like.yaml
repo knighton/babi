@@ -190,6 +190,75 @@
       - in: Then they went to the bathroom.
       - in: Where is John?
         out: bathroom
+  - name: task14
+    pairs:
+      - in: This morning Mary moved to the kitchen.
+      - in: This afternoon Mary moved to the cinema.
+      - in: Yesterday Bill went to the bedroom.
+      - in: Yesterday Mary journeyed to the school.
+      - in: Where was Mary before the cinema?
+        out: kitchen
+      - in: Yesterday Fred went back to the cinema.
+      - in: Bill journeyed to the office this morning.
+      - in: Where was Bill before the office?
+        out: bedroom
+      - in: Mary went to the school this evening.
+      - in: This afternoon Bill journeyed to the kitchen.
+      - in: Where was Bill before the office?
+        out: bedroom
+      - in: Julie went to the office yesterday.
+      - in: This morning Fred journeyed to the office.
+      - in: Where was Mary before the school?
+        out: cinema
+      - in: This evening Fred journeyed to the school.
+      - in: This afternoon Fred journeyed to the bedroom.
+      - in: Where was Mary before the school?
+        out: cinema
+  - name: task15
+    pairs:
+      - in: Wolves are afraid of mice.
+      - in: Sheep are afraid of mice.
+      - in: Winona is a sheep.
+      - in: Mice are afraid of cats.
+      - in: Cats are afraid of wolves.
+      - in: Jessica is a mouse.
+      - in: Emily is a cat.
+      - in: Gertrude is a wolf.
+      - in: What is emily afraid of?
+        out: wolf
+      - in: What is winona afraid of?
+        out: mouse
+      - in: What is gertrude afraid of?
+        out: mouse
+      - in: What is jessica afraid of?
+        out: cat
+  - name: task16
+    pairs:
+      - in: Bernhard is a lion.
+      - in: Bernhard is white.
+      - in: Brian is a lion.
+      - in: What color is Brian?
+        out: white
+  - name: task17
+    pairs:
+      - in: The pink rectangle is to the left of the triangle.
+      - in: The triangle is to the left of the red square.
+      - in: Is the pink rectangle to the right of the red square?
+        out: "no"
+      - in: Is the pink rectangle to the left of the red square?
+        out: "yes"
+      - in: Is the pink rectangle to the left of the red square?
+        out: "yes"
+      - in: Is the pink rectangle to the left of the red square?
+        out: "yes"
+      - in: Is the pink rectangle to the right of the red square?
+        out: "no"
+      - in: Is the red square to the right of the pink rectangle?
+        out: "yes"
+      - in: Is the pink rectangle to the left of the red square?
+        out: "yes"
+      - in: Is the pink rectangle to the left of the red square?
+        out: "yes"
   - name: task18_normal
     pairs:
       - in: The suitcase fits inside the box.
@@ -217,19 +286,19 @@
       - in: The suitcase fits inside the chest.
       - in: Does the suitcase fit in the chest?
         out: "yes"
-#  - name: task18_prep_phrases
-#    pairs:
-#      - in: The container is bigger than the suitcase.
-#      - in: The chest fits inside the box.
-#      - in: The chest is bigger than the box of chocolates.
-#      - in: The box is bigger than the chocolate.
-#      - in: The container is bigger than the suitcase.
-#      - in: Is the box bigger than the box of chocolates?
-#        out: "yes"
-#      - in: Does the box of chocolates fit in the box?
-#        out: "yes"
-#      - in: Does the box fit in the box of chocolates?
-#        out: "no"
+  - name: task18_prep_phrases
+    pairs:
+      - in: The container is bigger than the suitcase.
+      - in: The chest fits inside the box.
+      - in: The chest is bigger than the box of chocolates.
+      - in: The box is bigger than the chocolate.
+      - in: The container is bigger than the suitcase.
+      - in: Is the box bigger than the box of chocolates?
+        out: "yes"
+      - in: Does the box of chocolates fit in the box?
+        out: "yes"
+      - in: Does the box fit in the box of chocolates?
+        out: "no"
   - name: task19_normal
     pairs:
       - in: The garden is west of the bathroom.
