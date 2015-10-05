@@ -190,6 +190,28 @@
       - in: Then they went to the bathroom.
       - in: Where is John?
         out: bathroom
+  - name: task18
+    pairs:
+      - in: The suitcase fits inside the box.
+      - in: The chocolate fits inside the box.
+      - in: The container is bigger than the box of chocolates.
+      - in: The container is bigger than the suitcase.
+      - in: The box is bigger than the box of chocolates.
+      - in: The container is bigger than the chocolate.
+      - in: The chocolate fits inside the container.
+      - in: The chocolate fits inside the suitcase.
+      - in: The chocolate fits inside the chest.
+      - in: The suitcase fits inside the container.
+      - in: Does the box fit in the chocolate?
+        out: "no"
+      - in: Is the chocolate bigger than the box?
+        out: "no"
+      - in: Does the box fit in the chocolate?
+        out: "no"
+      - in: Does the box fit in the chocolate?
+        out: "no"
+      - in: Is the chocolate bigger than the box?
+        out: "no"
   - name: task19_normal
     pairs:
       - in: The garden is west of the bathroom.
