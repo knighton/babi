@@ -21,6 +21,9 @@ class Graph(object):
             'south': 'north',
             'east': 'west',
             'west': 'east',
+
+            'smaller': 'bigger',
+            'bigger': 'smaller',
         }
 
     def dump(self):
