@@ -6,11 +6,12 @@ class SayState(object):
     """
     Extrinsic information needed to say verb arguments.
 
-    Eg, I + reflexive = "me".
+    Eg, 1st person singular + reflexive = "me".
     """
 
-    def __init__(self, det_pronoun_mgr, inflection_mgr, personal_mgr,
-                 plural_mgr, pro_adverb_mgr, verb_mgr):
+    def __init__(self, comparative_mgr, det_pronoun_mgr, inflection_mgr,
+                 personal_mgr, plural_mgr, pro_adverb_mgr, verb_mgr):
+        self.comparative_mgr = comparative_mgr  # ComparativeManager.
         self.det_pronoun_mgr = det_pronoun_mgr  # CorrelativeManager.
         self.inflection_mgr = inflection_mgr    # InflectionManager.
         self.personal_mgr = personal_mgr        # PersonalManager.

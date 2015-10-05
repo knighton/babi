@@ -16,6 +16,7 @@ from panoptes.ling.tree.common.proper_noun import ProperNoun
 from panoptes.ling.tree.common.util.selector import Correlative, Selector
 from panoptes.ling.tree.surface.base import SayContext, SayState
 from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
+from panoptes.ling.tree.surface.comparative import SurfaceComparative
 from panoptes.ling.tree.surface.content_clause import Complementizer, \
     SurfaceContentClause
 from panoptes.ling.tree.surface.direction import SurfaceDirection
@@ -125,8 +126,8 @@ class ParseToSurface(object):
     Object that converts parses to surface structure.
     """
 
-    def __init__(self, det_pronoun_mgr, personal_mgr, plural_mgr,
-                 pro_adverb_mgr, say_state, verb_mgr):
+    def __init__(self, comparative_mgr, det_pronoun_mgr, personal_mgr,
+                 plural_mgr, pro_adverb_mgr, say_state, verb_mgr):
         # For extracting the correct verb conjugation from subjects.
         self.arbitrary_idiolect = Idiolect()
         self.say_state = say_state
@@ -136,6 +137,7 @@ class ParseToSurface(object):
         self.end_punct_clf = EndPunctClassifier()
         self.verb_extractor = VerbExtractor(verb_mgr)
 
+        self.comparative_mgr = comparative_mgr
         self.det_pronoun_mgr = det_pronoun_mgr
         self.personal_mgr = personal_mgr
         self.plural_mgr = plural_mgr
@@ -144,6 +146,7 @@ class ParseToSurface(object):
         self.tag2recognize_arg = {
             'DT': self.recog_dt,
             'EX': self.recog_ex,
+            'JJR': self.recog_jjr,
             'NN': self.recog_nn,
             'NNS': self.recog_nns,
             'NNP': self.recog_nnp,
@@ -172,6 +175,48 @@ class ParseToSurface(object):
     def recog_ex(self, root_token):
         p_n = (None, ExistentialThere())
         return [p_n]
+
+    def recog_jjr(self, root_token):
+        if len(root_token.downs) != 1:
+            return []
+
+        rel, child = root_token.downs[0]
+
+        if rel != 'prep':
+            return []
+
+        if child.text != 'than':
+            return []
+
+        # Eg, "what is the castle [bigger than]?"
+        if not child.downs:
+            rr = []
+            for degree, polarity, base in \
+                    self.comparative_mgr.decode(None, root_token.text):
+                n = SurfaceComparative(polarity, base, None)
+                rr.append((None, n))
+            return rr
+
+        rel, child = child.downs[0]
+
+        if rel != 'pobj':
+            return []
+
+        r = self.recognize_verb_arg(child)
+        if r is None:
+            return []
+        pp_nn = r
+
+        pp_nn = filter(lambda (p, n): not p, pp_nn)
+        thans = map(lambda (p, n): n, pp_nn)
+
+        rr = []
+        for degree, polarity, base in \
+                self.comparative_mgr.decode(None, root_token.text):
+            for than in thans:
+                n = SurfaceComparative(polarity, base, than)
+                rr.append((None, n))
+        return rr
 
     def recog_how_many_nn(self, root_token, noun, n2):
         many = None
@@ -275,7 +320,7 @@ class ParseToSurface(object):
             return []
 
         # Eg, "what is the castle [east of _]?"
-        if len(child.downs) != 1:
+        if not child.downs:
             n = SurfaceDirection(root_token.text, None)
             return [(None, n)]
 
@@ -487,7 +532,7 @@ class ParseToSurface(object):
         for rel, t in root_token.downs:
             if rel not in ('nsubj', 'nsubjpass', 'agent', 'dobj', 'dative',
                            'expl', 'attr', 'advmod', 'prep', 'compound',
-                           'npadvmod'):
+                           'npadvmod', 'acomp'):
                 continue
 
             if rel == 'advmod':

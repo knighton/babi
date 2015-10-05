@@ -4,7 +4,9 @@ from panoptes.ling.glue.inflection import InflectionManager
 from panoptes.ling.glue.purpose import PurposeManager
 from panoptes.ling.glue.relation import RelationManager
 from panoptes.ling.join.joiner import Joiner
+from panoptes.ling.morph.comparative.comparative import ComparativeManager
 from panoptes.ling.morph.plural.plural import PluralManager
+from panoptes.ling.morph.pronunciation.syllable_counter import SyllableCounter
 from panoptes.ling.parse.parser import Parser as TextToParse
 from panoptes.ling.tree.deep.base import TransformState
 from panoptes.ling.tree.deep.recog import SurfaceToDeep
@@ -33,6 +35,8 @@ class English(object):
         verb_f = 'data/verbs.json'
         verb_mgr = VerbManager.from_files(conj_f, verb_f)
 
+        syllable_counter = SyllableCounter.default()
+        comparative_mgr = ComparativeManager.default(syllable_counter)
         det_pronoun_mgr = DetPronounManager()
         pro_adverb_mgr = ProAdverbManager()
 
@@ -41,8 +45,8 @@ class English(object):
         plural_mgr = PluralManager.default()
 
         self.say_state = SayState(
-            det_pronoun_mgr, inflection_mgr, personal_mgr, plural_mgr,
-            pro_adverb_mgr, verb_mgr)
+            comparative_mgr, det_pronoun_mgr, inflection_mgr, personal_mgr,
+            plural_mgr, pro_adverb_mgr, verb_mgr)
 
         # The SayContext is needed for conjugation.  None of its fields affect
         # conjugation for any object.
@@ -56,8 +60,8 @@ class English(object):
         # Text -> surface structure -> deep structure.
         self.text_to_parse = TextToParse()
         self.parse_to_surface = ParseToSurface(
-            det_pronoun_mgr, personal_mgr, plural_mgr, pro_adverb_mgr,
-            self.say_state, verb_mgr)
+            comparative_mgr, det_pronoun_mgr, personal_mgr, plural_mgr,
+            pro_adverb_mgr, self.say_state, verb_mgr)
         self.surface_to_deep = SurfaceToDeep(purpose_mgr, relation_mgr)
 
         self.joiner = Joiner()
