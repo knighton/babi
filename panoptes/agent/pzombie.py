@@ -40,6 +40,8 @@ class PhilosophicalZombie(Agent):
             delib.out = r.text
             return delib
 
-        assert delib.out is not None
+        # Enable this assert to require everything to be understood by the
+        # system, including funky parses.  Useful for development.
+        # assert delib.out is not None
 
         return delib
