@@ -50,7 +50,7 @@ class TimeOfDay(CommonArgument):
 class TimeOfDayManager(object):
     def __init__(self):
         self.section2s = {
-
+            DaySection.MORNING: 'morning',
             DaySection.AFTERNOON: 'afternoon',
             DaySection.EVENING: 'evening',
             DaySection.NIGHT: 'night',
@@ -107,7 +107,7 @@ class TimeOfDayManager(object):
             return [r]
 
         day_offset = self.s2offset.get(day)
-        if not day_offset:
+        if day_offset is None:
             return []
 
         section_of_day = self.s2section.get(section)
