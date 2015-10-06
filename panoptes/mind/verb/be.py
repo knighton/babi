@@ -205,7 +205,7 @@ class IsAgentToQuestion(ClauseMeaning):
         if isinstance(agent, Noun) and isinstance(to, Direction):
             path = memory.graph.decide_path(agent_x, to.of_x)
             if path is None:
-                return Respnose('dunno')
+                return Response('dunno')
 
             if not path:
                 return Response("they're the same thing")
