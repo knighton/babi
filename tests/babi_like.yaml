@@ -215,6 +215,12 @@
       - in: This afternoon Fred journeyed to the bedroom.
       - in: Where was Mary before the school?
         out: cinema
+  - name: task14_fred_is_not_a_verb
+    pairs:
+      - in: This morning Fred journeyed to the cinema.
+      - in: Yesterday Fred went back to the office.
+      - in: Where was Fred before the cinema?
+        out: office
   - name: task15
     pairs:
       - in: Wolves are afraid of mice.

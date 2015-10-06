@@ -27,12 +27,18 @@ class Parser(object):
         print 'done'
 
     def parse(self, text):
+        # Fred gets parsed by spacy as VBN.  Replace with a unique name.
+        text = text.replace(' Fred ', ' Jameson ')
+        text = text.replace(' fred ', ' jameson ')
+
         # spaCy doesn't like "following" used as a preposition, so we use a
         # similar word instead.  Oh well.
         text = text.replace('Following', 'After')
 
         tokens = self.nlp(text, parse=True)
         words = truecase(tokens)
+        words = map(lambda s: 'Fred' if s == 'Jameson' else s, words)
+        words = map(lambda s: 'fred' if s == 'jameson' else s, words)
 
         x2dep_x = {}
         x2deps_xx = defaultdict(list)
