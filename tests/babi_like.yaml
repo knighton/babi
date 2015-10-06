@@ -221,32 +221,32 @@
       - in: Yesterday Fred went back to the office.
       - in: Where was Fred before the cinema?
         out: office
-  - name: task15
-    pairs:
-      - in: Wolves are afraid of mice.
-      - in: Sheep are afraid of mice.
-      - in: Winona is a sheep.
-      - in: Mice are afraid of cats.
-      - in: Cats are afraid of wolves.
-      - in: Jessica is a mouse.
-      - in: Emily is a cat.
-      - in: Gertrude is a wolf.
-      - in: What is emily afraid of?
-        out: wolf
-      - in: What is winona afraid of?
-        out: mouse
-      - in: What is gertrude afraid of?
-        out: mouse
-      - in: What is jessica afraid of?
-        out: cat
-  - name: task16
-    pairs:
-      - in: Bernhard is a lion.
-      - in: Bernhard is white.
-      - in: Brian is a lion.
-      - in: What color is Brian?
-        out: white
-  - name: task17
+#  - name: task15
+#    pairs:
+#      - in: Wolves are afraid of mice.
+#      - in: Sheep are afraid of mice.
+#      - in: Winona is a sheep.
+#      - in: Mice are afraid of cats.
+#      - in: Cats are afraid of wolves.
+#      - in: Jessica is a mouse.
+#      - in: Emily is a cat.
+#      - in: Gertrude is a wolf.
+#      - in: What is emily afraid of?
+#        out: wolf
+#      - in: What is winona afraid of?
+#        out: mouse
+#      - in: What is gertrude afraid of?
+#        out: mouse
+##      - in: What is jessica afraid of?
+#        out: cat
+#  - name: task16
+##    pairs:
+#      - in: Bernhard is a lion.
+#      - in: Bernhard is white.
+#      - in: Brian is a lion.
+#      - in: What color is Brian?
+#        out: white
+  - name: task17_to_the_left_right
     pairs:
       - in: The pink rectangle is to the left of the triangle.
       - in: The triangle is to the left of the red square.
@@ -266,6 +266,40 @@
         out: "yes"
       - in: Is the pink rectangle to the left of the red square?
         out: "yes"
+  - name: task17_also_above_below
+    pairs:
+      - in: The pink rectangle is to the left of the triangle.
+      - in: The triangle is below the red sphere.
+      - in: Is the red sphere above the pink rectangle?
+        out: "yes"
+      - in: Is the pink rectangle below the red sphere?
+        out: "yes"
+      - in: Is the red sphere below the pink rectangle?
+        out: "no"
+      - in: Is the pink rectangle below the red sphere?
+        out: "yes"
+      - in: Is the red sphere to the left of the pink rectangle?
+        out: "no"
+  - name: task17_attributes
+    pairs:
+      - in: The triangle is above the blue square.
+      - in: The triangle is below the red square.
+      - in: Is the blue square below the red square?
+        out: "yes"
+      - in: Is the blue square below the red square?
+        out: "yes"
+      - in: Is the red square above the blue square?
+        out: "yes"
+      - in: Is the blue square to the right of the red square?
+        out: "no"
+      - in: Is the blue square to the left of the red square?
+        out: "no"
+      - in: Is the red square below the blue square?
+        out: "no"
+      - in: Is the blue square to the right of the red square?
+        out: "no"
+      - in: Is the red square below the blue square?
+        out: "no"
   - name: task18_normal
     pairs:
       - in: The suitcase fits inside the box.
