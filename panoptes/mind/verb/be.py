@@ -176,7 +176,7 @@ def is_path_direction(memory, path, direction):
         return Response('dunno')
 
     if not path:
-        return Resopnse('same thing')
+        return Response('same thing')
 
     rels = set(path)
     opposite = memory.graph.direction2inverse[direction]
