@@ -48,6 +48,15 @@ class Parse(object):
         """
         We completely give up on certain parse shapes.
         """
+        print 'INPUT TO FIXED:'
+        print
+        print
+        print
+        self.dump()
+        print
+        print
+        print
+
         for token in self.tokens:
             if token.tag == 'XX':
                 return None
@@ -304,6 +313,39 @@ class Parse(object):
                 continue
             t.downs.append(('det', det))
             t.downs.sort(key=lambda (dep, child): child.index)
+
+
+        # If it starts with a "to be" VBZ, it should be of the form
+        #
+        #   "(is) (something) (something)"
+        #
+        # so if you get "(is) (something)" try to split the something.
+        #
+        #
+        #   "Is the triangle above the pink rectangle?"
+        while True:
+            t = self.tokens[0]
+            if t.tag != 'VBZ':
+                break
+
+            if self.root.index:
+                break
+
+            n = len(self.root.downs)
+            if n != 2:  # One for punct, the other for the joined arg.
+                break
+
+            rel, child = self.root.downs[0]
+            if len(child.downs) != 2:  # det, prep
+                break
+
+            child_rel, grandchild = child.downs[1]
+            if child_rel != 'prep':
+                break
+
+            reassign_parent(grandchild, self.root)
+
+            break
 
         # Prepositional phrase attachment: should be owned by another arg.
         #
