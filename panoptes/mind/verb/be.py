@@ -242,7 +242,7 @@ def a_direction_b(memory, agent_xx, relation, what_xx):
     return Response()
 
 
-def is_path_direction(path, direction):
+def is_path_direction(memory, path, direction):
     print 'IS_PATH_DIRECTION', path, direction
     if path is None:
         return Response('dunno')
@@ -251,14 +251,16 @@ def is_path_direction(path, direction):
         return Resopnse('same thing')
 
     rels = set(path)
-    if len(rels) != 1:
-        return Response('unclear')
-
-    rel = rels.pop()
-    if rel == direction:
-        return Response('yes')
+    opposite = memory.graph.direction2inverse[direction]
+    if direction in rels:
+        if opposite in rels:
+            r = 'no'
+        else:
+            r = 'yes'
     else:
-        return Response('no')
+        r = 'no'
+
+    return Response(r)
 
 
 def is_a_direction_b(memory, a_xx, relation, b_xx):
@@ -280,7 +282,7 @@ def is_a_direction_b(memory, a_xx, relation, b_xx):
         return None
 
     path = memory.graph.decide_path(b_x, a_x)
-    return is_path_direction(path, relation)
+    return is_path_direction(memory, path, relation)
 
 
 class AgentIsAbove(ClauseMeaning):
