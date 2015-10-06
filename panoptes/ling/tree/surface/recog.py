@@ -218,12 +218,18 @@ class ParseToSurface(object):
                 rr.append((None, n))
         return rr
 
+    def recog_time_of_day(self, root_token, noun, n2):
+        if n2 != N2.SING:
+            return []
+
+        return []
+
     def recog_how_many_nn(self, root_token, noun, n2):
         many = None
         for rel, child in root_token.downs:
             if rel == 'amod' and child.text in ('few', 'many'):
-                    many = child
-                    break
+                many = child
+                break
 
         if not many:
             return []
@@ -301,6 +307,10 @@ class ParseToSurface(object):
         return pp_nn
 
     def recog_common_noun(self, root_token, noun, n2):
+        pp_nn = self.recog_time_of_day(root_token, noun, n2)
+        if pp_nn:
+            return pp_nn
+
         pp_nn = self.recog_how_many_nn(root_token, noun, n2)
         pp_nn += self.recog_dt_nn(root_token, noun, n2)
         pp_nn += self.recog_posdet_nn(root_token, noun, n2)

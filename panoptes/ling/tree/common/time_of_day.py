@@ -1,29 +1,31 @@
+from panoptes.etc.dicts import v2k_from_k2v
 from panoptes.etc.enum import enum
 from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.tree.common.base import CommonArgument
 from panoptes.ling.tree.surface.base import SayResult
 
 
-DayPart = enum('DayPart = MORNING AFTERNOON EVENING NIGHT')
+DaySection = enum('DaySection = MORNING AFTERNOON EVENING NIGHT')
 
 
 class TimeOfDay(CommonArgument):
-    def __init__(self, day_offset, part):
+    def __init__(self, day_offset, section):
         self.day_offset = day_offset
         assert isinstance(self.day_offset, int)
 
-        self.part = part
-        if self.part:
-            assert isinstance(self.part, DayPart)
+        self.section = section
+        if self.section:
+            assert DaySection.is_valid(self.section)
 
     # --------------------------------------------------------------------------
     # From base.
 
     def dump(self):
+        section = SaySection.to_str[self.section] if self.section else None
         return {
             'type': 'TimeOfDay',
             'day_offset': self.day_offset,
-            'part': DayPart.to_str[self.part] if self.part else None,
+            'section': section,
         }
 
     # --------------------------------------------------------------------------
@@ -33,23 +35,80 @@ class TimeOfDay(CommonArgument):
         return Conjugation.S3
 
     def say(self, state, idiolect, context):
-        tokens = []
-
-        day_token = {
-            -1: 'yesterday',
-            0: 'this',
-            +1: 'tomorrow',
-        }[self.day_offset]
-        tokens.append(day_token)
-
-        if self.part:
-            part_token = {
-                DayPart.MORNING: 'morning',
-                DayPart.AFTERNOON: 'afternoon',
-                DayPart.EVENING: 'evening',
-                DayPart.NIGHT: 'night',
-            }[self.part]
-            tokens.append(part_token)
-
+        tokens = state.time_of_day_mgr.encode(self.day_offset, self.section)
         return SayResult(tokens=tokens, conjugation=Conjugation.S3,
                          eat_prep=False)
+
+
+class TimeOfDayManager(object):
+    def __init__(self):
+        self.section2s = {
+            DaySection.MORNING: 'morning',
+            DaySection.AFTERNOON: 'afternoon',
+            DaySection.EVENING: 'evening',
+            DaySection.NIGHT: 'night',
+        }
+
+        self.offset2section2ss = {
+            -1: {
+                DaySection.MORNING: 'yesterday morning'.split(),
+                DaySection.AFTERNOON: 'yesterday afternoon'.split(),
+                DaySection.EVENING: 'last evening'.split(),
+                DaySection.NIGHT: 'last night'.split(),
+            },
+            0: {
+                DaySection.MORNING: 'this morning'.split(),
+                DaySection.AFTERNOON: 'this afternoon'.split(),
+                DaySection.EVENING: 'this evening'.split(),
+                DaySection.NIGHT: ['tonight'],
+            },
+            1: {
+                DaySection.MORNING: 'tomorrow morning'.split(),
+                DaySection.AFTERNOON: 'tomorrow afternoon'.split(),
+                DaySection.EVENING: 'tomorrow evening'.split(),
+                DaySection.NIGHT: 'tomorrow night'.split(),
+            },
+        }
+
+        self.s2offset_section = {
+            (None, 'tonight'): (0, DaySection.NIGHT),
+        }
+
+        self.s2offset = {
+            'yesterday': -1,
+            'last': -1,
+            'this': 0,
+            'tomorrow': 1,
+            'next': 1,
+        }
+
+        self.s2section = v2k_from_k2v(self.section2s)
+
+    def encode(self, day_offset, section_of_day):
+        """
+        (day offset, section of day) -> list of words
+        """
+        d = self.offset2section2ss.get(day_offset)
+        if not d:
+            return None
+
+        return d[section_of_day]
+
+    def decode(self, first, second):
+        """
+        (first word, second word) -> (day offset, section of day)
+        """
+        r = self.s2offset_section.get((first, second))
+        if r:
+            return [r]
+
+        day_offset = self.s2offset.get(first)
+        if not day_offset:
+            return []
+
+        section_of_day = self.s2section.get(second)
+        if not section_of_day:
+            return []
+
+        r = (day_offset, section_of_day)
+        return [r]
