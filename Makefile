@@ -1,13 +1,4 @@
 # ------------------------------------------------------------------------------
-# Setup.
-
-setup:
-	virtualenv env --system-site-packages
-	. env/bin/activate
-	pip install -r requirements.txt
-	python -m spacy.en.download
-
-# ------------------------------------------------------------------------------
 # Evaluation.
 
 babi:
@@ -18,6 +9,15 @@ english:
 
 mind:
 	time python -m tests.test_babi_like > data/test_babi_like.out
+
+# ------------------------------------------------------------------------------
+# Setup.
+
+setup:
+	virtualenv env --system-site-packages
+	. env/bin/activate
+	pip install -r requirements.txt
+	python -m spacy.en.download
 
 # ------------------------------------------------------------------------------
 # Views.
