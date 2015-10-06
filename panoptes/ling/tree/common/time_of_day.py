@@ -21,7 +21,7 @@ class TimeOfDay(CommonArgument):
     # From base.
 
     def dump(self):
-        section = SaySection.to_str[self.section] if self.section else None
+        section = DaySection.to_str[self.section] if self.section else None
         return {
             'type': 'TimeOfDay',
             'day_offset': self.day_offset,
@@ -43,7 +43,7 @@ class TimeOfDay(CommonArgument):
 class TimeOfDayManager(object):
     def __init__(self):
         self.section2s = {
-            DaySection.MORNING: 'morning',
+
             DaySection.AFTERNOON: 'afternoon',
             DaySection.EVENING: 'evening',
             DaySection.NIGHT: 'night',
@@ -94,21 +94,32 @@ class TimeOfDayManager(object):
 
         return d[section_of_day]
 
-    def decode(self, first, second):
-        """
-        (first word, second word) -> (day offset, section of day)
-        """
-        r = self.s2offset_section.get((first, second))
+    def sub_decode(self, day, section):
+        r = self.s2offset_section.get((day, section))
         if r:
             return [r]
 
-        day_offset = self.s2offset.get(first)
+        day_offset = self.s2offset.get(day)
         if not day_offset:
             return []
 
-        section_of_day = self.s2section.get(second)
+        section_of_day = self.s2section.get(section)
         if not section_of_day:
             return []
 
         r = (day_offset, section_of_day)
         return [r]
+
+    def decode(self, first, second):
+        """
+        (first word, second word) -> (day offset, section of day)
+        """
+        rr = []
+
+        # Eg, "tomorrow night", "tonight".
+        rr += self.sub_decode(first, second)
+
+        # Eg, "tomorrow".
+        rr += self.sub_decode(second, None)
+
+        return rr
