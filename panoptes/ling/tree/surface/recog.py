@@ -227,7 +227,7 @@ class ParseToSurface(object):
 
         if not root_token.downs:
             pre = None
-        if len(root_token.downs) == 1:
+        elif len(root_token.downs) == 1:
             rel, child = root_token.downs[0]
             pre = child.text
         else:

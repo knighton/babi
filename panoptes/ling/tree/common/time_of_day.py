@@ -111,8 +111,6 @@ class TimeOfDayManager(object):
             return []
 
         section_of_day = self.s2section.get(section)
-        if not section_of_day:
-            return []
 
         r = (day_offset, section_of_day)
         return [r]
