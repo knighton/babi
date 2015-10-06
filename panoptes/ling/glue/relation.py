@@ -84,6 +84,12 @@ RELATION_TEXT = """
     preps:
       - about INERT
 
+  - relation: TO
+    core: OBLIQUE
+    order: 30
+    preps:
+      - to INERT
+
   - relation: AT
     core: OBLIQUE
     order: 30
