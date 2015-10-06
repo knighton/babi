@@ -168,6 +168,11 @@ class ParseToSurface(object):
             'VB',
         ])
 
+        self.directions = """
+            north south east west
+            left right
+        """.split()
+
     def recog_dt(self, root_token):
         nn = []
         for selector in self.det_pronoun_mgr.parse_pronoun(root_token.text):
@@ -323,23 +328,35 @@ class ParseToSurface(object):
         return pp_nn
 
     def recog_direction(self, root_token):
-        if len(root_token.downs) != 1:
+        if root_token.text not in self.directions:
             return []
 
-        dep, child = root_token.downs[0]
-
-        if dep != 'prep':
+        z = len(root_token.downs)
+        if z == 0:
+            return []
+        elif z == 1:
+            (prep, of), = root_token.downs
+        elif z == 2:
+            (det, dt), (prep, of) = root_token.downs
+            if det != 'det':
+                return []
+            if dt.tag != 'DT':
+                return []
+        else:
             return []
 
-        if child.text != 'of':
+        if prep != 'prep':
+            return []
+
+        if of.text != 'of':
             return []
 
         # Eg, "what is the castle [east of _]?"
-        if not child.downs:
+        if not of.downs:
             n = SurfaceDirection(root_token.text, None)
             return [(None, n)]
 
-        dep, child = child.downs[0]
+        dep, child = of.downs[0]
 
         if dep != 'pobj':
             return []
@@ -362,13 +379,16 @@ class ParseToSurface(object):
         """
         Eg, cat.
         """
-        pp_nn = self.recog_time_of_day(root_token)
-        if pp_nn:
-            return pp_nn
+        rr = self.recog_time_of_day(root_token)
+        if rr:
+            return rr
+
+        rr = self.recog_direction(root_token)
+        if rr:
+            return rr
 
         sing = root_token.text
         rr = self.recog_common_noun(root_token, sing, N2.SING)
-        rr += self.recog_direction(root_token)
         return rr
 
     def recog_nns(self, root_token):
