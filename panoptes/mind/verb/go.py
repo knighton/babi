@@ -16,10 +16,10 @@ def go_common(c, memory, agent_xx, to_xx):
     for x in agent_xx:
         agent = memory.ideas[x]
         loc = At(to_x)
-        agent.location_history.update_location(loc)
+        agent.location_history.set_location(loc)
         for x2 in agent.carrying:
             loc = At(to_x)
-            memory.ideas[x2].location_history.update_location(loc)
+            memory.ideas[x2].location_history.set_location(loc)
 
     return Response()
 

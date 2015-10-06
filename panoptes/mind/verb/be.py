@@ -171,7 +171,7 @@ class AgentPlaceQuestion(ClauseMeaning):
         if agent.query == Query.IDENTITY:
             return None
         elif place.query == Query.IDENTITY:
-            x = agent.location_history.current_location()
+            x = agent.location_history.get_location()
             if x is None:
                 return Response('dunno')
             loc = memory.ideas[x]
@@ -205,7 +205,7 @@ class AgentPlaceBeforeQuestion(ClauseMeaning):
         if what.query == Query.IDENTITY:
             return None
         elif where.query == Query.IDENTITY:
-            x = what.location_history.location_before(before_x)
+            x = what.location_history.get_location_before_location(before_x)
             if x is None:
                 return Response('dunno')
             idea = memory.ideas[x]
@@ -233,14 +233,14 @@ class AgentIn(ClauseMeaning):
         place_x, = place_xx
         if c.adverbs == ['no', 'longer']:
             loc = NotAt(place_x)
-            agent.location_history.update_location(loc)
+            agent.location_history.set_location(loc)
             return Response()
 
         if c.verb.polarity.tf:
             loc = At(place_x)
         else:
             loc = NotAt(place_x)
-        agent.location_history.update_location(loc)
+        agent.location_history.set_location(loc)
         return Response()
 
 

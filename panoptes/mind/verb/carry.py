@@ -27,7 +27,7 @@ class Bring(ClauseMeaning):
             agent.carrying.append(x)
             target = memory.ideas[x]
             loc = At(to_x)
-            target.location_history.update_location(loc)
+            target.location_history.set_location(loc)
 
         return Response()
 
@@ -56,7 +56,7 @@ class Drop(ClauseMeaning):
             for x in target_xx:
                 target = memory.ideas[x]
                 loc = At(to_x)
-                target.location_history.update_location(loc)
+                target.location_history.set_location(loc)
 
         return Response()
 
@@ -87,7 +87,7 @@ class PickUp(ClauseMeaning):
             agent.carrying.append(x)
             if at_x is not None:
                 loc = At(at_x)
-                memory.ideas[x].location_history.update_location(loc)
+                memory.ideas[x].location_history.set_location(loc)
 
         return Response()
 
