@@ -1,12 +1,10 @@
 from collections import defaultdict
 
-from panoptes.mind.verb.be import AgentIsTarget, AgentIsTargetQuestion, \
-    AgentTargetQuestion, AgentIsTo, AgentIsAbove, AgentIsBelow, \
-    IsAgentToQuestion, AgentPlaceBeforeQuestion, AgentPlaceQuestion, AgentIn, AgentInQuestion
-from panoptes.mind.verb.carry import Bring, CarryingWhatQuestion, Drop, PickUp
-from panoptes.mind.verb.fit import DoesItFitInside, FitsInside
-from panoptes.mind.verb.go import GoTo, GoToAfter, GoToAt, HowGoFromToQuestion
-from panoptes.mind.verb.give import Give, GiveQuestion, ReceiveQuestion
+from panoptes.mind.verb.be import *
+from panoptes.mind.verb.carry import *
+from panoptes.mind.verb.fit import *
+from panoptes.mind.verb.go import *
+from panoptes.mind.verb.give import *
 
 
 class VerbSemanticsManager(object):
@@ -21,6 +19,8 @@ class VerbSemanticsManager(object):
             IsAgentToQuestion(),
             AgentIsAbove(),
             AgentIsBelow(),
+            IsAgentAbove(),
+            IsAgentBelow(),
             AgentPlaceBeforeQuestion(),
             AgentPlaceQuestion(),
             AgentIn(),
