@@ -292,3 +292,12 @@ class RelativeDay(Idea):
             'day_offset': self.day_offset,
             'section': section,
         }
+
+    def to_time_span(self):
+        a = self.day_offset * len(DaySection.values)
+        if self.section:
+            a += self.section - DaySection.first
+            z = a
+        else:
+            z = a + len(DaySection.values) - 1
+        return a, z

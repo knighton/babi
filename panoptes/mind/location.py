@@ -64,18 +64,27 @@ class LocationHistory(object):
             'spans_items': rr,
         }
 
-    def set_location(self, location):
+    def set_location(self, location, input_time_span=None):
         """
-        location idea index ->
+        location item, time span -> None
 
-        Update our location.
+        Update our location, with an optional inclusive time integer range.
         """
-        if self.spans_items:
-            span, item = self.spans_items[-1]
-            if item.dump() == location.dump():
-                return
+        if input_time_span:
+            for i, (span, item) in enumerate(self.spans_items):
+                if input_time_span[0] < span[0]:
+                    self.spans_items = self.spans_items[:i] + \
+                        [(input_time_span, location)] + self.spans_items[i:]
+                    return
 
-        self.spans_items.append((None, location))
+            self.spans_items.append((input_time_span, location))
+        else:
+            if self.spans_items:
+                span, item = self.spans_items[-1]
+                if item.dump() == location.dump():
+                    return
+
+            self.spans_items.append((None, location))
 
     def is_at_location(self, x):
         """
@@ -101,24 +110,12 @@ class LocationHistory(object):
         span, loc = self.spans_items[-1]
         return loc.current_location()
 
-    def set_location_at_time(self, location, input_span):
-        insert_before = 0
-        for i, (span, item) in enumerate(self.spans_items):
-            if input_span[0] < span[0]:
-                insert_before = i
-
-        self.spans_items = self.spans_items[:insert_before] + \
-            [(input_span, location)] + self.spans_items[insert_before:]
-
     def get_location_before_location(self, loc_x):
         """
         locatiion idea index -> location idea index or None if we don't know
 
         Get where we were most recently before we were at the given location.
         """
-        print 'EVAL LOCATION BEFORE'
-        import json
-        print json.dumps(self.dump(), indent=4, sort_keys=True)
         for i in xrange(len(self.spans_items) - 1, -1, -1):
             span, item = self.spans_items[i]
             if not item.is_at_location(loc_x):

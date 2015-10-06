@@ -1,6 +1,6 @@
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
-from panoptes.mind.idea import Query
+from panoptes.mind.idea import Query, RelativeDay
 from panoptes.mind.location import At
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
@@ -8,18 +8,31 @@ from panoptes.mind.verb.base import ClauseMeaning, Response
 GO_LEMMAS = ['go', 'journey', 'move', 'travel']
 
 
-def go_common(c, memory, agent_xx, to_xx):
+def go_common(c, memory, agent_xx, to_xx, when_xx=None):
     if len(to_xx) != 1:
         return None
+
+    if when_xx and len(when_xx) != 1:
+        return None
+
+    if when_xx:
+        when_x, = when_xx
+        when = memory.ideas[when_x]
+        if isinstance(when, RelativeDay):
+            time_span = when.to_time_span()
+        else:
+            time_span = None
+    else:
+        time_span = None
 
     to_x, = to_xx
     for x in agent_xx:
         agent = memory.ideas[x]
         loc = At(to_x)
-        agent.location_history.set_location(loc)
+        agent.location_history.set_location(loc, time_span)
         for x2 in agent.carrying:
             loc = At(to_x)
-            memory.ideas[x2].location_history.set_location(loc)
+            memory.ideas[x2].location_history.set_location(loc, time_span)
 
     return Response()
 
@@ -60,7 +73,7 @@ class GoToAt(ClauseMeaning):
         ]
 
     def handle(self, c, memory, (agent_xx, to_xx, when_xx)):
-        return go_common(c, memory, agent_xx, to_xx)
+        return go_common(c, memory, agent_xx, to_xx, when_xx)
 
 
 class HowGoFromToQuestion(ClauseMeaning):
