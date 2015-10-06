@@ -1,3 +1,6 @@
+from collections import defaultdict
+
+
 class Token(object):
     """
     A single token in a parse.
@@ -392,6 +395,38 @@ class Parse(object):
             t.up = dep, up.up[1]
             t.up[1].downs.append((dep, t))
             t.up[1].downs.sort(key=lambda (a, b): b.index)
+
+        # The parser may give us multiple npadvmod links when what we want is
+        # just one npadvmod that compound-links to the "other" one.  In other
+        # words:
+        #
+        # Make
+        #
+        #   "[Yesterday] [evening] Tim moved to the abyss."
+        #
+        # parse similar to
+        #
+        #   "[This evening] Tim moved to the abyss."
+        verb2npadvmods = defaultdict(list)
+        for t in self.tokens:
+            rel, parent = t.up
+            if not parent:
+                continue
+            if rel != 'npadvmod':
+                continue
+            if not parent.tag.startswith('V'):
+                continue
+            verb2npadvmods[parent.index].append(t.index)
+        for verb_x, npadvmod_xx in verb2npadvmods.iteritems():
+            if len(npadvmod_xx) == 1:
+                continue
+            elif len(npadvmod_xx) != 2:
+                assert False
+            left_x, right_x = npadvmod_xx
+            left = self.tokens[left_x]
+            right = self.tokens[right_x]
+            left.up = ('compound', left.up[1])
+            reassign_parent(left, right)
 
         return self
 
