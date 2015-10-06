@@ -335,10 +335,10 @@ class Parse(object):
                 break
 
             rel, child = self.root.downs[0]
-            if len(child.downs) != 2:  # det, prep
+            if len(child.downs) < 2:  # det, (amod,) prep
                 break
 
-            child_rel, grandchild = child.downs[1]
+            child_rel, grandchild = child.downs[-1]
             if child_rel != 'prep':
                 break
 
