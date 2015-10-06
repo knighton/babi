@@ -66,11 +66,10 @@ class SurfaceToDeep(object):
 
         rr = []
         for pos in poss:
-            assert not n.attributes
             assert not n.preps_nargs
             r = DeepCommonNoun(
                 possessor=pos, selector=n.selector, number=n.number,
-                noun=n.noun)
+                attributes=n.attributes, noun=n.noun)
             rr.append(r)
         return rr
 

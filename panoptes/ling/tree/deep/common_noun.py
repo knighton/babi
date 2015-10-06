@@ -24,8 +24,9 @@ class DeepCommonNoun(DeepArgument):
 
         self.attributes = attributes
         assert isinstance(self.attributes, list)
-        for a in self.attributes:
-            assert False  # NOTE: not in demo.
+        for s in self.attributes:
+            assert s
+            assert isinstance(s, basestring)
 
         self.noun = noun
         if self.noun:
@@ -61,7 +62,7 @@ class DeepCommonNoun(DeepArgument):
             'possessor': possessor,
             'selector': self.selector.dump(),
             'number': number,
-            'attributes': map(lambda a: a.dump(), self.attributes),
+            'attributes': self.attributes,
             'noun': self.noun,
             'rels_nargs': rels_nargs,
         }
@@ -106,10 +107,6 @@ class DeepCommonNoun(DeepArgument):
         else:
             number = None
 
-        attributes = map(
-            lambda a: a.to_surface(transform_state, say_state, idiolect),
-            self.attributes)
-
         preps_nargs = []
         for rel, arg in self.rels_nargs:
             arg_type = arg.relation_arg_type()
@@ -117,8 +114,9 @@ class DeepCommonNoun(DeepArgument):
             narg = arg.to_surface(transform_state, say_state, idiolect)
             preps_nargs.append([prep, narg])
 
-        return SurfaceCommonNoun(possessor, self.selector, number, attributes,
-                                 self.noun, preps_nargs)
+        return SurfaceCommonNoun(
+            possessor, self.selector, number, self.attributes, self.noun,
+            preps_nargs)
 
     # --------------------------------------------------------------------------
     # Static.
@@ -128,7 +126,7 @@ class DeepCommonNoun(DeepArgument):
         possessor = loader.load(d['possessor'])
         selector = Selector.load(d['selector'])
         number = loader.load(d['number'])
-        attributes = map(loader.load, d['attributes'])
+        attributes = d['attributes']
         noun = d['noun']
 
         rels_nargs = []
