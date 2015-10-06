@@ -221,10 +221,7 @@ class ParseToSurface(object):
                 rr.append((None, n))
         return rr
 
-    def recog_time_of_day(self, root_token, noun, n2):
-        if n2 != N2.SING:
-            return []
-
+    def recog_time_of_day(self, root_token):
         if not root_token.downs:
             pre = None
         elif len(root_token.downs) == 1:
@@ -319,10 +316,6 @@ class ParseToSurface(object):
         return pp_nn
 
     def recog_common_noun(self, root_token, noun, n2):
-        pp_nn = self.recog_time_of_day(root_token, noun, n2)
-        if pp_nn:
-            return pp_nn
-
         pp_nn = self.recog_how_many_nn(root_token, noun, n2)
         pp_nn += self.recog_dt_nn(root_token, noun, n2)
         pp_nn += self.recog_posdet_nn(root_token, noun, n2)
@@ -369,6 +362,10 @@ class ParseToSurface(object):
         """
         Eg, cat.
         """
+        pp_nn = self.recog_time_of_day(root_token)
+        if pp_nn:
+            return pp_nn
+
         sing = root_token.text
         rr = self.recog_common_noun(root_token, sing, N2.SING)
         rr += self.recog_direction(root_token)
