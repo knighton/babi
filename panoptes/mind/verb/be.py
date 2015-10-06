@@ -6,10 +6,13 @@ from panoptes.mind.location import At, NotAt
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
 
+BE_LEMMAS = ['be']
+
+
 class AgentIsTarget(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.INFO
-        self.lemmas = ['be']
+        self.lemmas = BE_LEMMAS
         self.signatures = [
             [Relation.AGENT, Relation.TARGET],
         ]
@@ -43,7 +46,7 @@ class AgentIsTarget(ClauseMeaning):
 class AgentIsTargetQuestion(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.TF_Q
-        self.lemmas = ['be']
+        self.lemmas = BE_LEMMAS
         self.signatures = [
             [Relation.AGENT, Relation.TARGET],
         ]
@@ -87,7 +90,7 @@ class AgentIsTargetQuestion(ClauseMeaning):
 class AgentTargetQuestion(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.WH_Q
-        self.lemmas = ['be']
+        self.lemmas = BE_LEMMAS
         self.signatures = [
             [Relation.AGENT, Relation.TARGET],
         ]
@@ -150,10 +153,80 @@ class AgentTargetQuestion(ClauseMeaning):
             return None
 
 
+class AgentIsTo(ClauseMeaning):
+    def __init__(self):
+        self.purpose = Purpose.INFO
+        self.lemmas = BE_LEMMAS
+        self.signatures = [
+            [Relation.AGENT, Relation.TO],
+        ]
+
+    def handle(self, c, memory, (agent_xx, to_xx)):
+        if len(agent_xx) != 1:
+            return None
+
+        if len(to_xx) != 1:
+            return None
+
+        agent_x, = agent_xx
+        agent = memory.ideas[agent_x]
+
+        to_x, = to_xx
+        to = memory.ideas[to_x]
+
+        if isinstance(agent, Noun) and isinstance(to, Direction):
+            memory.graph.link(agent_x, to.which, to.of_x)
+            return Response()
+        else:
+            return None
+
+
+class IsAgentToQuestion(ClauseMeaning):
+    def __init__(self):
+        self.purpose = Purpose.TF_Q
+        self.lemmas = BE_LEMMAS
+        self.signatures = [
+            [Relation.AGENT, Relation.TO],
+        ]
+
+    def handle(self, c, memory, (agent_xx, to_xx)):
+        if len(agent_xx) != 1:
+            return None
+
+        if len(to_xx) != 1:
+            return None
+
+        agent_x, = agent_xx
+        agent = memory.ideas[agent_x]
+
+        to_x, = to_xx
+        to = memory.ideas[to_x]
+
+        if isinstance(agent, Noun) and isinstance(to, Direction):
+            path = memory.graph.decide_path(agent_x, to.of_x)
+            if path is None:
+                return Respnose('dunno')
+
+            if not path:
+                return Response("they're the same thing")
+
+            rels = set(path)
+            if len(rels) != 1:
+                return Response('unclear')
+
+            rel = rels.pop()
+            if rel == to.which:
+                return Response('yes')
+            else:
+                return Response('no')
+        else:
+            return None
+
+
 class AgentPlaceQuestion(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.WH_Q
-        self.lemmas = ['be']
+        self.lemmas = BE_LEMMAS
         self.signatures = [
             [Relation.AGENT, Relation.PLACE],
         ]
@@ -183,7 +256,7 @@ class AgentPlaceQuestion(ClauseMeaning):
 class AgentPlaceBeforeQuestion(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.WH_Q
-        self.lemmas = ['be']
+        self.lemmas = BE_LEMMAS
         self.signatures = [
             [Relation.AGENT, Relation.PLACE, Relation.BEFORE],
         ]
@@ -217,7 +290,7 @@ class AgentPlaceBeforeQuestion(ClauseMeaning):
 class AgentIn(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.INFO
-        self.lemmas = ['be']
+        self.lemmas = BE_LEMMAS
         self.signatures = [
             [Relation.AGENT, Relation.IN],
         ]
@@ -247,7 +320,7 @@ class AgentIn(ClauseMeaning):
 class AgentInQuestion(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.TF_Q
-        self.lemmas = ['be']
+        self.lemmas = BE_LEMMAS
         self.signatures = [
             [Relation.AGENT, Relation.IN],
         ]

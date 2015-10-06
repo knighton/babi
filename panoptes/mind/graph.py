@@ -24,6 +24,13 @@ class Graph(object):
 
             'smaller': 'bigger',
             'bigger': 'smaller',
+
+            'above': 'below',
+            'below': 'above',
+            'left': 'right',
+            'right': 'left',
+            'front': 'behind',
+            'behind': 'front',
         }
 
     def dump(self):
