@@ -249,9 +249,10 @@ class Memory(object):
             if rel in self.place_rels:
                 for x in xx:
                     idea = self.ideas[x]
-                    if not idea.kind:
-                        continue
-                    self.place_kinds.add(idea.kind)
+                    if isinstance(idea, Noun):
+                        if not idea.kind:
+                            continue
+                        self.place_kinds.add(idea.kind)
 
             assert xx
             rel2xx[rel] = xx
