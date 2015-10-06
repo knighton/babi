@@ -6,12 +6,14 @@ from panoptes.mind.mind import Mind, OverhearResult
 
 
 class PhilosophicalZombie(Agent):
-    def __init__(self):
+    def __init__(self, verbose=True):
         # Static state.
         self.english = English()
 
         # Dynamic state.
         self.reset()
+
+        self.verbose = verbose
 
     def reset(self):
         self.mind = Mind()
@@ -21,7 +23,7 @@ class PhilosophicalZombie(Agent):
         return self.mind.new_user()
 
     def put(self, from_uid, text):
-        recog = self.english.recognize(text)
+        recog = self.english.recognize(text, verbose=self.verbose)
         delib = Deliberation(recog)
 
         if not delib.recognized.dsens:

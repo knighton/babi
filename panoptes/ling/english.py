@@ -68,7 +68,7 @@ class English(object):
 
         self.joiner = Joiner()
 
-    def recognize(self, text, verbose=True):
+    def recognize(self, text, verbose=False):
         """
         text -> Recognition
         """

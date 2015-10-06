@@ -34,7 +34,7 @@ def main():
             try:
                 assert want_out == got_out
             except:
-                print 'died', want_out, '!=', got_out
+                print PRE, 'died', 'WANTED', want_out, '!=', 'GOT', got_out
                 raise
 
 

@@ -4,7 +4,7 @@ from panoptes.dataset.html_evaluator import HtmlEvaluator
 
 
 def main():
-    agent = PhilosophicalZombie()
+    agent = PhilosophicalZombie(verbose=False)
 
     d = 'data/tasks_1-20_v1-2/en-10k/'
     babi = load_babi(d)
