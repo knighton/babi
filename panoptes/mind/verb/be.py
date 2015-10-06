@@ -224,6 +224,48 @@ class IsAgentToQuestion(ClauseMeaning):
             return None
 
 
+def add_links(memory, agent_xx, relation, what_xx):
+    agents = map(lambda x: memory.ideas[x], agent_xx)
+    for n in agents:
+        if not isinstance(n, Noun):
+            return None
+
+    whats = map(lambda x: memory.ideas[x], what_xx)
+    for n in whats:
+        if not isinstance(n, Noun):
+            return None
+
+    for agent_x in agent_xx:
+        for what_x in what_xx:
+            memory.graph.link(agent_x, relation, what_x)
+
+    return Response()
+
+
+class AgentIsAbove(ClauseMeaning):
+    def __init__(self):
+        self.purpose = Purpose.INFO
+        self.lemmas = BE_LEMMAS
+        self.signatures = [
+            [Relation.AGENT, Relation.ABOVE],
+        ]
+
+    def handle(self, c, memory, (agent_xx, above_xx)):
+        return add_links(memory, agent_xx, 'above', above_xx)
+
+
+class AgentIsBelow(ClauseMeaning):
+    def __init__(self):
+        self.purpose = Purpose.INFO
+        self.lemmas = BE_LEMMAS
+        self.signatures = [
+            [Relation.AGENT, Relation.BELOW],
+        ]
+
+    def handle(self, c, memory, (agent_xx, below_xx)):
+        return add_links(memory, agent_xx, 'below', below_xx)
+
+
 class AgentPlaceQuestion(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.WH_Q
