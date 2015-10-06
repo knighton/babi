@@ -10,14 +10,16 @@ class SayState(object):
     """
 
     def __init__(self, comparative_mgr, det_pronoun_mgr, inflection_mgr,
-                 personal_mgr, plural_mgr, pro_adverb_mgr, verb_mgr):
-        self.comparative_mgr = comparative_mgr  # ComparativeManager.
-        self.det_pronoun_mgr = det_pronoun_mgr  # CorrelativeManager.
-        self.inflection_mgr = inflection_mgr    # InflectionManager.
-        self.personal_mgr = personal_mgr        # PersonalManager.
-        self.plural_mgr = plural_mgr            # PluralManager.
-        self.pro_adverb_mgr = pro_adverb_mgr    # ShortcutManager.
-        self.verb_mgr = verb_mgr                # VerbManager.
+                 personal_mgr, plural_mgr, pro_adverb_mgr, time_of_day_mgr,
+                 verb_mgr):
+        self.comparative_mgr = comparative_mgr
+        self.det_pronoun_mgr = det_pronoun_mgr
+        self.inflection_mgr = inflection_mgr
+        self.personal_mgr = personal_mgr
+        self.plural_mgr = plural_mgr
+        self.pro_adverb_mgr = pro_adverb_mgr
+        self.time_of_day_mgr = time_of_day_mgr
+        self.verb_mgr = verb_mgr
 
 
 class SayContext(object):

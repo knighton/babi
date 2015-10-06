@@ -1,6 +1,7 @@
 from panoptes.ling.tree.common.existential_there import ExistentialThere
 from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun
 from panoptes.ling.tree.common.proper_noun import ProperNoun
+from panoptes.ling.tree.common.time_of_day import TimeOfDay
 from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
 from panoptes.ling.tree.deep.comparative import DeepComparative
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
@@ -32,6 +33,7 @@ class ArgLoader(object):
             ExistentialThere,
             PersonalPronoun,
             ProperNoun,
+            TimeOfDay,
 
             # Surface.
             SurfaceCommonNoun,

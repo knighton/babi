@@ -13,6 +13,7 @@ from panoptes.ling.tree.common.number import Number
 from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun, \
     PersonalPronounCase
 from panoptes.ling.tree.common.proper_noun import ProperNoun
+from panoptes.ling.tree.common.time_of_day import TimeOfDay
 from panoptes.ling.tree.common.util.selector import Correlative, Selector
 from panoptes.ling.tree.surface.base import SayContext, SayState
 from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
@@ -127,7 +128,8 @@ class ParseToSurface(object):
     """
 
     def __init__(self, comparative_mgr, det_pronoun_mgr, personal_mgr,
-                 plural_mgr, pro_adverb_mgr, say_state, verb_mgr):
+                 plural_mgr, pro_adverb_mgr, say_state, time_of_day_mgr,
+                 verb_mgr):
         # For extracting the correct verb conjugation from subjects.
         self.arbitrary_idiolect = Idiolect()
         self.say_state = say_state
@@ -142,6 +144,7 @@ class ParseToSurface(object):
         self.personal_mgr = personal_mgr
         self.plural_mgr = plural_mgr
         self.pro_adverb_mgr = pro_adverb_mgr
+        self.time_of_day_mgr = time_of_day_mgr
 
         self.tag2recognize_arg = {
             'DT': self.recog_dt,
@@ -222,7 +225,16 @@ class ParseToSurface(object):
         if n2 != N2.SING:
             return []
 
-        return []
+        if not root_token.downs:
+            pre = None
+        if len(root_token.downs) == 1:
+            rel, child = root_token.downs[0]
+            pre = child.text
+        else:
+            return []
+
+        rr = self.time_of_day_mgr.decode(pre, root_token.text)
+        return map(lambda r: ((TIME_PREP,), TimeOfDay(*r)), rr)
 
     def recog_how_many_nn(self, root_token, noun, n2):
         many = None
@@ -578,10 +590,12 @@ class ParseToSurface(object):
                 continue
             pp_nn = r
 
+            """
             if rel == 'npadvmod':
                 for i, (p, n) in enumerate(pp_nn):
                     if not p:
                         pp_nn[i] = (TIME_PREP,), n
+            """
 
             spoken_preps = [prep] * len(pp_nn)
             absorbed_preps, vargs = zip(*pp_nn) if pp_nn else ([], [])

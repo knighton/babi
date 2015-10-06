@@ -39,6 +39,13 @@ class TimeOfDay(CommonArgument):
         return SayResult(tokens=tokens, conjugation=Conjugation.S3,
                          eat_prep=False)
 
+    # --------------------------------------------------------------------------
+    # Static.
+
+    @staticmethod
+    def load(self, d, loader):
+        return TimeOfDay(d['day_offset'], d['section'])
+
 
 class TimeOfDayManager(object):
     def __init__(self):

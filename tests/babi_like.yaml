@@ -192,6 +192,7 @@
         out: bathroom
   - name: task14
     pairs:
+      - in: Last night Tim moved to the abyss.
       - in: This morning Mary moved to the kitchen.
       - in: This afternoon Mary moved to the cinema.
       - in: Yesterday Bill went to the bedroom.

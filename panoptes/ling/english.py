@@ -11,6 +11,7 @@ from panoptes.ling.parse.parser import Parser as TextToParse
 from panoptes.ling.tree.deep.base import TransformState
 from panoptes.ling.tree.deep.recog import SurfaceToDeep
 from panoptes.ling.tree.common.personal_pronoun import PersonalManager
+from panoptes.ling.tree.common.time_of_day import TimeOfDayManager
 from panoptes.ling.tree.surface.base import SayContext, SayState
 from panoptes.ling.tree.surface.recog import ParseToSurface
 from panoptes.ling.tree.surface.util.pro_adverb import ProAdverbManager
@@ -39,6 +40,7 @@ class English(object):
         comparative_mgr = ComparativeManager.default(syllable_counter)
         det_pronoun_mgr = DetPronounManager()
         pro_adverb_mgr = ProAdverbManager()
+        time_of_day_mgr = TimeOfDayManager()
 
         inflection_mgr = InflectionManager()
         personal_mgr = PersonalManager(inflection_mgr)
@@ -46,7 +48,7 @@ class English(object):
 
         self.say_state = SayState(
             comparative_mgr, det_pronoun_mgr, inflection_mgr, personal_mgr,
-            plural_mgr, pro_adverb_mgr, verb_mgr)
+            plural_mgr, pro_adverb_mgr, time_of_day_mgr, verb_mgr)
 
         # The SayContext is needed for conjugation.  None of its fields affect
         # conjugation for any object.
@@ -61,7 +63,7 @@ class English(object):
         self.text_to_parse = TextToParse()
         self.parse_to_surface = ParseToSurface(
             comparative_mgr, det_pronoun_mgr, personal_mgr, plural_mgr,
-            pro_adverb_mgr, self.say_state, verb_mgr)
+            pro_adverb_mgr, self.say_state, time_of_day_mgr, verb_mgr)
         self.surface_to_deep = SurfaceToDeep(purpose_mgr, relation_mgr)
 
         self.joiner = Joiner()
