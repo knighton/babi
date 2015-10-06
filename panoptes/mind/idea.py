@@ -114,6 +114,10 @@ class Noun(Idea):
             if view.gender != self.gender:
                 return False
 
+        for s in view.attributes:
+            if s not in self.attributes:
+                return False
+
         if view.kind and self.kind:
             if view.kind == self.kind:
                 pass
