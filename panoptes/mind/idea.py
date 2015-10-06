@@ -29,8 +29,10 @@ Query = enum('Query = CARDINALITY IDENTITY')
 
 class Noun(Idea):
     def __init__(self, query=None, name=None, gender=None,
-                 is_animate=None, selector=None, kind=None, rel2xx=None,
-                 carrying=None):
+                 is_animate=None, selector=None, attributes=None, kind=None,
+                 rel2xx=None, carrying=None):
+        if attributes is None:
+            attributes = []
         if rel2xx is None:
             rel2xx = {}
         if carrying is None:
@@ -56,6 +58,12 @@ class Noun(Idea):
         self.selector = selector
         if self.selector:
             assert isinstance(self.selector, Selector)
+
+        self.attributes = attributes
+        assert isinstance(self.attributes, list)
+        for s in self.attributes:
+            assert s
+            assert isinstance(s, basestring)
 
         self.kind = kind
         if self.kind:
@@ -86,6 +94,7 @@ class Noun(Idea):
             'gender': Gender.to_str[self.gender] if self.gender else None,
             'is_animate': self.is_animate,
             'selector': self.selector.dump() if self.selector else None,
+            'attributes': self.attributes,
             'kind': self.kind,
             'rel2xx': rel2xx,
             'carrying': self.carrying,
@@ -117,9 +126,7 @@ class Noun(Idea):
 
     @staticmethod
     def make_who():
-        return Noun(query=Query.IDENTITY, name=None, gender=None,
-                    is_animate=None, selector=None, kind='person', rel2xx=None,
-                    carrying=None)
+        return Noun(query=Query.IDENTITY, kind='person')
 
 
 class NounReverb(Idea):
@@ -146,15 +153,20 @@ class NounReverb(Idea):
 
 
 class NounView(object):
-    def __init__(self, name=None, gender=None, kind=None):
+    def __init__(self, name=None, gender=None, attributes=None, kind=None):
+        if attributes is None:
+            attributes = []
+
         self.name = name
         self.gender = gender
+        self.attributes = attributes
         self.kind = kind
 
     def dump(self):
         return {
             'name': self.name,
             'gender': Gender.to_str[self.gender] if self.gender else None,
+            'attributes': self.attributes,
             'kind': self.kind,
         }
 

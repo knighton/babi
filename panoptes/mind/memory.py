@@ -178,13 +178,12 @@ class Memory(object):
         n = deep_ref.arg
 
         assert not n.possessor
-        assert not n.attributes
         assert not n.rels_nargs
 
         if n.number and n.number.is_interrogative():
             assert n.selector.correlative == Correlative.INDEF
             idea = Noun(query=Query.CARDINALITY, selector=n.selector,
-                        kind=n.noun)
+                        attributes=n.attributes, kind=n.noun)
             x = self.add_idea(idea)
             return [x]
 
@@ -196,7 +195,7 @@ class Memory(object):
 
         if n.selector.correlative == Correlative.INTR:
             idea = Noun(query=Query.IDENTITY, selector=n.selector,
-                        kind=n.noun)
+                        attributes=n.attributes, kind=n.noun)
             x = self.add_idea(idea)
             return [x]
 
@@ -214,7 +213,7 @@ class Memory(object):
             gender = None
         else:
             gender = Gender.NEUTER
-        view = NounView(kind=n.noun, gender=gender)
+        view = NounView(attributes=n.attributes, kind=n.noun, gender=gender)
         return self.resolve_one_noun(view)
 
     def decode_comparative(self, deep_ref, from_xx, to_xx):
