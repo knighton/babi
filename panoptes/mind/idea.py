@@ -177,7 +177,8 @@ class NounView(object):
 
 def idea_from_view(view):
     print 'IDEA FROM VIEW', view.dump()
-    return Noun(name=view.name, gender=view.gender, kind=view.kind)
+    return Noun(name=view.name, gender=view.gender, attributes=view.attributes,
+                kind=view.kind)
 
 
 class Direction(Idea):
