@@ -215,6 +215,7 @@ class IsAgentToQuestion(ClauseMeaning):
                 return Response('unclear')
 
             rel = rels.pop()
+            rel = memory.graph.direction2inverse[rel]
             if rel == to.which:
                 return Response('yes')
             else:
