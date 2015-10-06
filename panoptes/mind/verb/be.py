@@ -153,6 +153,65 @@ class AgentTargetQuestion(ClauseMeaning):
             return None
 
 
+def a_direction_b(memory, agent_xx, relation, what_xx):
+    agents = map(lambda x: memory.ideas[x], agent_xx)
+    for n in agents:
+        if not isinstance(n, Noun):
+            return None
+
+    whats = map(lambda x: memory.ideas[x], what_xx)
+    for n in whats:
+        if not isinstance(n, Noun):
+            return None
+
+    for agent_x in agent_xx:
+        for what_x in what_xx:
+            memory.graph.link(agent_x, relation, what_x)
+
+    return Response()
+
+
+def is_path_direction(memory, path, direction):
+    if path is None:
+        return Response('dunno')
+
+    if not path:
+        return Resopnse('same thing')
+
+    rels = set(path)
+    opposite = memory.graph.direction2inverse[direction]
+    if direction in rels:
+        if opposite in rels:
+            r = 'no'
+        else:
+            r = 'yes'
+    else:
+        r = 'no'
+
+    return Response(r)
+
+
+def is_a_direction_b(memory, a_xx, relation, b_xx):
+    if len(a_xx) != 1:
+        return None
+
+    if len(b_xx) != 1:
+        return None
+
+    a_x, = a_xx
+    a = memory.ideas[a_x]
+    if not isinstance(a, Noun):
+        return None
+
+    b_x, = b_xx
+    b = memory.ideas[b_x]
+    if not isinstance(b, Noun):
+        return None
+
+    path = memory.graph.decide_path(b_x, a_x)
+    return is_path_direction(memory, path, relation)
+
+
 class AgentIsTo(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.INFO
@@ -203,86 +262,9 @@ class IsAgentToQuestion(ClauseMeaning):
         to = memory.ideas[to_x]
 
         if isinstance(agent, Noun) and isinstance(to, Direction):
-            path = memory.graph.decide_path(agent_x, to.of_x)
-            if path is None:
-                return Response('dunno')
-
-            if not path:
-                return Response("they're the same thing")
-
-            rels = set(path)
-            if len(rels) != 1:
-                return Response('unclear')
-
-            rel = rels.pop()
-            rel = memory.graph.direction2inverse[rel]
-            if rel == to.which:
-                return Response('yes')
-            else:
-                return Response('no')
+            return is_a_direction_b(memory, [agent_x], to.which, [to.of_x])
         else:
             return None
-
-
-def a_direction_b(memory, agent_xx, relation, what_xx):
-    agents = map(lambda x: memory.ideas[x], agent_xx)
-    for n in agents:
-        if not isinstance(n, Noun):
-            return None
-
-    whats = map(lambda x: memory.ideas[x], what_xx)
-    for n in whats:
-        if not isinstance(n, Noun):
-            return None
-
-    for agent_x in agent_xx:
-        for what_x in what_xx:
-            memory.graph.link(agent_x, relation, what_x)
-
-    return Response()
-
-
-def is_path_direction(memory, path, direction):
-    print 'IS_PATH_DIRECTION', path, direction
-    if path is None:
-        return Response('dunno')
-
-    if not path:
-        return Resopnse('same thing')
-
-    rels = set(path)
-    opposite = memory.graph.direction2inverse[direction]
-    if direction in rels:
-        if opposite in rels:
-            r = 'no'
-        else:
-            r = 'yes'
-    else:
-        r = 'no'
-
-    return Response(r)
-
-
-def is_a_direction_b(memory, a_xx, relation, b_xx):
-    print 'IS_A_DIRECTION_B', a_xx, relation, b_xx
-    if len(a_xx) != 1:
-        return None
-
-    if len(b_xx) != 1:
-        return None
-
-    a_x, = a_xx
-    a = memory.ideas[a_x]
-    if not isinstance(a, Noun):
-        return None
-
-    b_x, = b_xx
-    b = memory.ideas[b_x]
-    if not isinstance(b, Noun):
-        return None
-
-    path = memory.graph.decide_path(b_x, a_x)
-    return is_path_direction(memory, path, relation)
 
 
 class AgentIsAbove(ClauseMeaning):
@@ -318,7 +300,6 @@ class IsAgentAbove(ClauseMeaning):
         ]
 
     def handle(self, c, memory, (agent_xx, above_xx)):
-        print 'IS AGENT ABOVE'
         return is_a_direction_b(memory, agent_xx, 'above', above_xx)
 
 
