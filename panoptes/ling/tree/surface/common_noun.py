@@ -68,8 +68,9 @@ class SurfaceCommonNoun(SurfaceArgument):
         # List of restrictive or descriptive attributes.
         self.attributes = attributes
         assert isinstance(self.attributes, list)
-        for a in self.attributes:
-            assert False  # NOTE: not in demo.
+        for s in self.attributes:
+            assert s
+            assert isinstance(s, basestring)
 
         # The word(s) for its type, unit, noun, etc.
         #
@@ -137,7 +138,7 @@ class SurfaceCommonNoun(SurfaceArgument):
             'possessor': pos,
             'selector': self.selector.dump(),
             'number': num,
-            'attributes': map(lambda a: a.dump(), self.attributes),
+            'attributes': self.attributes,
             'noun': self.noun,
             'preps_nargs': preps_nargs,
         }
@@ -308,8 +309,7 @@ class SurfaceCommonNoun(SurfaceArgument):
             r.tokens += r2.tokens
 
         # Say the attributes.
-        if self.attributes:
-            assert False  # NOTE: not in demo.
+        r.tokens += self.attributes
 
         # Say the noun.
         if is_plur:

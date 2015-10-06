@@ -264,40 +264,56 @@ class ParseToSurface(object):
         return [(None, n)]
 
     def recog_dt_nn(self, root_token, noun, gram_n2):
-        deps_childs = filter(lambda (d, c): d == 'det', root_token.downs)
-
-        if len(deps_childs) != 1:
+        """
+        * DT (ADJS) NN(S)
+        """
+        if not root_token.downs:
             return []
 
-        dep, child = deps_childs[0]
+        dep, child = root_token.downs[0]
+        if dep != 'det':
+            return []
 
         s = child.text
 
         if s in ['a', 'an']:
             s = A_OR_AN
 
+        attrs = []
+        for dep, child in root_token.downs[1:]:
+            if dep != 'amod':
+                return []
+            attrs.append(child.text)
+
         nn = []
         for selector in self.det_pronoun_mgr.parse_determiner(s):
             for selector in selector.restricted_to_grammatical_number(
                     gram_n2, self.det_pronoun_mgr.cor2res_gno):
-                n = SurfaceCommonNoun(selector=selector, noun=noun)
+                n = SurfaceCommonNoun(selector=selector, attributes=list(attrs),
+                                      noun=noun)
                 nn.append(n)
         return map(lambda n: (None, n), nn)
 
     def recog_posdet_nn(self, root_token, noun, gram_n2):
         """
-        * PRP$ NN(S)
-        * WP$ NN(S)
+        * PRP$ (ADJS) NN(S)
+        * WP$ (ADJS) NN(S)
         """
-        deps_childs = filter(lambda (d, c): d == 'poss', root_token.downs)
-
-        if len(deps_childs) != 1:
+        if not root_token.downs:
             return []
 
-        dep, child = deps_childs[0]
+        rel, possessor = root_token.downs[0]
+        if rel != 'pos':
+            return []
+
+        attrs = []
+        for rel, child in root_token.downs[1:]:
+            if rel != 'amod':
+                return []
+            attrs.append(child.text)
 
         nn = []
-        for declension in self.personal_mgr.posdet_parse((child.text,)):
+        for declension in self.personal_mgr.posdet_parse((possessor.text,)):
             pos = PersonalPronoun(declension, PersonalPronounCase.OBJECT)
 
             correlative = Correlative.DEF
@@ -308,7 +324,7 @@ class ParseToSurface(object):
             for selector in selector.restricted_to_grammatical_number(
                     gram_n2, self.det_pronoun_mgr.cor2res_gno):
                 n = SurfaceCommonNoun(possessor=pos, selector=selector,
-                                      noun=noun)
+                                      attributes=list(attrs), noun=noun)
                 nn.append(n)
         return map(lambda n: (None, n), nn)
 
