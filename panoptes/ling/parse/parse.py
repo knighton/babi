@@ -321,7 +321,6 @@ class Parse(object):
         #
         # so if you get "(is) (something)" try to split the something.
         #
-        #
         #   "Is the triangle above the pink rectangle?"
         while True:
             t = self.tokens[0]
@@ -346,6 +345,33 @@ class Parse(object):
             reassign_parent(grandchild, self.root)
 
             break
+
+        # Convert from
+        #
+        #   verb -prep-> IN -npadvmod-> anything
+        #
+        # to
+        #
+        #   verb -prep-> IN
+        #   verb -nsubj-> anything
+        for t in self.tokens:
+            rel, parent = t.up
+            if not parent:
+                continue
+            if rel != 'npadvmod':
+                continue
+            if parent.tag != 'IN':
+                continue
+            parent_rel, grandparent = parent.up
+            if not grandparent:
+                continue
+            if parent_rel != 'prep':
+                continue
+            if not grandparent.tag.startswith('V'):
+                continue
+
+            t.up = 'nsubj', parent
+            reassign_parent(t, grandparent)
 
         # Prepositional phrase attachment: should be owned by another arg.
         #
