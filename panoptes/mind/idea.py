@@ -3,6 +3,7 @@ from panoptes.ling.glue.inflection import Gender
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
 from panoptes.ling.morph.comparative.comparative import ComparativePolarity
+from panoptes.ling.tree.common.time_of_day import DaySection
 from panoptes.ling.tree.common.util.selector import Selector
 from panoptes.ling.tree.deep.content_clause import Status
 from panoptes.ling.verb.verb import DeepVerb
@@ -272,4 +273,22 @@ class ClauseView(object):
         return {
             'possible_lemmas': sorted(self.possible_lemmas),
             'rel2xx': rel2xx,
+        }
+
+
+class RelativeDay(Idea):
+    def __init__(self, day_offset, section):
+        self.day_offset = day_offset
+        assert isinstance(self.day_offset, int)
+
+        self.section = section
+        if self.section:
+            assert DaySection.is_valid(self.section)
+
+    def dump(self):
+        section = DaySection.to_str[self.section] if self.section else None
+        return {
+            'type': 'RelativeDay',
+            'day_offset': self.day_offset,
+            'section': section,
         }

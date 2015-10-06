@@ -8,6 +8,7 @@ from panoptes.ling.morph.gender.gender import GenderClassifier
 from panoptes.ling.tree.common.util.selector import Correlative
 from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun
 from panoptes.ling.tree.common.proper_noun import ProperNoun
+from panoptes.ling.tree.common.time_of_day import TimeOfDay
 from panoptes.ling.tree.deep.common_noun import DeepCommonNoun
 from panoptes.ling.tree.deep.comparative import DeepComparative
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
@@ -15,7 +16,7 @@ from panoptes.ling.tree.deep.direction import DeepDirection
 from panoptes.ling.tree.deep.logic import DeepAnd
 from panoptes.mind.graph import Graph
 from panoptes.mind.idea import Clause, ClauseView, Comparative, Query, Noun, \
-    NounView, NounReverb, idea_from_view, Direction
+    NounView, NounReverb, idea_from_view, Direction, RelativeDay
 
 
 class DeepReference(object):
@@ -64,6 +65,7 @@ class Memory(object):
             DeepDirection: self.decode_direction,
             PersonalPronoun: self.decode_personal_pronoun,
             ProperNoun: self.decode_proper_noun,
+            TimeOfDay: self.decode_time_of_day,
         }
 
         self.next_clause_id = 0
@@ -305,6 +307,12 @@ class Memory(object):
         gender = self.gender_clf.classify(name)
         view = NounView(name=name, gender=gender, kind='person')
         return self.resolve_one_noun(view)
+
+    def decode_time_of_day(self, deep_ref, from_xx, to_xx):
+        t = deep_ref.arg
+        n = RelativeDay(t.day_offset, t.section)
+        x = self.add_idea(n)
+        return [x]
 
     def decode(self, deep_ref, from_xx, to_xx):
         """
