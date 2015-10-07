@@ -1,7 +1,7 @@
 from panoptes.mind.idea.base import Idea
 
 
-class NounReverb(Idea):
+class Reverb(Idea):
     """
     Points back to an earlier idea.
 
@@ -15,10 +15,14 @@ class NounReverb(Idea):
 
     def dump(self):
         return {
-            'type': 'NounReverb',
+            'type': self.__class__.__name__,
             'x': self.x,
         }
 
     def matches_noun_view(self, view, ideas, place_kinds):
         n = ideas[self.x]
         return n.matches_noun_view(view, ideas, place_kinds)
+
+    def matches_clause_view(self, view, ideas):
+        c = ideas[self.x]
+        return c.matches_clause_view(view, ideas)

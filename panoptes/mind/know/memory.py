@@ -21,7 +21,7 @@ from panoptes.mind.idea.clause import Clause, ClauseView
 from panoptes.mind.idea.comparative import Comparative
 from panoptes.mind.idea.direction import Direction
 from panoptes.mind.idea.noun import Noun, NounView, Query
-from panoptes.mind.idea.reverb import NounReverb
+from panoptes.mind.idea.reverb import Reverb
 from panoptes.mind.idea.time import RelativeDay
 
 
@@ -130,7 +130,7 @@ class Memory(object):
     def go_to_the_source(self, x):
         while True:
             idea = self.ideas[x]
-            if not isinstance(idea, NounReverb):
+            if not isinstance(idea, Reverb):
                 break
             x = idea.x
         return x
@@ -141,7 +141,7 @@ class Memory(object):
             if not idea:
                 continue
             if idea.matches_noun_view(view, self.ideas, self.place_kinds):
-                idea = NounReverb(i)
+                idea = Reverb(i)
                 x = self.add_idea(idea)
                 x = self.go_to_the_source(x)
                 return [x]
@@ -157,7 +157,7 @@ class Memory(object):
             if not idea:
                 continue
             if idea.matches_noun_view(view, self.ideas, self.place_kinds):
-                idea = NounReverb(i)
+                idea = Reverb(i)
                 x = self.add_idea(idea)
                 x = self.go_to_the_source(x)
                 rr.append(x)
@@ -173,7 +173,7 @@ class Memory(object):
             idea = self.ideas[i]
             if not idea:
                 continue
-            if idea.matches_clause_view(view):
+            if idea.matches_clause_view(view, self.ideas):
                 return i
 
         return None

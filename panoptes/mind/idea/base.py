@@ -5,5 +5,5 @@ class Idea(object):
     def matches_noun_view(self, view, ideas, place_kinds):
         return False
 
-    def matches_clause_view(self, view):
+    def matches_clause_view(self, view, ideas):
         return False

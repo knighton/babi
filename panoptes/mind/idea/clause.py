@@ -50,7 +50,7 @@ class Clause(Idea):
             'rel2xx': rel2xx,
         }
 
-    def matches_clause_view(self, view):
+    def matches_clause_view(self, view, ideas):
         if self.purpose != Purpose.INFO:
             return False
 
