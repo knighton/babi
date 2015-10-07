@@ -132,6 +132,15 @@
       - in: Mary is no longer in the office.
       - in: Is Mary in the office?
         out: "no"
+  - name: task10
+    pairs:
+      - in: Mary is either in the school or the office.
+      - in: Is Mary in the car?
+        out: "no"
+      - in: Is Mary in the school?
+        out: maybe
+      - in: Is Mary in the office?
+        out: maybe
   - name: task11_he
     pairs:
       - in: John journeyed to the hallway.
