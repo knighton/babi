@@ -20,7 +20,7 @@ from panoptes.mind.know.graph import Graph
 from panoptes.mind.idea.clause import Clause, ClauseView
 from panoptes.mind.idea.comparative import Comparative
 from panoptes.mind.idea.direction import Direction
-from panoptes.mind.idea.noun import Noun, NounView, Query, idea_from_view
+from panoptes.mind.idea.noun import Noun, NounView, Query
 from panoptes.mind.idea.reverb import NounReverb
 from panoptes.mind.idea.time import RelativeDay
 
@@ -146,7 +146,7 @@ class Memory(object):
                 x = self.go_to_the_source(x)
                 return [x]
 
-        idea = idea_from_view(view)
+        idea = Noun.from_view(view)
         x = self.add_idea(idea)
         return [x]
 
@@ -164,7 +164,7 @@ class Memory(object):
                 if 1 < len(rr):
                     return rr
 
-        idea = idea_from_view(view)
+        idea = Noun.from_view(view)
         x = self.add_idea(idea)
         return [x]
 

@@ -137,6 +137,11 @@ class Noun(Idea):
     def make_who():
         return Noun(query=Query.IDENTITY, kind='person')
 
+    @staticmethod
+    def from_view(view):
+        return Noun(query=view.query, name=view.name, gender=view.gender,
+                    attributes=view.attributes, kind=view.kind)
+
 
 class NounView(object):
     def __init__(self, query=None, name=None, gender=None, attributes=None,
@@ -158,8 +163,3 @@ class NounView(object):
             'attributes': self.attributes,
             'kind': self.kind,
         }
-
-
-def idea_from_view(view):
-    return Noun(query=view.query, name=view.name, gender=view.gender,
-                attributes=view.attributes, kind=view.kind)
