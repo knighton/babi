@@ -17,10 +17,10 @@ from panoptes.ling.tree.deep.conjunction import DeepConjunction
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
 from panoptes.ling.tree.deep.direction import DeepDirection
 from panoptes.mind.know.graph import Graph
-from panoptes.mind.idea.clause import Clause, ClauseView
+from panoptes.mind.idea.clause import Clause, ClauseFeatures
 from panoptes.mind.idea.comparative import Comparative
 from panoptes.mind.idea.direction import Direction
-from panoptes.mind.idea.noun import Noun, NounView, Query
+from panoptes.mind.idea.noun import Noun, NounFeatures, Query
 from panoptes.mind.idea.reverb import Reverb
 from panoptes.mind.idea.time import RelativeDay
 
@@ -135,28 +135,30 @@ class Memory(object):
             x = idea.x
         return x
 
-    def resolve_one_noun(self, view):
+    def resolve_one_noun(self, features):
         for i in xrange(len(self.ideas) - 1, -1, -1):
             idea = self.ideas[i]
             if not idea:
                 continue
-            if idea.matches_noun_view(view, self.ideas, self.place_kinds):
+            if idea.matches_noun_features(
+                    features, self.ideas, self.place_kinds):
                 idea = Reverb(i)
                 x = self.add_idea(idea)
                 x = self.go_to_the_source(x)
                 return [x]
 
-        idea = Noun.from_view(view)
+        idea = Noun.from_features(features)
         x = self.add_idea(idea)
         return [x]
 
-    def resolve_plural_noun(self, view):
+    def resolve_plural_noun(self, features):
         rr = []
         for i in xrange(len(self.ideas) - 1, -1, -1):
             idea = self.ideas[i]
             if not idea:
                 continue
-            if idea.matches_noun_view(view, self.ideas, self.place_kinds):
+            if idea.matches_noun_features(
+                    features, self.ideas, self.place_kinds):
                 idea = Reverb(i)
                 x = self.add_idea(idea)
                 x = self.go_to_the_source(x)
@@ -164,16 +166,16 @@ class Memory(object):
                 if 1 < len(rr):
                     return rr
 
-        idea = Noun.from_view(view)
+        idea = Noun.from_feature(features)
         x = self.add_idea(idea)
         return [x]
 
-    def resolve_one_clause(self, view):
+    def resolve_one_clause(self, features):
         for i in xrange(len(self.ideas) - 1, -1, -1):
             idea = self.ideas[i]
             if not idea:
                 continue
-            if idea.matches_clause_view(view, self.ideas):
+            if idea.matches_clause_features(features, self.ideas):
                 return i
 
         return None
@@ -214,9 +216,9 @@ class Memory(object):
                 return [x]
             elif N5.DUAL <= n.selector.n_min:
                 # It's referring to all of instances with those fields.
-                view = NounView(query=Query.GENERIC, attributes=n.attributes,
-                                kind=n.noun)
-                xx = self.resolve_one_noun(view)
+                features = NounFeatures(
+                    query=Query.GENERIC, attributes=n.attributes, kind=n.noun)
+                xx = self.resolve_one_noun(features)
                 return xx
             else:
                 assert False
@@ -247,8 +249,9 @@ class Memory(object):
             gender = None
         else:
             gender = Gender.NEUTER
-        view = NounView(attributes=n.attributes, kind=n.noun, gender=gender)
-        return self.resolve_one_noun(view)
+        features = NounFeatures(
+            attributes=n.attributes, kind=n.noun, gender=gender)
+        return self.resolve_one_noun(features)
 
     def decode_comparative(self, deep_ref, from_xx, to_xx):
         sub_deep_ref = DeepReference(
@@ -323,24 +326,24 @@ class Memory(object):
         elif d == Declension.YOU:
             return to_xx
         elif d == Declension.HE:
-            view = NounView(gender=Gender.MALE, kind='person')
+            features = NounFeatures(gender=Gender.MALE, kind='person')
         elif d == Declension.SHE:
-            view = NounView(gender=Gender.FEMALE, kind='person')
+            features = NounFeatures(gender=Gender.FEMALE, kind='person')
         elif d == Declension.THEY2:
-            view = NounView(kind='person')
-            return self.resolve_plural_noun(view)
+            features = NounFeatures(kind='person')
+            return self.resolve_plural_noun(features)
         else:
             print 'Unhandled declension, bailing on this dsen:', \
                 Declension.to_str[d]
             return None
 
-        return self.resolve_one_noun(view)
+        return self.resolve_one_noun(features)
 
     def decode_proper_noun(self, deep_ref, from_xx, to_xx):
         name = deep_ref.arg.name
         gender = self.gender_clf.classify(name)
-        view = NounView(name=name, gender=gender)
-        return self.resolve_one_noun(view)
+        features = NounFeatures(name=name, gender=gender)
+        return self.resolve_one_noun(features)
 
     def decode_time_of_day(self, deep_ref, from_xx, to_xx):
         t = deep_ref.arg

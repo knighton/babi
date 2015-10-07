@@ -106,27 +106,27 @@ class Noun(Idea):
 
         assert to.location_history.is_empty()
 
-    def matches_noun_view(self, view, ideas, place_kinds):
-        if self.query != view.query:
+    def matches_noun_features(self, f, ideas, place_kinds):
+        if self.query != f.query:
             return False
 
         # Otherwise we'll match indiscriminately.
-        if view.name:
-            if view.name != self.name:
+        if f.name:
+            if f.name != self.name:
                 return False
 
-        if view.gender and self.gender:
-            if view.gender != self.gender:
+        if f.gender and self.gender:
+            if f.gender != self.gender:
                 return False
 
-        for s in view.attributes:
+        for s in f.attributes:
             if s not in self.attributes:
                 return False
 
-        if view.kind and self.kind:
-            if view.kind == self.kind:
+        if f.kind and self.kind:
+            if f.kind == self.kind:
                 pass
-            elif view.kind == 'place' and self.kind in place_kinds:
+            elif f.kind == 'place' and self.kind in place_kinds:
                 pass
             else:
                 return False
@@ -138,12 +138,12 @@ class Noun(Idea):
         return Noun(query=Query.IDENTITY, kind='person')
 
     @staticmethod
-    def from_view(view):
-        return Noun(query=view.query, name=view.name, gender=view.gender,
-                    attributes=view.attributes, kind=view.kind)
+    def from_features(f):
+        return Noun(query=f.query, name=f.name, gender=f.gender,
+                    attributes=f.attributes, kind=f.kind)
 
 
-class NounView(object):
+class NounFeatures(object):
     def __init__(self, query=None, name=None, gender=None, attributes=None,
                  kind=None):
         if attributes is None:

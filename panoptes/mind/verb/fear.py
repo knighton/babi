@@ -1,7 +1,7 @@
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
-from panoptes.mind.idea.clause import ClauseView
-from panoptes.mind.idea.noun import Noun, NounView, Query
+from panoptes.mind.idea.clause import ClauseFeatures
+from panoptes.mind.idea.noun import Noun, NounFeatures, Query
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
 
@@ -77,24 +77,25 @@ class BefearQuestion(ClauseMeaning):
                 rel2xx = {
                     Relation.TARGET: target_xx,
                 }
-                view = ClauseView(
+                features = ClauseFeatures(
                     possible_lemmas=BEFEAR_LEMMAS, rel2xx=rel2xx)
-                c = memory.resolve_one_clause(view)
+                c = memory.resolve_one_clause(features)
                 if c is None:
                     if not target.kind:
                         return Response('dunno')
 
-                    view = NounView(query=Query.GENERIC, kind=target.kind)
-                    target_kind_xx = memory.resolve_one_noun(view)
+                    features = NounFeatures(
+                        query=Query.GENERIC, kind=target.kind)
+                    target_kind_xx = memory.resolve_one_noun(features)
                     if len(target_kind_xx) != 1:
                         return Response('todo')
 
                     rel2xx = {
                         Relation.TARGET: target_kind_xx,
                     }
-                    view = ClauseView(
+                    features = ClauseFeatures(
                         possible_lemmas=BEFEAR_LEMMAS, rel2xx=rel2xx)
-                    c = memory.resolve_one_clause(view)
+                    c = memory.resolve_one_clause(features)
 
                 if c is None:
                     return Response('dunno')

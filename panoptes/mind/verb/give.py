@@ -1,6 +1,6 @@
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
-from panoptes.mind.idea.clause import ClauseView
+from panoptes.mind.idea.clause import ClauseFeatures
 from panoptes.mind.idea.noun import Query
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
@@ -93,8 +93,8 @@ class GiveQuestion(ClauseMeaning):
         else:
             assert False
 
-        view = ClauseView(possible_lemmas=self.lemmas, rel2xx=rel2xx)
-        x = memory.resolve_one_clause(view)
+        features = ClauseFeatures(possible_lemmas=self.lemmas, rel2xx=rel2xx)
+        x = memory.resolve_one_clause(features)
         if x is None:
             return Response('dunno')
 
@@ -173,8 +173,9 @@ class ReceiveQuestion(ClauseMeaning):
         else:
             assert False
 
-        view = ClauseView(possible_lemmas=GIVE_LEMMAS, rel2xx=give_rel2xx)
-        x = memory.resolve_one_clause(view)
+        features = ClauseFeatures(
+            possible_lemmas=GIVE_LEMMAS, rel2xx=give_rel2xx)
+        x = memory.resolve_one_clause(features)
         if x is None:
             return Response('dunno')
 

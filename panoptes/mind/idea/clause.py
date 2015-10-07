@@ -50,14 +50,14 @@ class Clause(Idea):
             'rel2xx': rel2xx,
         }
 
-    def matches_clause_view(self, view, ideas):
+    def matches_clause_features(self, f, ideas):
         if self.purpose != Purpose.INFO:
             return False
 
-        if self.verb.lemma not in view.possible_lemmas:
+        if self.verb.lemma not in f.possible_lemmas:
             return False
 
-        for rel, want_xx in view.rel2xx.iteritems():
+        for rel, want_xx in f.rel2xx.iteritems():
             if rel not in self.rel2xx:
                 continue
 
@@ -68,7 +68,7 @@ class Clause(Idea):
         return True
 
 
-class ClauseView(object):
+class ClauseFeatures(object):
     def __init__(self, possible_lemmas=None, rel2xx=None):
         if possible_lemmas is None:
             possible_lemmas = []

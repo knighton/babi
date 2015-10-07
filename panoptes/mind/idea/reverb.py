@@ -19,10 +19,10 @@ class Reverb(Idea):
             'x': self.x,
         }
 
-    def matches_noun_view(self, view, ideas, place_kinds):
+    def matches_noun_features(self, f, ideas, place_kinds):
         n = ideas[self.x]
-        return n.matches_noun_view(view, ideas, place_kinds)
+        return n.matches_noun_features(f, ideas, place_kinds)
 
-    def matches_clause_view(self, view, ideas):
+    def matches_clause_features(self, f, ideas):
         c = ideas[self.x]
-        return c.matches_clause_view(view, ideas)
+        return c.matches_clause_features(f, ideas)
