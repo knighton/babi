@@ -101,6 +101,31 @@ class Noun(Idea):
             'location_history': self.location_history.dump(),
         }
 
+    def assign(self, to):
+        assert not self.query
+        assert not to.query
+
+        if to.name:
+            self.name = to.name
+
+        if to.gender:
+            self.gender = to.gender
+
+        if to.is_animate is not None:
+            self.is_antimate = to.is_animate
+
+        self.attributes = sorted(set(self.attributes + to.attributes))
+
+        if to.kind:
+            self.kind = to.kind
+
+        for rel, xx in to.rel2xx:
+            self.rel2xx[rel] = xx
+
+        self.carrying = sorted(set(self.carrying + to.carrying))
+
+        assert to.location_history.is_empty()
+
     def matches_noun_view(self, view, ideas, place_kinds):
         if self.query:
             return False
