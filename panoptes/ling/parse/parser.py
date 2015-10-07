@@ -27,6 +27,10 @@ class Parser(object):
         print 'done'
 
     def parse(self, text):
+        # I'm deciding "afraid" is a passive verb.  Have it parse as such.
+        text = text.replace('afraid of', 'befeared by')
+        text = text.replace('afraid', 'befeared')
+
         # Fred gets parsed by spacy as VBN.  Replace with a unique name.
         text = text.replace(' Fred ', ' Jameson ')
         text = text.replace(' fred ', ' jameson ')
