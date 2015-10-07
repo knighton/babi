@@ -221,26 +221,26 @@
       - in: Yesterday Fred went back to the office.
       - in: Where was Fred before the cinema?
         out: office
-#  - name: task15
-#    pairs:
-#      - in: Wolves are afraid of mice.
-#      - in: Sheep are afraid of mice.
-#      - in: Winona is a sheep.
-#      - in: Mice are afraid of cats.
-#      - in: Cats are afraid of wolves.
-#      - in: Jessica is a mouse.
-#      - in: Emily is a cat.
-#      - in: Gertrude is a wolf.
-#      - in: What is emily afraid of?
-#        out: wolf
-#      - in: What is winona afraid of?
-#        out: mouse
-#      - in: What is gertrude afraid of?
-#        out: mouse
-##      - in: What is jessica afraid of?
-#        out: cat
+  - name: task15
+    pairs:
+      - in: Wolves are afraid of mice.
+      - in: Sheep are afraid of mice.
+      - in: Winona is a sheep.
+      - in: Mice are afraid of cats.
+      - in: Cats are afraid of wolves.
+      - in: Jessica is a mouse.
+      - in: Emily is a cat.
+      - in: Gertrude is a wolf.
+      - in: What is emily afraid of?
+        out: wolf
+      - in: What is winona afraid of?
+        out: mouse
+      - in: What is gertrude afraid of?
+        out: mouse
+      - in: What is jessica afraid of?
+        out: cat
 #  - name: task16
-##    pairs:
+#    pairs:
 #      - in: Bernhard is a lion.
 #      - in: Bernhard is white.
 #      - in: Brian is a lion.
