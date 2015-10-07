@@ -314,7 +314,6 @@ class Parse(object):
             t.downs.append(('det', det))
             t.downs.sort(key=lambda (dep, child): child.index)
 
-
         # If it starts with a "to be" VBZ, it should be of the form
         #
         #   "(is) (something) (something)"
@@ -322,6 +321,10 @@ class Parse(object):
         # so if you get "(is) (something)" try to split the something.
         #
         #   "Is the triangle above the pink rectangle?"
+        #
+        # and
+        #
+        #   "Is the box bigger than the box of chocolates?"
         while True:
             t = self.tokens[0]
             if t.tag != 'VBZ':
@@ -334,15 +337,23 @@ class Parse(object):
             if n != 2:  # One for punct, the other for the joined arg.
                 break
 
+            rel, child = self.root.downs[1]
+            if rel != 'punct':
+                break
+
             rel, child = self.root.downs[0]
             if len(child.downs) < 2:  # det, (amod,) prep
                 break
 
             child_rel, grandchild = child.downs[-1]
-            if child_rel != 'prep':
+            if child_rel == 'prep':
+                reassign_parent(grandchild, self.root)
+            elif child_rel == 'amod':
+                child.downs[1] = ('acomp', grandchild)
+                grandchild.up = ('acomp', child)
+                reassign_parent(grandchild, self.root)
+            else:
                 break
-
-            reassign_parent(grandchild, self.root)
 
             break
 
