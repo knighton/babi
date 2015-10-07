@@ -1,3 +1,6 @@
+from panoptes.mind.idea.base import Idea
+
+
 class Direction(Idea):
     def __init__(self, which, of_x):
         self.which = which

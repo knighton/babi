@@ -17,8 +17,12 @@ from panoptes.ling.tree.deep.conjunction import DeepConjunction
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
 from panoptes.ling.tree.deep.direction import DeepDirection
 from panoptes.mind.know.graph import Graph
-from panoptes.mind.idea import Clause, ClauseView, Comparative, Query, Noun, \
-    NounView, NounReverb, idea_from_view, Direction, RelativeDay
+from panoptes.mind.idea.clause import Clause, ClauseView
+from panoptes.mind.idea.comparative import Comparative
+from panoptes.mind.idea.direction import Direction
+from panoptes.mind.idea.noun import Noun, NounView, Query, idea_from_view
+from panoptes.mind.idea.reverb import NounReverb
+from panoptes.mind.idea.time import RelativeDay
 
 
 class DeepReference(object):

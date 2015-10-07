@@ -1,3 +1,6 @@
+from panoptes.mind.idea.base import Idea
+
+
 class NounReverb(Idea):
     """
     Points back to an earlier idea.

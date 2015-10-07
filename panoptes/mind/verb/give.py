@@ -1,6 +1,7 @@
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
-from panoptes.mind.idea import ClauseView, Query
+from panoptes.mind.idea.clause import ClauseView
+from panoptes.mind.idea.noun import Query
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
 

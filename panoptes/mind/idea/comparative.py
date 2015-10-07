@@ -1,4 +1,4 @@
-from panpotes.ling.morph.comparative.comparative import ComparativePolarity
+from panoptes.ling.morph.comparative.comparative import ComparativePolarity
 from panoptes.mind.idea.base import Idea
 
 

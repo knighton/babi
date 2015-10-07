@@ -1,6 +1,6 @@
 from random import randint
 
-from panoptes.mind.idea import Noun
+from panoptes.mind.idea.noun import Noun
 
 
 class UserManager(object):

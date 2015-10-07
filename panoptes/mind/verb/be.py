@@ -1,7 +1,9 @@
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
 from panoptes.ling.morph.comparative.comparative import ComparativePolarity
-from panoptes.mind.idea import Comparative, Direction, Query, Noun
+from panoptes.mind.idea.comparative import Comparative
+from panoptes.mind.idea.direction import Direction
+from panoptes.mind.idea.noun import Noun, Query
 from panoptes.mind.know.location import At, NotAt
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
