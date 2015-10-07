@@ -434,7 +434,7 @@ class Parse(object):
             up_dep, up_up = up.up
             if up_up is None:
                 continue
-            if up_dep != 'aux':
+            if up_dep not in ('aux', 'auxpass'):
                 continue
             for i, (_, child) in enumerate(up.downs):
                 if child.index == t.index:
