@@ -328,7 +328,7 @@ class Memory(object):
     def decode_proper_noun(self, deep_ref, from_xx, to_xx):
         name = deep_ref.arg.name
         gender = self.gender_clf.classify(name)
-        view = NounView(name=name, gender=gender, kind='person')
+        view = NounView(name=name, gender=gender)
         return self.resolve_one_noun(view)
 
     def decode_time_of_day(self, deep_ref, from_xx, to_xx):
