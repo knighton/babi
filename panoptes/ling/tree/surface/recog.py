@@ -612,6 +612,11 @@ class ParseToSurface(object):
 
             if rel == 'agent':
                 prep = 'by',
+                if not t.downs:
+                    pp_nn = [(prep, None)]
+                    ppp_nnn.append(pp_nn)
+                    varg_root_indexes.append(t.index)
+                    continue
                 assert len(t.downs) == 1
                 rel, down = t.downs[0]
                 assert rel == 'pobj'
