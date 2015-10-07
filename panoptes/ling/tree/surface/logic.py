@@ -1,11 +1,26 @@
+from panoptes.etc.dicts import v2k_from_k2v
+from panoptes.etc.enum import enum
 from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.tree.surface.base import SayContext, SayResult, \
     SurfaceArgument
 
 
+Logical = enum('Logical = ALL_OF ONE_OF')
+
+
+OP2TEXT = {
+    Logical.ALL_OF: 'and',
+    Logical.ONE_OF: 'or',
+}
+
+
+TEXT2OP = v2k_from_k2v(OP2TEXT)
+
+
 class SurfaceConjunction(SurfaceArgument):
-    def __init__(self, aa):
-        raise NotImplementedError
+    def __init__(self, op, aa):
+        self.op = op
+        self.aa = aa
 
     # --------------------------------------------------------------------------
     # From base.
@@ -16,6 +31,7 @@ class SurfaceConjunction(SurfaceArgument):
             dd.append(a.dump())
         return {
             'type': self.__class__.__name__,
+            'op': Logical.to_str[self.op],
             'aa': dd,
         }
 
@@ -65,7 +81,7 @@ class SurfaceConjunction(SurfaceArgument):
             if i < len(self.aa) - 2:
                 tokens += [',']
             if i != len(self.aa) - 1:
-                tokens += [self.text]
+                tokens += [OP2TEXT[self.op]]
 
         return SayResult(tokens=tokens, conjugation=Conjugation.P3,
                          eat_prep=False)
@@ -75,28 +91,9 @@ class SurfaceConjunction(SurfaceArgument):
 
     @staticmethod
     def load(d, loader):
+        op = d['op']
         aa = []
         for j in d['aa']:
             a = loader.load(j)
             aa.append(a)
-        return DeepAnd(aa)
-
-
-class SurfaceAllOf(SurfaceConjunction):
-    """
-    And.
-    """
-
-    def __init__(self, aa):
-        self.aa = aa
-        self.text = 'and'
-
-
-class SurfaceOneOf(SurfaceConjunction):
-    """
-    Either-or.
-    """
-
-    def __init__(self, aa):
-        self.aa = aa
-        self.text = 'or'
+        return DeepAnd(op, aa)
