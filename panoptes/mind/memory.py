@@ -1,6 +1,7 @@
 from copy import deepcopy
 import json
 
+from panoptes.ling.glue.grammatical_number import N5
 from panoptes.ling.glue.inflection import Declension, Gender
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
@@ -182,10 +183,25 @@ class Memory(object):
 
         if n.number and n.number.is_interrogative():
             assert n.selector.correlative == Correlative.INDEF
-            idea = Noun(query=Query.CARDINALITY, selector=n.selector,
-                        attributes=n.attributes, kind=n.noun)
+            idea = Noun(query=Query.CARDINALITY, attributes=n.attributes,
+                        kind=n.noun)
             x = self.add_idea(idea)
             return [x]
+
+        if n.selector.correlative == Correlative.INDEF:
+            if n.selector.n_min == N5.SING and n.selector.n_max == N5.SING:
+                # Create a new one.
+                idea = Noun(attributes=n.attributes, kind=n.noun)
+                x = self.add_idea(idea)
+                return [x]
+            elif N5.DUAL <= n.selector.n_min:
+                # It's referring to all of instances with those fields.
+                view = NounView(query=Query.GENERIC, attributes=n.attributes,
+                                kind=n.noun)
+                xx = self.resolve_one_noun(view)
+                return xx
+            else:
+                assert False
 
         assert n.selector.correlative in [
             Correlative.DEF,
@@ -194,8 +210,8 @@ class Memory(object):
         ]
 
         if n.selector.correlative == Correlative.INTR:
-            idea = Noun(query=Query.IDENTITY, selector=n.selector,
-                        attributes=n.attributes, kind=n.noun)
+            idea = Noun(query=Query.IDENTITY, attributes=n.attributes,
+                        kind=n.noun)
             x = self.add_idea(idea)
             return [x]
 

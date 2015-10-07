@@ -4,7 +4,6 @@ from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
 from panoptes.ling.morph.comparative.comparative import ComparativePolarity
 from panoptes.ling.tree.common.time_of_day import DaySection
-from panoptes.ling.tree.common.util.selector import Selector
 from panoptes.ling.tree.deep.content_clause import Status
 from panoptes.ling.verb.verb import DeepVerb
 from panoptes.mind.location import LocationHistory
@@ -21,15 +20,17 @@ class Idea(object):
         return False
 
 
+# What about it?
+#
 # What we are looking up, if anything.
 #
-# If query is None, the Idea is data.
-Query = enum('Query = CARDINALITY IDENTITY')
+# If query is None, the Idea is an instance.
+Query = enum('Query = CARDINALITY IDENTITY GENERIC')
 
 
 class Noun(Idea):
     def __init__(self, query=None, name=None, gender=None,
-                 is_animate=None, selector=None, attributes=None, kind=None,
+                 is_animate=None, attributes=None, kind=None,
                  rel2xx=None, carrying=None):
         if attributes is None:
             attributes = []
@@ -54,10 +55,6 @@ class Noun(Idea):
         self.is_animate = is_animate
         if self.is_animate:
             assert isinstance(self.is_animate, bool)
-
-        self.selector = selector
-        if self.selector:
-            assert isinstance(self.selector, Selector)
 
         self.attributes = attributes
         assert isinstance(self.attributes, list)
@@ -93,7 +90,6 @@ class Noun(Idea):
             'name': self.name,
             'gender': Gender.to_str[self.gender] if self.gender else None,
             'is_animate': self.is_animate,
-            'selector': self.selector.dump() if self.selector else None,
             'attributes': self.attributes,
             'kind': self.kind,
             'rel2xx': rel2xx,
@@ -127,7 +123,7 @@ class Noun(Idea):
         assert to.location_history.is_empty()
 
     def matches_noun_view(self, view, ideas, place_kinds):
-        if self.query:
+        if self.query != view.query:
             return False
 
         # Otherwise we'll match indiscriminately.
@@ -182,10 +178,12 @@ class NounReverb(Idea):
 
 
 class NounView(object):
-    def __init__(self, name=None, gender=None, attributes=None, kind=None):
+    def __init__(self, query=None, name=None, gender=None, attributes=None,
+                 kind=None):
         if attributes is None:
             attributes = []
 
+        self.query = query
         self.name = name
         self.gender = gender
         self.attributes = attributes
@@ -193,6 +191,7 @@ class NounView(object):
 
     def dump(self):
         return {
+            'query': Query.to_str[self.query] if self.query else None,
             'name': self.name,
             'gender': Gender.to_str[self.gender] if self.gender else None,
             'attributes': self.attributes,
@@ -201,9 +200,8 @@ class NounView(object):
 
 
 def idea_from_view(view):
-    print 'IDEA FROM VIEW', view.dump()
-    return Noun(name=view.name, gender=view.gender, attributes=view.attributes,
-                kind=view.kind)
+    return Noun(query=view.query, name=view.name, gender=view.gender,
+                attributes=view.attributes, kind=view.kind)
 
 
 class Direction(Idea):

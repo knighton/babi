@@ -64,6 +64,9 @@ class LocationHistory(object):
             'spans_items': rr,
         }
 
+    def is_empty(self):
+        return not self.spans_items
+
     def set_location(self, location, input_time_span=None):
         """
         location item, time span -> None
