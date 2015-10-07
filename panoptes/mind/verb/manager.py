@@ -27,7 +27,7 @@ class VerbSemanticsManager(object):
             AgentIn(),
             AgentInQuestion(),
 
-            Bring(),
+            Take(),
             Drop(),
             PickUp(),
             CarryingWhatQuestion(),

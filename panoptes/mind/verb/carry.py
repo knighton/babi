@@ -5,29 +5,34 @@ from panoptes.mind.location import At
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
 
-class Bring(ClauseMeaning):
+class Take(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.INFO
         self.lemmas = ['take']
         self.signatures = [
             [Relation.AGENT, Relation.TARGET, Relation.PLACE],
             [Relation.AGENT, Relation.TARGET, Relation.TO_LOCATION],
+            [Relation.AGENT, Relation.TARGET, None],
         ]
 
     def handle(self, c, memory, (agent_xx, target_xx, to_xx)):
         if len(agent_xx) != 1:
             return None
 
-        if len(to_xx) != 1:
+        if to_xx and len(to_xx) != 1:
             return None
 
         agent = memory.ideas[agent_xx[0]]
-        to_x, = to_xx
+
         for x in target_xx:
             agent.carrying.append(x)
-            target = memory.ideas[x]
-            loc = At(to_x)
-            target.location_history.set_location(loc)
+
+        if to_xx:
+            to_x, = to_xx
+            for x in target_xx:
+                target = memory.ideas[x]
+                loc = At(to_x)
+                target.location_history.set_location(loc)
 
         return Response()
 
