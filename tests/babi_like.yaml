@@ -221,7 +221,13 @@
       - in: Yesterday Fred went back to the office.
       - in: Where was Fred before the cinema?
         out: office
-  - name: task15
+  - name: task15_simple
+    pairs:
+      - in: Mice are afraid of cats.
+      - in: Emily is a mouse.
+      - in: What is emily afraid of?
+        out: cat
+  - name: task15_real
     pairs:
       - in: Wolves are afraid of mice.
       - in: Sheep are afraid of mice.
