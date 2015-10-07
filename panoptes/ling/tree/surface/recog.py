@@ -1,6 +1,7 @@
 from copy import deepcopy
 from itertools import product
 
+from panoptes.ling.glue.conjunction import STR2CONJUNCTION
 from panoptes.ling.glue.grammatical_number import N2, N3, N5, \
     nx_eq_nx_is_possible, nx_to_nxs
 from panoptes.ling.glue.idiolect import Idiolect
@@ -18,10 +19,10 @@ from panoptes.ling.tree.common.util.selector import Correlative, Selector
 from panoptes.ling.tree.surface.base import SayContext, SayState
 from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
 from panoptes.ling.tree.surface.comparative import SurfaceComparative
+from panoptes.ling.tree.surface.conjunction import SurfaceConjunction
 from panoptes.ling.tree.surface.content_clause import Complementizer, \
     SurfaceContentClause
 from panoptes.ling.tree.surface.direction import SurfaceDirection
-from panoptes.ling.tree.surface.logic import SurfaceAllOf, SurfaceOneOf
 from panoptes.ling.tree.surface.sentence import SurfaceSentence
 from panoptes.ling.verb.annotation import annotate_as_aux
 from panoptes.ling.verb.verb import ModalFlavor
@@ -526,20 +527,14 @@ class ParseToSurface(object):
         if not rr:
             return rr
 
-        klass = None
+        op = None
         for rel, child in root_token.downs:
             if rel != 'cc':
                 continue
 
-            if child.text == 'and':
-                klass = SurfaceAllOf
-                break
-            elif child.text == 'or':
-                klass = SurfaceOneOf
-                break
-            else:
-                return None
-        if klass is None:
+            op = STR2CONJUNCTION.get(child.text)
+            break
+        if not op:
             return rr
 
         for rel, child in root_token.downs:
@@ -551,7 +546,7 @@ class ParseToSurface(object):
                 rr2 = []
                 for prep, n in rr:
                     for other_prep, other_n in other_pp_nn:
-                        r2 = prep, klass([n, other_n])
+                        r2 = prep, SurfaceConjunction(op, [n, other_n])
                         rr2.append(r2)
                 return rr2
 

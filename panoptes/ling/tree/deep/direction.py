@@ -24,7 +24,7 @@ class DeepDirection(DeepArgument):
     # --------------------------------------------------------------------------
     # From deep.
 
-    def to_surface(transform_state, say_state, idiolect):
+    def to_surface(self, transform_state, say_state, idiolect):
         of = self.of.to_surface(transform_state, say_state, idiolect)
         return SurfaceDirection(self.which, of)
 
