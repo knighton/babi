@@ -16,7 +16,7 @@ from panoptes.ling.tree.deep.comparative import DeepComparative
 from panoptes.ling.tree.deep.conjunction import DeepConjunction
 from panoptes.ling.tree.deep.content_clause import DeepContentClause
 from panoptes.ling.tree.deep.direction import DeepDirection
-from panoptes.mind.graph import Graph
+from panoptes.mind.know.graph import Graph
 from panoptes.mind.idea import Clause, ClauseView, Comparative, Query, Noun, \
     NounView, NounReverb, idea_from_view, Direction, RelativeDay
 

@@ -6,7 +6,7 @@ from panoptes.ling.morph.comparative.comparative import ComparativePolarity
 from panoptes.ling.tree.common.time_of_day import DaySection
 from panoptes.ling.tree.deep.content_clause import Status
 from panoptes.ling.verb.verb import DeepVerb
-from panoptes.mind.location import LocationHistory
+from panoptes.mind.know.location import LocationHistory
 
 
 class Idea(object):

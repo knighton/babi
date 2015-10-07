@@ -1,7 +1,7 @@
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
 from panoptes.mind.idea import Query, RelativeDay
-from panoptes.mind.location import At
+from panoptes.mind.know.location import At
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
 

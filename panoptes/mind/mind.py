@@ -1,6 +1,6 @@
-from panoptes.mind.memory import Memory
+from panoptes.mind.know.memory import Memory
+from panoptes.mind.know.user import UserManager
 from panoptes.mind.verb.manager import VerbSemanticsManager
-from panoptes.mind.user import UserManager
 
 
 class Mind(object):
