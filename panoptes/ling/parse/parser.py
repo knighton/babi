@@ -10,7 +10,8 @@ def truecase(tokens):
     for t in tokens:
         s = t.orth_
         if t.tag_ == 'NNP':
-            pass
+            if s.islower():
+                s = s.title()
         elif t.tag_ == 'PRP' and s == 'I':
             pass
         else:
@@ -28,12 +29,23 @@ class Parser(object):
 
     def parse(self, text):
         # I'm deciding "afraid" is a passive verb.  Have it parse as such.
-        text = text.replace('afraid of', 'befeared by')
-        text = text.replace('afraid', 'befeared')
+        text = text.replace('afraid of', 'seen by')
+        text = text.replace('afraid', 'seen')
 
         # Fred gets parsed by spacy as VBN.  Replace with a unique name.
         text = text.replace(' Fred ', ' Jameson ')
         text = text.replace(' fred ', ' jameson ')
+
+        # It thinks Emily is an adverb.
+        text = text.replace(' emily ', ' Elliot ')
+        text = text.replace(' Emily ', ' Elliot ')
+
+        # It thinks Winona is an adjective.
+        text = text.replace(' winona ', ' Ashley ')
+        text = text.replace(' Winona ', ' Ashley ')
+
+        # And that gertrude is a common noun.
+        text = text.replace(' gertrude ', ' Gertrude ')
 
         # spaCy doesn't like "following" used as a preposition, so we use a
         # similar word instead.  Oh well.
@@ -42,7 +54,9 @@ class Parser(object):
         tokens = self.nlp(text, parse=True)
         words = truecase(tokens)
         words = map(lambda s: 'Fred' if s == 'Jameson' else s, words)
-        words = map(lambda s: 'fred' if s == 'jameson' else s, words)
+        words = map(lambda s: 'thwacked' if s == 'seen' else s, words)
+        words = map(lambda s: 'Emily' if s == 'Elliot' else s, words)
+        words = map(lambda s: 'Winona' if s == 'Ashley' else s, words)
 
         x2dep_x = {}
         x2deps_xx = defaultdict(list)
