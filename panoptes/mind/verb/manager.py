@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from panoptes.mind.verb.be import *
 from panoptes.mind.verb.carry import *
+from panoptes.mind.verb.fear import *
 from panoptes.mind.verb.fit import *
 from panoptes.mind.verb.go import *
 from panoptes.mind.verb.give import *
@@ -30,6 +31,10 @@ class VerbSemanticsManager(object):
             Drop(),
             PickUp(),
             CarryingWhatQuestion(),
+
+            Befear(),
+            Fear(),
+            BefearQuestion(),
 
             FitsInside(),
             DoesItFitInside(),
