@@ -21,7 +21,7 @@ from panoptes.ling.tree.surface.comparative import SurfaceComparative
 from panoptes.ling.tree.surface.content_clause import Complementizer, \
     SurfaceContentClause
 from panoptes.ling.tree.surface.direction import SurfaceDirection
-from panoptes.ling.tree.surface.logic import SurfaceAnd
+from panoptes.ling.tree.surface.logic import SurfaceAllOf, SurfaceOneOf
 from panoptes.ling.tree.surface.sentence import SurfaceSentence
 from panoptes.ling.verb.annotation import annotate_as_aux
 from panoptes.ling.verb.verb import ModalFlavor
@@ -268,8 +268,10 @@ class ParseToSurface(object):
         * (ADJS) NN(S)     "fat mice"
         * DT (ADJS) NN(S)  "the fat mice"
         """
-        if root_token.downs:
-            dep, child = root_token.downs[0]
+        downs = filter(lambda (rel, child): rel not in ('cc', 'conj'),
+                       root_token.downs)
+        if downs:
+            dep, child = downs[0]
             if dep != 'det':
                 return []
 
@@ -293,7 +295,7 @@ class ParseToSurface(object):
             selectors = [selector]
 
         attrs = []
-        for dep, child in root_token.downs[1:]:
+        for dep, child in downs[1:]:
             if dep != 'amod':
                 return []
             attrs.append(child.text)
@@ -311,15 +313,18 @@ class ParseToSurface(object):
         * PRP$ (ADJS) NN(S)
         * WP$ (ADJS) NN(S)
         """
-        if not root_token.downs:
+        downs = filter(lambda (rel, child): rel not in ('cc', 'conj'),
+                       root_token.downs)
+
+        if not downs:
             return []
 
-        rel, possessor = root_token.downs[0]
+        rel, possessor = downs[0]
         if rel != 'pos':
             return []
 
         attrs = []
-        for rel, child in root_token.downs[1:]:
+        for rel, child in downs[1:]:
             if rel != 'amod':
                 return []
             attrs.append(child.text)
@@ -521,6 +526,22 @@ class ParseToSurface(object):
         if not rr:
             return rr
 
+        klass = None
+        for rel, child in root_token.downs:
+            if rel != 'cc':
+                continue
+
+            if child.text == 'and':
+                klass = SurfaceAllOf
+                break
+            elif child.text == 'or':
+                klass = SurfaceOneOf
+                break
+            else:
+                return None
+        if klass is None:
+            return rr
+
         for rel, child in root_token.downs:
             if rel == 'conj':
                 # TODO: generalize this later.
@@ -530,7 +551,7 @@ class ParseToSurface(object):
                 rr2 = []
                 for prep, n in rr:
                     for other_prep, other_n in other_pp_nn:
-                        r2 = prep, SurfaceAnd([n, other_n])
+                        r2 = prep, klass([n, other_n])
                         rr2.append(r2)
                 return rr2
 
@@ -622,16 +643,19 @@ class ParseToSurface(object):
                 assert rel == 'pobj'
                 t = down
             elif t.tag == 'IN':
-                prep = t.text,
-                if len(t.downs) != 1:
+                if t.downs:
+                    # Skip the conjunctions.
+                    downs = filter(lambda (rel, child): rel == 'pobj', t.downs)
+                    if len(downs) != 1:
+                        continue
+                    prep = t.text,
+                    t = downs[0][1]
+                else:
                     p = t.text,
                     pp_nn = [(p, None)]
                     ppp_nnn.append(pp_nn)
                     varg_root_indexes.append(t.index)
                     continue
-                rel, down = t.downs[0]
-                assert rel == 'pobj'
-                t = down
             else:
                 prep = None
 
@@ -697,7 +721,8 @@ class ParseToSurface(object):
             return set([Conjugation.S2, Conjugation.P2])
 
         # Get the required conjugation from the subject.
-        conj = pp_nn[subj_argx][1].decide_conjugation(
+        subj_n = pp_nn[subj_argx][1]
+        conj = subj_n.decide_conjugation(
             self.say_state, self.arbitrary_idiolect,
             self.subject_say_context)
 

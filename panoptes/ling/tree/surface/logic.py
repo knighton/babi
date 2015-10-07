@@ -3,9 +3,9 @@ from panoptes.ling.tree.surface.base import SayContext, SayResult, \
     SurfaceArgument
 
 
-class SurfaceAnd(SurfaceArgument):
+class SurfaceConjunction(SurfaceArgument):
     def __init__(self, aa):
-        self.aa = aa
+        raise NotImplementedError
 
     # --------------------------------------------------------------------------
     # From base.
@@ -15,7 +15,7 @@ class SurfaceAnd(SurfaceArgument):
         for a in self.aa:
             dd.append(a.dump())
         return {
-            'type': 'SurfaceConjunction',
+            'type': self.__class__.__name__,
             'aa': dd,
         }
 
@@ -65,7 +65,7 @@ class SurfaceAnd(SurfaceArgument):
             if i < len(self.aa) - 2:
                 tokens += [',']
             if i != len(self.aa) - 1:
-                tokens += ['and']
+                tokens += [self.text]
 
         return SayResult(tokens=tokens, conjugation=Conjugation.P3,
                          eat_prep=False)
@@ -80,3 +80,23 @@ class SurfaceAnd(SurfaceArgument):
             a = loader.load(j)
             aa.append(a)
         return DeepAnd(aa)
+
+
+class SurfaceAllOf(SurfaceConjunction):
+    """
+    And.
+    """
+
+    def __init__(self, aa):
+        self.aa = aa
+        self.text = 'and'
+
+
+class SurfaceOneOf(SurfaceConjunction):
+    """
+    Either-or.
+    """
+
+    def __init__(self, aa):
+        self.aa = aa
+        self.text = 'or'
