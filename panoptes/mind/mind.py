@@ -3,11 +3,6 @@ from panoptes.mind.verb.manager import VerbSemanticsManager
 from panoptes.mind.user import UserManager
 
 
-class OverhearResult(object):
-    def __init__(self, out=None):
-        self.out = out
-
-
 class Mind(object):
     def __init__(self):
         self.memory = Memory()

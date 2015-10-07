@@ -2,7 +2,7 @@ from random import randint
 
 from panoptes.agent.agent import Agent, Deliberation
 from panoptes.ling.english import English
-from panoptes.mind.mind import Mind, OverhearResult
+from panoptes.mind.mind import Mind
 
 
 class PhilosophicalZombie(Agent):
