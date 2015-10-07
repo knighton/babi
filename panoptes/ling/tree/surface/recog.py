@@ -265,19 +265,32 @@ class ParseToSurface(object):
 
     def recog_dt_nn(self, root_token, noun, gram_n2):
         """
-        * DT (ADJS) NN(S)
+        * (ADJS) NN(S)     "fat mice"
+        * DT (ADJS) NN(S)  "the fat mice"
         """
-        if not root_token.downs:
-            return []
+        if root_token.downs:
+            dep, child = root_token.downs[0]
+            if dep != 'det':
+                return []
 
-        dep, child = root_token.downs[0]
-        if dep != 'det':
-            return []
+            s = child.text
+            if s == 'a' or s == 'an':
+                s = A_OR_AN
 
-        s = child.text
+            maybe_selectors = self.det_pronoun_mgr.parse_determiner(s)
 
-        if s in ['a', 'an']:
-            s = A_OR_AN
+            selectors = []
+            for maybe_selector in maybe_selectors:
+                for sel in maybe_selector.restricted_to_grammatical_number(
+                        gram_n2, self.det_pronoun_mgr.cor2res_gno):
+                    selectors.append(sel)
+        else:
+            if gram_n2 == N2.SING:
+                return []
+
+            selector = Selector(
+                Correlative.INDEF, N5.DUAL, N5.MANY, N5.DUAL, N5.MANY)
+            selectors = [selector]
 
         attrs = []
         for dep, child in root_token.downs[1:]:
@@ -286,12 +299,11 @@ class ParseToSurface(object):
             attrs.append(child.text)
 
         nn = []
-        for selector in self.det_pronoun_mgr.parse_determiner(s):
-            for selector in selector.restricted_to_grammatical_number(
-                    gram_n2, self.det_pronoun_mgr.cor2res_gno):
-                n = SurfaceCommonNoun(selector=selector, attributes=list(attrs),
-                                      noun=noun)
-                nn.append(n)
+        for selector in selectors:
+            n = SurfaceCommonNoun(selector=selector, attributes=list(attrs),
+                                  noun=noun)
+            nn.append(n)
+
         return map(lambda n: (None, n), nn)
 
     def recog_posdet_nn(self, root_token, noun, gram_n2):
