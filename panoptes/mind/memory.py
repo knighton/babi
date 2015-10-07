@@ -108,7 +108,8 @@ class Memory(object):
         print '-' * 80
         for i, idea in enumerate(self.ideas):
             print '\t\t[%d]' % i
-            print json.dumps(idea.dump(), indent=4, sort_keys=True)
+            if idea:
+                print json.dumps(idea.dump(), indent=4, sort_keys=True)
         print '=' * 80
 
     def new_clause_id(self):
@@ -132,6 +133,8 @@ class Memory(object):
     def resolve_one_noun(self, view):
         for i in xrange(len(self.ideas) - 1, -1, -1):
             idea = self.ideas[i]
+            if not idea:
+                continue
             if idea.matches_noun_view(view, self.ideas, self.place_kinds):
                 idea = NounReverb(i)
                 x = self.add_idea(idea)
@@ -146,6 +149,8 @@ class Memory(object):
         rr = []
         for i in xrange(len(self.ideas) - 1, -1, -1):
             idea = self.ideas[i]
+            if not idea:
+                continue
             if idea.matches_noun_view(view, self.ideas, self.place_kinds):
                 idea = NounReverb(i)
                 x = self.add_idea(idea)
@@ -161,6 +166,8 @@ class Memory(object):
     def resolve_one_clause(self, view):
         for i in xrange(len(self.ideas) - 1, -1, -1):
             idea = self.ideas[i]
+            if not idea:
+                continue
             if idea.matches_clause_view(view):
                 return i
 

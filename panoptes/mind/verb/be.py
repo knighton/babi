@@ -26,7 +26,8 @@ class AgentIsTarget(ClauseMeaning):
 
         agent_x, = agent_xx
         agent = memory.ideas[agent_x]
-        target = memory.ideas[target_xx[0]]
+        target_x, = target_xx
+        target = memory.ideas[target_x]
         if isinstance(agent, Noun) and isinstance(target, Comparative):
             if target.polarity == ComparativePolarity.POS and \
                     target.adjective == 'big':
@@ -36,6 +37,11 @@ class AgentIsTarget(ClauseMeaning):
                 pass
         elif isinstance(agent, Noun) and isinstance(target, Direction):
             memory.graph.link(agent_x, target.which, target.of_x)
+            return Response()
+        elif isinstance(agent, Noun) and isinstance(target, Noun):
+            agent.assign(target)
+            memory.ideas[agent_x] = agent
+            memory.ideas[target_x] = None
             return Response()
         else:
             pass
