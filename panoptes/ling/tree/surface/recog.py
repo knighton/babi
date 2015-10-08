@@ -378,7 +378,8 @@ class ParseToSurface(object):
             pp_nn = r
             pp_nn = filter(lambda (p, n): not p, pp_nn)
             nn = map(lambda (p, n): n, pp_nn)
-            preps_optionss.append((child.text, nn))
+            prep = child.text,
+            preps_optionss.append((prep, nn))
         return preps_optionss
 
     def recog_common_noun(self, root_token, noun, n2):
