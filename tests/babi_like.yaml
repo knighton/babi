@@ -141,6 +141,11 @@
         out: maybe
       - in: Is Mary in the office?
         out: maybe
+  - name: task10_failing
+    pairs:
+      - in: Fred is either in the office or the park.
+      - in: Is Fred in the park?
+        out: maybe
   - name: task11_he
     pairs:
       - in: John journeyed to the hallway.
