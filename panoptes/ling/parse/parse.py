@@ -507,6 +507,31 @@ class Parse(object):
             left.up = ('compound', left.up[1])
             reassign_parent(left, right)
 
+        # At least in the bAbi dataset, the same sentence 'shape' almost always
+        # parses one way, but in a few cases it parses the other way.  Normalize
+        # those to the common way.
+        #
+        #   "Julie is either in the bedroom or the office." -- canonical
+        #   "Mary is either in the school or the office." -- non-canonical
+        #
+        # Reassign "cc" and "conj" relations descending from an IN token to its
+        # "pobj" child.
+        for t in self.tokens:
+            if t.tag != 'IN':
+                continue
+
+            pobj = None
+            for rel, child in t.downs:
+                if rel == 'pobj':
+                    pobj = child
+                    break
+            if pobj is None:
+                continue
+
+            for rel, child in list(t.downs):
+                if rel in ('cc', 'conj'):
+                    reassign_parent(child, pobj)
+
         return self
 
     def dump(self):
