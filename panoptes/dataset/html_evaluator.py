@@ -36,6 +36,9 @@ body {
 td {
     padding: 5px;
 }
+a {
+    text-decoration: none;
+}
     </style>
 </head>
 <body>
@@ -186,15 +189,17 @@ body {
             for i, ((correct, total), task) in \
                     enumerate(zip(results, dataset.tasks)):
                 pct = 100.0 * correct / total
+                task_url = '%02d_%s.html' % (i + 1, task.name)
+                task_name = task.name.replace('-', ' ')
                 line = """
                     <tr>
                         <td style="text-align: right">%d.</td>
                         <td style="text-align: right">%.2f%%</td>
                         <td style="text-align: right">%d</td>
                         <td style="text-align: right">%d</td>
-                        <td>%s</td>
+                        <td><a href="%s">%s</a></td>
                     </tr>
-                """ % (i + 1, pct, correct, total, task.name)
+                """ % (i + 1, pct, correct, total, task_url, task_name)
                 out.write(line)
             out.write('</table>')
             self.dump_overview_foot(out)
