@@ -354,12 +354,38 @@ class ParseToSurface(object):
             pp_nn.append((prep, n))
         return pp_nn
 
-    def recog_common_noun(self, root_token, noun, n2):
-        pp_nn = self.recog_how_many_nn(root_token, noun, n2)
+    def recog_common_noun_head(self, root_token, noun, n2):
+        pp_nn = []
+        pp_nn += self.recog_how_many_nn(root_token, noun, n2)
         pp_nn += self.recog_dt_nn(root_token, noun, n2)
         pp_nn += self.recog_posdet_nn(root_token, noun, n2)
         pp_nn += self.recog_shortcut(root_token)
         return pp_nn
+
+    def recog_common_noun_tail(self, root_token):
+        preps_optionss = []
+        for prep, child in root_token.downs:
+            if prep != 'prep':
+                continue
+            options = []
+        return preps_optionss
+
+    def recog_common_noun(self, root_token, noun, n2):
+        head_pp_nn = self.recog_common_noun_head(root_token, noun, n2)
+
+        preps_optionss = self.recog_common_noun_tail(root_token)
+
+        if not preps_optionss:
+            return head_pp_nn
+
+        rr = []
+        tail_preps, tail_optionss = zip(*preps_optionss)
+        for head_p, head_n in head_pp_nn:
+            for tail_options in product(*tail_optionss):
+                n = deepcopy(head_n)
+                n.preps_nargs = zip(tail_preps, tail_options)
+                rr.append((head_p, n))
+        return rr
 
     def recog_direction(self, root_token):
         if root_token.text not in self.directions:
