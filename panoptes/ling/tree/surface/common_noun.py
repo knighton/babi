@@ -87,7 +87,11 @@ class SurfaceCommonNoun(SurfaceArgument):
         self.preps_nargs = preps_nargs
         assert isinstance(self.preps_nargs, list)
         for p, n in self.preps_nargs:
-            assert False  # NOTE: not used in this demo.
+            assert isinstance(p, tuple)
+            for s in p:
+                assert isinstance(s, basestring)
+
+            assert isinstance(n, SurfaceArgument)
 
         # We can have at most one relative child (eg, "the castle whose king",
         # "the castle the kind of which").

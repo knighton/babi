@@ -239,7 +239,7 @@ class ParseToSurface(object):
         rr = self.time_of_day_mgr.decode(pre, root_token.text)
         return map(lambda r: ((TIME_PREP,), TimeOfDay(*r)), rr)
 
-    def recog_how_many_nn(self, root_token, noun, n2):
+    def recog_how_many_nn_head(self, root_token, noun, n2):
         many = None
         for rel, child in root_token.downs:
             if rel == 'amod' and child.text in ('few', 'many'):
@@ -264,12 +264,12 @@ class ParseToSurface(object):
         n = SurfaceCommonNoun(selector=selector, number=number, noun=noun)
         return [(None, n)]
 
-    def recog_dt_nn(self, root_token, noun, gram_n2):
+    def recog_dt_nn_head(self, root_token, noun, gram_n2):
         """
         * (ADJS) NN(S)     "fat mice"
         * DT (ADJS) NN(S)  "the fat mice"
         """
-        downs = filter(lambda (rel, child): rel not in ('cc', 'conj'),
+        downs = filter(lambda (rel, child): rel not in ('cc', 'conj', 'prep'),
                        root_token.downs)
         if downs:
             dep, child = downs[0]
@@ -309,12 +309,12 @@ class ParseToSurface(object):
 
         return map(lambda n: (None, n), nn)
 
-    def recog_posdet_nn(self, root_token, noun, gram_n2):
+    def recog_posdet_nn_head(self, root_token, noun, gram_n2):
         """
         * PRP$ (ADJS) NN(S)
         * WP$ (ADJS) NN(S)
         """
-        downs = filter(lambda (rel, child): rel not in ('cc', 'conj'),
+        downs = filter(lambda (rel, child): rel not in ('cc', 'conj', 'prep'),
                        root_token.downs)
 
         if not downs:
@@ -346,7 +346,7 @@ class ParseToSurface(object):
                 nn.append(n)
         return map(lambda n: (None, n), nn)
 
-    def recog_shortcut(self, root_token):
+    def recog_shortcut_head(self, root_token):
         pp_nn = []
         ss = root_token.text,
         for prep, selector, noun in self.pro_adverb_mgr.parse(ss):
@@ -356,18 +356,29 @@ class ParseToSurface(object):
 
     def recog_common_noun_head(self, root_token, noun, n2):
         pp_nn = []
-        pp_nn += self.recog_how_many_nn(root_token, noun, n2)
-        pp_nn += self.recog_dt_nn(root_token, noun, n2)
-        pp_nn += self.recog_posdet_nn(root_token, noun, n2)
-        pp_nn += self.recog_shortcut(root_token)
+        pp_nn += self.recog_how_many_nn_head(root_token, noun, n2)
+        pp_nn += self.recog_dt_nn_head(root_token, noun, n2)
+        pp_nn += self.recog_posdet_nn_head(root_token, noun, n2)
+        pp_nn += self.recog_shortcut_head(root_token)
         return pp_nn
 
     def recog_common_noun_tail(self, root_token):
         preps_optionss = []
-        for prep, child in root_token.downs:
-            if prep != 'prep':
+        for rel, child in root_token.downs:
+            if rel != 'prep':
                 continue
-            options = []
+            if len(child.downs) != 1:
+                continue
+            rel, grandchild = child.downs[0]
+            if rel != 'pobj':
+                continue
+            r = self.recognize_verb_arg(grandchild)
+            if r is None:
+                return None
+            pp_nn = r
+            pp_nn = filter(lambda (p, n): not p, pp_nn)
+            nn = map(lambda (p, n): n, pp_nn)
+            preps_optionss.append((child.text, nn))
         return preps_optionss
 
     def recog_common_noun(self, root_token, noun, n2):
@@ -423,7 +434,7 @@ class ParseToSurface(object):
 
         r = self.recognize_verb_arg(child)
         if r is None:
-            return []
+            return None
         pp_nn = r
 
         pp_nn = filter(lambda (p, n): not p, pp_nn)
@@ -499,7 +510,7 @@ class ParseToSurface(object):
         We don't normally bother with adverbs, but do recognize pro-adverbs as
         actually being (prep, argument) pairs encoded into a single word.
         """
-        return self.recog_shortcut(root_token)
+        return self.recog_shortcut_head(root_token)
 
     def recog_rb(self, root_token):
         """

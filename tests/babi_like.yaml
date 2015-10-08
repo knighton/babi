@@ -320,6 +320,11 @@
         out: "no"
       - in: Is the red square below the blue square?
         out: "no"
+  - name: task18_prep_simple
+    pairs:
+      - in: The cat is bigger than the box of chocolates.
+      - in: Is the cat bigger than the box of chocolates?
+        out: "yes"
   - name: task18_normal
     pairs:
       - in: The suitcase fits inside the box.
