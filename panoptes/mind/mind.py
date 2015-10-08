@@ -17,13 +17,12 @@ class Mind(object):
 
         from_xx = map(self.user_mgr.get, from_uids)
         to_xx = map(self.user_mgr.get, to_uids)
-        xx = self.memory.decode_dsen(dsen, from_xx, to_xx)
+        x = self.memory.decode_dsen(dsen, from_xx, to_xx)
 
-        if not xx:
+        if x is None:
             self.memory.load_checkpoint(checkpoint)
             return None
 
-        x, = xx
         c = self.memory.ideas[x]
         r = self.semantics_mgr.handle(c)
 

@@ -186,14 +186,20 @@ class Memory(object):
             sub_deep_ref = DeepReference(
                 owning_clause_id=deep_ref.owning_clause_id,
                 is_subj=deep_ref.is_subj, arg=a)
-            xx = self.decode(sub_deep_ref, from_xx, to_xx)
-            xxx.append(xx)
+            sub_xxx = self.decode(sub_deep_ref, from_xx, to_xx)
+            if len(sub_xxx) != 1:
+                return None
+            xxx.append(sub_xxx[0])
 
-        if deep_ref.arg.op == Conjunction.ALL_OF:
+        op = deep_ref.arg.op
+        if op == Conjunction.ALL_OF:
             xx = reduce(lambda a, b: a + b, xxx)
-            return sorted(set(xx))
+            xx = sorted(set(xx))
+            return [xx]
+        elif op == Conjunction.ONE_OF:
+            return xxx
         else:
-            return xxx[0]
+            assert False
 
     def decode_common_noun(self, deep_ref, from_xx, to_xx):
         n = deep_ref.arg
@@ -206,20 +212,20 @@ class Memory(object):
             idea = Noun(query=Query.CARDINALITY, attributes=n.attributes,
                         kind=n.noun)
             x = self.add_idea(idea)
-            return [x]
+            return [[x]]
 
         if n.selector.correlative == Correlative.INDEF:
             if n.selector.n_min == N5.SING and n.selector.n_max == N5.SING:
                 # Create a new one.
                 idea = Noun(attributes=n.attributes, kind=n.noun)
                 x = self.add_idea(idea)
-                return [x]
+                return [[x]]
             elif N5.DUAL <= n.selector.n_min:
                 # It's referring to all of instances with those fields.
                 features = NounFeatures(
                     query=Query.GENERIC, attributes=n.attributes, kind=n.noun)
                 xx = self.resolve_one_noun(features)
-                return xx
+                return [xx]
             else:
                 assert False
 
@@ -233,7 +239,7 @@ class Memory(object):
             idea = Noun(query=Query.IDENTITY, attributes=n.attributes,
                         kind=n.noun)
             x = self.add_idea(idea)
-            return [x]
+            return [[x]]
 
         d = n.selector.dump()
         del d['correlative']
@@ -243,7 +249,7 @@ class Memory(object):
             'of_n_min': 'SING',
             'of_n_max': 'SING',
         }:
-            return []
+            assert False
 
         if n.noun == 'person':
             gender = None
@@ -251,20 +257,24 @@ class Memory(object):
             gender = Gender.NEUTER
         features = NounFeatures(
             attributes=n.attributes, kind=n.noun, gender=gender)
-        return self.resolve_one_noun(features)
+        xx = self.resolve_one_noun(features)
+        return [xx]
 
     def decode_comparative(self, deep_ref, from_xx, to_xx):
         sub_deep_ref = DeepReference(
             owning_clause_id=deep_ref.owning_clause_id, is_subj=False,
             arg=deep_ref.arg.than)
-        sub_xx = self.decode(sub_deep_ref, from_xx, to_xx)
-        rr = []
-        for sub_x in sub_xx:
-            deep = deep_ref.arg
-            comp = Comparative(deep.polarity, deep.adjective, sub_x)
-            x = self.add_idea(comp)
-            rr.append(x)
-        return rr
+        sub_xxx = self.decode(sub_deep_ref, from_xx, to_xx)
+        xxx = []
+        for sub_xx in sub_xxx:
+            xx = []
+            for sub_x in sub_xx:
+                comp = Comparative(
+                    deep_ref.arg.polarity, deep_ref.arg.adjective, sub_x)
+                x = self.add_idea(comp)
+                xx.append(x)
+            xxx.append(xx)
+        return xxx
 
     def decode_content_clause(self, deep_ref, from_xx, to_xx):
         c = deep_ref.arg
@@ -272,45 +282,51 @@ class Memory(object):
         # We use the clause ID to tell decode reflexives and so on recursively.
         clause_id = self.new_clause_id()
 
-        # Translate each verb argument to a list of memory indexes.
-        rel2xx = {}
+        # Translate each verb argument to a disjunction of conjunctions of
+        # memory indexes.
+        rel2xxx = {}
         for i, (rel, varg) in enumerate(c.rels_vargs):
             is_subj = i == c.subj_index
             deep_ref = DeepReference(clause_id, is_subj, varg)
-            xx = self.decode(deep_ref, from_xx, to_xx)
-            if xx is None:
+            xxx = self.decode(deep_ref, from_xx, to_xx)
+            if xxx is None:
                 return None
 
             # Learn "places".
             if rel in self.place_rels:
-                for x in xx:
-                    idea = self.ideas[x]
-                    if isinstance(idea, Noun):
-                        if not idea.kind:
-                            continue
-                        self.place_kinds.add(idea.kind)
+                for xx in xxx:
+                    for x in xx:
+                        idea = self.ideas[x]
+                        if isinstance(idea, Noun):
+                            if not idea.kind:
+                                continue
+                            self.place_kinds.add(idea.kind)
 
-            assert xx
-            rel2xx[rel] = xx
+            assert xxx
+            rel2xxx[rel] = xxx
 
         # The rest are unchanged in the conversion to memory.
         idea = Clause(c.status, c.purpose, c.is_intense, c.verb, c.adverbs,
-                      rel2xx)
+                      rel2xxx)
 
         x = self.add_idea(idea)
-        return [x]
+        xx = [x]
+        return [xx]
 
     def decode_direction(self, deep_ref, from_xx, to_xx):
         sub_deep_ref = DeepReference(
             owning_clause_id=deep_ref.owning_clause_id, is_subj=False,
             arg=deep_ref.arg.of)
-        sub_xx = self.decode(sub_deep_ref, from_xx, to_xx)
-        rr = []
-        for sub_x in sub_xx:
-            dr = Direction(deep_ref.arg.which, sub_x)
-            x = self.add_idea(dr)
-            rr.append(x)
-        return rr
+        sub_xxx = self.decode(sub_deep_ref, from_xx, to_xx)
+        xxx = []
+        for sub_xx in sub_xxx:
+            xx = []
+            for sub_x in sub_xx:
+                dr = Direction(deep_ref.arg.which, sub_x)
+                x = self.add_idea(dr)
+                xx.append(x)
+            xxx.append(xx)
+        return xxx
 
     def decode_personal_pronoun(self, deep_ref, from_xx, to_xx):
         d = deep_ref.arg.declension
@@ -318,50 +334,60 @@ class Memory(object):
         if d == Declension.WHO1:
             who = Noun.make_who()
             x = self.add_idea(who)
-            return [x]
+            return [[x]]
         elif d == Declension.WHO2:
             who = Noun.make_who()
             x = self.add_idea(who)
-            return [x]
+            return [[x]]
         elif d == Declension.YOU:
-            return to_xx
+            return [to_xx]
         elif d == Declension.HE:
             features = NounFeatures(gender=Gender.MALE, kind='person')
         elif d == Declension.SHE:
             features = NounFeatures(gender=Gender.FEMALE, kind='person')
         elif d == Declension.THEY2:
             features = NounFeatures(kind='person')
-            return self.resolve_plural_noun(features)
+            xx = self.resolve_plural_noun(features)
+            return [xx]
         else:
             print 'Unhandled declension, bailing on this dsen:', \
                 Declension.to_str[d]
             return None
 
-        return self.resolve_one_noun(features)
+        xx = self.resolve_one_noun(features)
+        return [xx]
 
     def decode_proper_noun(self, deep_ref, from_xx, to_xx):
         name = deep_ref.arg.name
         gender = self.gender_clf.classify(name)
         features = NounFeatures(name=name, gender=gender)
-        return self.resolve_one_noun(features)
+        xx = self.resolve_one_noun(features)
+        return [xx]
 
     def decode_time_of_day(self, deep_ref, from_xx, to_xx):
         t = deep_ref.arg
         n = RelativeDay(t.day_offset, t.section)
         x = self.add_idea(n)
-        return [x]
+        xx = [x]
+        return [xx]
 
     def decode(self, deep_ref, from_xx, to_xx):
         """
-        (DeepReference, from_xx, to_xx) -> xx
+        (DeepReference, from_xx, to_xx) -> disjunction of conjunctions of index
         """
         f = self.type2decode[type(deep_ref.arg)]
+        print '!!', type(deep_ref.arg), deep_ref.arg
         return f(deep_ref, from_xx, to_xx)
 
     def decode_dsen(self, dsen, from_xx, to_xx):
         deep_ref = DeepReference(
             owning_clause_id=None, is_subj=False, arg=dsen.root)
-        return self.decode(deep_ref, from_xx, to_xx)
+        xxx = self.decode(deep_ref, from_xx, to_xx)
+        assert len(xxx) == 1
+        xx, = xxx
+        assert len(xx) == 1
+        x, = xx
+        return x
 
 
 """

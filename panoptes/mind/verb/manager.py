@@ -57,7 +57,7 @@ class VerbSemanticsManager(object):
     def try_meaning(self, meaning, c):
         for rels in meaning.signatures:
             # Relations must match.
-            if sorted(filter(bool, rels)) != sorted(c.rel2xx):
+            if sorted(filter(bool, rels)) != sorted(c.rel2xxx):
                 continue
 
             # Collect args of each relation, in signature order.
@@ -67,7 +67,8 @@ class VerbSemanticsManager(object):
                     xxx.append(None)
                     continue
 
-                xx = c.rel2xx[rel_or_none]
+                sub_xxx = c.rel2xxx[rel_or_none]
+                xx = sub_xxx[0]
                 xxx.append(xx)
 
             # Try to execute it.

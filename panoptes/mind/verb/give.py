@@ -99,7 +99,10 @@ class GiveQuestion(ClauseMeaning):
             return Response('dunno')
 
         c = memory.ideas[x]
-        xx = c.rel2xx[want_rel]
+        xxx = c.rel2xxx[want_rel]
+        if len(xxx) != 1:
+            return None
+        xx, = xxx
         if len(xx) != 1:
             return None
 
@@ -180,7 +183,10 @@ class ReceiveQuestion(ClauseMeaning):
             return Response('dunno')
 
         c = memory.ideas[x]
-        xx = c.rel2xx[give_want_rel]
+        xxx = c.rel2xxx[give_want_rel]
+        if len(xxx) != 1:
+            return None
+        xx, = xxx
         if len(xx) != 1:
             return None
 

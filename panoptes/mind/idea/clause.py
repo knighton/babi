@@ -7,9 +7,9 @@ from panoptes.mind.idea.base import Idea
 
 class Clause(Idea):
     def __init__(self, status=Status.ACTUAL, purpose=Purpose.INFO,
-                 is_intense=False, verb=None, adverbs=None, rel2xx=None):
-        if rel2xx is None:
-            rel2xx = {}
+                 is_intense=False, verb=None, adverbs=None, rel2xxx=None):
+        if rel2xxx is None:
+            rel2xxx = {}
         if adverbs is None:
             adverbs = []
 
@@ -30,24 +30,29 @@ class Clause(Idea):
         for s in self.adverbs:
             assert isinstance(s, basestring)
 
-        self.rel2xx = rel2xx
-        for rel, xx in self.rel2xx.iteritems():
+        self.rel2xxx = rel2xxx
+        for rel, xxx in self.rel2xxx.iteritems():
             assert Relation.is_valid(rel)
-            assert isinstance(xx, list)
-            for x in xx:
-                assert isinstance(x, int)
+            assert isinstance(xxx, list)
+            print 'xxx', xxx
+            for xx in xxx:
+                print 'xx', xx
+                assert isinstance(xx, list)
+                for x in xx:
+                    print '-- x', x
+                    assert isinstance(x, int)
 
     def dump(self):
-        rel2xx = {}
-        for rel, xx in self.rel2xx.iteritems():
-            rel2xx[Relation.to_str[rel]] = xx
+        rel2xxx = {}
+        for rel, xxx in self.rel2xxx.iteritems():
+            rel2xxx[Relation.to_str[rel]] = xxx
         return {
             'type': 'Clause',
             'status': Status.to_str[self.status],
             'purpose': Purpose.to_str[self.purpose],
             'is_intense': self.is_intense,
             'verb': self.verb.dump() if self.verb else None,
-            'rel2xx': rel2xx,
+            'rel2xxx': rel2xxx,
         }
 
     def matches_clause_features(self, f, ideas):
@@ -58,11 +63,11 @@ class Clause(Idea):
             return False
 
         for rel, want_xx in f.rel2xx.iteritems():
-            if rel not in self.rel2xx:
+            if rel not in self.rel2xxx:
                 continue
 
-            my_xx = self.rel2xx[rel]
-            if want_xx != my_xx:
+            my_xxx = self.rel2xxx[rel]
+            if want_xx not in my_xxx:
                 return False
 
         return True
