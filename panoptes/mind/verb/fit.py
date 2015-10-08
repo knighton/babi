@@ -49,7 +49,7 @@ class DoesItFitInside(ClauseMeaning):
             return Response('dunno')
 
         if not path:
-            return Response('what a stupid question')
+            return Response('same thing')
 
         rels = set(path)
         if len(rels) != 1:
