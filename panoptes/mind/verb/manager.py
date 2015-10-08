@@ -61,20 +61,33 @@ class VerbSemanticsManager(object):
                 continue
 
             # Collect args of each relation, in signature order.
-            xxx = []
+            xxxx = []
             for rel_or_none in rels:
                 if rel_or_none is None:
-                    xxx.append(None)
+                    xxxx.append(None)
                     continue
 
-                sub_xxx = c.rel2xxx[rel_or_none]
-                xx = sub_xxx[0]
-                xxx.append(xx)
+                xxx = c.rel2xxx[rel_or_none]
+                xxxx.append(xxx)
 
             # Try to execute it.
-            r = meaning.handle(c, self.memory, xxx)
-            if r:
-                return r
+            if hasattr(meaning, 'handle_disjunctions'):
+                r = meaning.handle_disjunctions(c, self.memory, xxxx)
+                if r:
+                    return r
+            else:
+                new_xxx = []
+                for xxx in xxxx:
+                    if xxx is None:
+                        xx = None
+                    elif len(xxx) == 1:
+                        xx = xxx[0]
+                    else:
+                        return None
+                    new_xxx.append(xx)
+                r = meaning.handle(c, self.memory, new_xxx)
+                if r:
+                    return r
 
         return None
 
