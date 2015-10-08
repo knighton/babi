@@ -52,6 +52,26 @@ class NotAt(LocationHistoryItem):
             return None
 
 
+class AtOneOf(LocationHistoryItem):
+    def __init__(self, xx):
+        self.xx = xx
+
+    def dump(self):
+        return {
+            'type': self.__class__.__name__,
+            'xx': self.xx,
+        }
+
+    def current_location(self):
+        return None
+
+    def is_at_location(self, there):
+        if there in self.xx:
+            return None
+        else:
+            return False
+
+
 class LocationHistory(object):
     def __init__(self):
         self.spans_items = []

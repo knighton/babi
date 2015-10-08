@@ -4,7 +4,7 @@ from panoptes.ling.morph.comparative.comparative import ComparativePolarity
 from panoptes.mind.idea.comparative import Comparative
 from panoptes.mind.idea.direction import Direction
 from panoptes.mind.idea.noun import Noun, Query
-from panoptes.mind.know.location import At, NotAt
+from panoptes.mind.know.location import At, NotAt, AtOneOf
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
 
@@ -416,6 +416,23 @@ class AgentIn(ClauseMeaning):
         agent.location_history.set_location(loc)
         return Response()
 
+    def handle_disjunctions(self, c, memory, (agent_xxx, place_xxx)):
+        if len(agent_xxx) != 1:
+            return None
+        agent_xx, = agent_xxx
+
+        for place_xx in place_xxx:
+            if len(place_xx) != 1:
+                return None
+        place_xx = map(lambda xx: xx[0], place_xxx)
+
+        for agent_x in agent_xx:
+            agent = memory.ideas[agent_x]
+            loc = AtOneOf(place_xx)
+            agent.location_history.set_location(loc)
+
+        return Response()
+
 
 class AgentInQuestion(ClauseMeaning):
     def __init__(self):
@@ -436,7 +453,7 @@ class AgentInQuestion(ClauseMeaning):
         place_x, = place_xx
         r = agent.location_history.is_at_location(place_x)
         if r is None:
-            return Response('dunno')
+            return Response('maybe')
         elif r:
             return Response('yes')
         else:

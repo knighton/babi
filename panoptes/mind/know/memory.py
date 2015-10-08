@@ -383,6 +383,9 @@ class Memory(object):
         deep_ref = DeepReference(
             owning_clause_id=None, is_subj=False, arg=dsen.root)
         xxx = self.decode(deep_ref, from_xx, to_xx)
+        if xxx is None:
+            return None
+
         assert len(xxx) == 1
         xx, = xxx
         assert len(xx) == 1

@@ -101,9 +101,13 @@ class BefearQuestion(ClauseMeaning):
                     return Response('dunno')
 
                 c = memory.ideas[c]
-                got_xx = c.rel2xx.get(Relation.AGENT)
-                if not got_xx:
+                got_xxx = c.rel2xxx.get(Relation.AGENT)
+                if not got_xxx:
                     return Reponse('dunno')
+
+                if len(got_xxx) != 1:
+                    return Response('todo')
+                got_xx, = got_xxx
 
                 rr = []
                 for x in got_xx:

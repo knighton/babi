@@ -60,7 +60,8 @@ class VerbSemanticsManager(object):
             if sorted(filter(bool, rels)) != sorted(c.rel2xxx):
                 continue
 
-            # Collect args of each relation, in signature order.
+            # Collect args of each relation (disjunctions of conjunctions), in
+            # signature order.
             xxxx = []
             for rel_or_none in rels:
                 if rel_or_none is None:
@@ -70,24 +71,29 @@ class VerbSemanticsManager(object):
                 xxx = c.rel2xxx[rel_or_none]
                 xxxx.append(xxx)
 
-            # Try to execute it.
-            if hasattr(meaning, 'handle_disjunctions'):
-                r = meaning.handle_disjunctions(c, self.memory, xxxx)
+            # Try to re-collect the args as just conjunctions.
+            xxx = []
+            ok = True
+            for arg_xxx in xxxx:
+                if arg_xxx is None:
+                    xxx.append(None)
+                elif len(arg_xxx) == 1:
+                    xx, = arg_xxx
+                    xxx.append(xx)
+                else:
+                    ok = False
+                    break
+
+            # Handle the args.
+            if ok:
+                r = meaning.handle(c, self.memory, xxx)
                 if r:
                     return r
             else:
-                new_xxx = []
-                for xxx in xxxx:
-                    if xxx is None:
-                        xx = None
-                    elif len(xxx) == 1:
-                        xx = xxx[0]
-                    else:
-                        return None
-                    new_xxx.append(xx)
-                r = meaning.handle(c, self.memory, new_xxx)
-                if r:
-                    return r
+                if hasattr(meaning, 'handle_disjunctions'):
+                    r = meaning.handle_disjunctions(c, self.memory, xxxx)
+                    if r:
+                        return r
 
         return None
 
