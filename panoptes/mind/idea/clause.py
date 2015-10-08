@@ -34,12 +34,9 @@ class Clause(Idea):
         for rel, xxx in self.rel2xxx.iteritems():
             assert Relation.is_valid(rel)
             assert isinstance(xxx, list)
-            print 'xxx', xxx
             for xx in xxx:
-                print 'xx', xx
                 assert isinstance(xx, list)
                 for x in xx:
-                    print '-- x', x
                     assert isinstance(x, int)
 
     def dump(self):

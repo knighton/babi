@@ -376,7 +376,6 @@ class Memory(object):
         (DeepReference, from_xx, to_xx) -> disjunction of conjunctions of index
         """
         f = self.type2decode[type(deep_ref.arg)]
-        print '!!', type(deep_ref.arg), deep_ref.arg
         return f(deep_ref, from_xx, to_xx)
 
     def decode_dsen(self, dsen, from_xx, to_xx):
