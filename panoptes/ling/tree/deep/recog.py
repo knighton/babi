@@ -1,3 +1,4 @@
+from copy import deepcopy
 from itertools import product
 
 from panoptes.ling.glue.purpose import PurposeManager
@@ -66,12 +67,33 @@ class SurfaceToDeep(object):
             poss = [None]
 
         rr = []
-        for pos in poss:
-            assert not n.preps_nargs
-            r = DeepCommonNoun(
-                possessor=pos, selector=n.selector, number=n.number,
-                attributes=n.attributes, noun=n.noun)
-            rr.append(r)
+        if n.preps_nargs:
+            pp, nn = zip(*n.preps_nargs)
+            tt = map(lambda n: n.relation_arg_type(), nn)
+            preps_rats = zip(pp, tt)
+            rrr = self.relation_mgr.decide_noun_phrase_relation_options(
+                preps_rats)
+            print 'RRR', rrr
+            if not rrr:
+                return []
+            nnn = map(self.recog_arg, nn)
+
+            for rels in product(*rrr):
+                for nn in product(*nnn):
+                    for pos in poss:
+                        r = DeepCommonNoun(
+                            possessor=pos, selector=n.selector, number=n.number,
+                            attributes=n.attributes, noun=n.noun,
+                            rels_nargs=zip(rels, nn))
+                        r = deepcopy(r)
+                        rr.append(r)
+        else:
+            for pos in poss:
+                r = DeepCommonNoun(
+                    possessor=pos, selector=n.selector, number=n.number,
+                    attributes=n.attributes, noun=n.noun)
+                r = deepcopy(r)
+                rr.append(r)
         return rr
 
     def recog_direction(self, n):
@@ -150,7 +172,7 @@ class SurfaceToDeep(object):
     def decide_possible_relations(self, unfronted_preps_vargs, voice):
         preps_types = map(lambda (p, n): (p, n.relation_arg_type()),
                           unfronted_preps_vargs)
-        return self.relation_mgr.decide_relation_options(
+        return self.relation_mgr.decide_clause_relation_options(
             preps_types, voice == Voice.ACTIVE)
 
     def recog_arg(self, arg):
@@ -218,9 +240,6 @@ class SurfaceToDeep(object):
                         continue
 
                     for rels in product(*relation_options_per_arg):
-                        if len(set(rels)) != len(rels):
-                            continue
-
                         rels_vargs = zip(rels, deeps)
                         r = DeepContentClause(
                             status, purpose, is_intense, c.verb.intrinsics,

@@ -1,4 +1,5 @@
 from panoptes.ling.glue.grammatical_number import N3, N5
+from panoptes.ling.glue.relation import Relation
 from panoptes.ling.tree.common.util.selector import Selector
 from panoptes.ling.tree.deep.base import DeepArgument
 from panoptes.ling.tree.surface.common_noun import SurfaceCommonNoun
@@ -34,8 +35,9 @@ class DeepCommonNoun(DeepArgument):
             assert self.noun
 
         self.rels_nargs = rels_nargs
-        for r, n in self.rels_nargs:
-            assert False  # NOTE: not in demo.
+        for rel, arg in self.rels_nargs:
+            assert Relation.is_valid(rel)
+            assert isinstance(arg, DeepArgument)
 
     # --------------------------------------------------------------------------
     # From base.

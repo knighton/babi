@@ -378,7 +378,7 @@ class RelationManager(object):
             return None
         return map(lambda core: self.core2relations[core], cores)
 
-    def decide_relation_options(self, preps_rats, is_active_voice):
+    def decide_clause_relation_options(self, preps_rats, is_active_voice):
         """
         list of (prep tuple, RelationArgType) -> Relation options per arg
 
@@ -403,6 +403,22 @@ class RelationManager(object):
 
         for x, relations in zip(prepless, relations_per_prepless):
             options_per_arg[x] = relations
+
+        options_per_arg = filter(lambda rr: len(set(rr)) == len(rr),
+                                 options_per_arg)
+
+        return options_per_arg
+
+    def decide_noun_phrase_relation_options(self, preps_rats):
+        options_per_arg = []
+        for prep, rat in preps_rats:
+            rels = self.decode_prep_type(prep, rat)
+            if not rels:
+                return None
+            options_per_arg.append(rels)
+
+        options_per_arg = filter(lambda rr: len(set(rr)) == len(rr),
+                                 options_per_arg)
 
         return options_per_arg
 
