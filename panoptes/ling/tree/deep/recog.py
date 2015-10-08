@@ -73,7 +73,6 @@ class SurfaceToDeep(object):
             preps_rats = zip(pp, tt)
             rrr = self.relation_mgr.decide_noun_phrase_relation_options(
                 preps_rats)
-            print 'RRR', rrr
             if not rrr:
                 return []
             nnn = map(self.recog_arg, nn)
