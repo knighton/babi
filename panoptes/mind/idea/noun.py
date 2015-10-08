@@ -1,5 +1,6 @@
 from panoptes.etc.enum import enum
 from panoptes.ling.glue.inflection import Gender
+from panoptes.ling.glue.relation import Relation
 from panoptes.mind.idea.base import Idea
 from panoptes.mind.know.location import LocationHistory
 
@@ -15,11 +16,11 @@ Query = enum('Query = CARDINALITY IDENTITY GENERIC')
 class Noun(Idea):
     def __init__(self, query=None, name=None, gender=None,
                  is_animate=None, attributes=None, kind=None,
-                 rel2xx=None, carrying=None):
+                 rel2xxx=None, carrying=None):
         if attributes is None:
             attributes = []
-        if rel2xx is None:
-            rel2xx = {}
+        if rel2xxx is None:
+            rel2xxx = {}
         if carrying is None:
             carrying = []
 
@@ -50,12 +51,14 @@ class Noun(Idea):
         if self.kind:
             assert isinstance(self.kind, basestring)
 
-        self.rel2xx = rel2xx
-        for rel, x in self.rel2xx.iteritems():
+        self.rel2xxx = rel2xxx
+        for rel, xxx in self.rel2xxx.iteritems():
             assert Relation.is_valid(rel)
-            assert isinstance(xx, list)
-            for x in xx:
-                assert isinstance(x, int)
+            assert isinstance(xxx, list)
+            for xx in xxx:
+                assert isinstance(xx, list)
+                for x in xx:
+                    assert isinstance(x, int)
 
         self.carrying = carrying
         for x in self.carrying:
@@ -65,9 +68,9 @@ class Noun(Idea):
 
 
     def dump(self):
-        rel2xx = {}
-        for rel, xx in self.rel2xx.iteritems():
-            rel2xx[Relation.to_str[rel]] = xx
+        rel2xxx = {}
+        for rel, xx in self.rel2xxx.iteritems():
+            rel2xxx[Relation.to_str[rel]] = xxx
         return {
             'type': 'Noun',
             'query': Query.to_str[self.query] if self.query else None,
@@ -76,7 +79,7 @@ class Noun(Idea):
             'is_animate': self.is_animate,
             'attributes': self.attributes,
             'kind': self.kind,
-            'rel2xx': rel2xx,
+            'rel2xxx': rel2xxx,
             'carrying': self.carrying,
             'location_history': self.location_history.dump(),
         }
@@ -99,8 +102,8 @@ class Noun(Idea):
         if to.kind:
             self.kind = to.kind
 
-        for rel, xx in to.rel2xx:
-            self.rel2xx[rel] = xx
+        for rel, xxx in to.rel2xxx:
+            self.rel2xxx[rel] = xxx
 
         self.carrying = sorted(set(self.carrying + to.carrying))
 
@@ -131,6 +134,9 @@ class Noun(Idea):
             else:
                 return False
 
+        if self.rel2xxx != f.rel2xxx:
+            return False
+
         return True
 
     @staticmethod
@@ -140,20 +146,23 @@ class Noun(Idea):
     @staticmethod
     def from_features(f):
         return Noun(query=f.query, name=f.name, gender=f.gender,
-                    attributes=f.attributes, kind=f.kind)
+                    attributes=f.attributes, kind=f.kind, rel2xxx=f.rel2xxx)
 
 
 class NounFeatures(object):
     def __init__(self, query=None, name=None, gender=None, attributes=None,
-                 kind=None):
+                 kind=None, rel2xxx=None):
         if attributes is None:
             attributes = []
+        if rel2xxx is None:
+            rel2xxx = {}
 
         self.query = query
         self.name = name
         self.gender = gender
         self.attributes = attributes
         self.kind = kind
+        self.rel2xxx = rel2xxx
 
     def dump(self):
         return {
@@ -162,4 +171,5 @@ class NounFeatures(object):
             'gender': Gender.to_str[self.gender] if self.gender else None,
             'attributes': self.attributes,
             'kind': self.kind,
+            'rel2xxx': self.rel2xxx,
         }

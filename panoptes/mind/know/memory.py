@@ -205,16 +205,15 @@ class Memory(object):
         n = deep_ref.arg
 
         assert not n.possessor
-        assert not n.rels_nargs
 
-        if n.number and n.number.is_interrogative():
+        if n.number and n.number.is_interrogative() and not n.rels_nargs:
             assert n.selector.correlative == Correlative.INDEF
             idea = Noun(query=Query.CARDINALITY, attributes=n.attributes,
                         kind=n.noun)
             x = self.add_idea(idea)
             return [[x]]
 
-        if n.selector.correlative == Correlative.INDEF:
+        if n.selector.correlative == Correlative.INDEF and not n.rels_nargs:
             if n.selector.n_min == N5.SING and n.selector.n_max == N5.SING:
                 # Create a new one.
                 idea = Noun(attributes=n.attributes, kind=n.noun)
@@ -251,12 +250,21 @@ class Memory(object):
         }:
             assert False
 
+        rel2xxx = {}
+        for rel, narg in n.rels_nargs:
+            sub_ref = DeepReference(
+                owning_clause_id=deep_ref.owning_clause_id, is_subj=False,
+                arg=narg)
+            xxx = self.decode(sub_ref, from_xx, to_xx)
+            rel2xxx[rel] = xxx
+
         if n.noun == 'person':
             gender = None
         else:
             gender = Gender.NEUTER
         features = NounFeatures(
-            attributes=n.attributes, kind=n.noun, gender=gender)
+            attributes=n.attributes, kind=n.noun, gender=gender,
+            rel2xxx=rel2xxx)
         xx = self.resolve_one_noun(features)
         return [xx]
 

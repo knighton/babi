@@ -414,6 +414,8 @@ class RelationManager(object):
         for prep, rat in preps_rats:
             rels = self.decode_prep_type(prep, rat)
             if not rels:
+                print 'Unknown preposition + arg type:', prep, \
+                    RelationArgType.to_str[rat]
                 return None
             options_per_arg.append(rels)
 
