@@ -314,6 +314,32 @@ class Parse(object):
             t.downs.append(('det', det))
             t.downs.sort(key=lambda (dep, child): child.index)
 
+        # Possibly the worst hack.
+        #
+        # Example:
+        #
+        #   "Is [the box of chocolates] [bigger than the box]?"
+        while True:
+            t = self.tokens[0]
+            if t.tag != 'VBZ':
+                break
+
+            if self.root.index:
+                break
+
+            n = len(self.root.downs)
+            if n != 2:  # One for the joined arg, one for ending punct.
+                break
+
+            rel, child = self.root.downs[1]
+            if rel != 'punct':
+                break
+
+            for t in self.tokens:
+                if t.tag == 'JJR' and t.up[0] == 'amod':
+                    t.up = ('nsubj', t.up[1])
+                    reassign_parent(t, self.root)
+
         # If it starts with a "to be" VBZ, it should be of the form
         #
         #   "(is) (something) (something)"
@@ -325,6 +351,10 @@ class Parse(object):
         # and
         #
         #   "Is the box bigger than the box of chocolates?"
+        #
+        # however note this won't handle the following alone:
+        #
+        #   "Is [the box of chocolates] [bigger than the box]?"
         while True:
             t = self.tokens[0]
             if t.tag != 'VBZ':

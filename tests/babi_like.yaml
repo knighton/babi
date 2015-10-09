@@ -365,6 +365,10 @@
         out: "yes"
       - in: Does the box fit in the box of chocolates?
         out: "no"
+  - name: task18_must_parse_too
+    pairs:
+     - in: Is the box of chocolates bigger than the box?
+       out: dunno
   - name: task19_normal
     pairs:
       - in: The garden is west of the bathroom.
