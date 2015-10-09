@@ -1,3 +1,4 @@
+from panoptes.ling.tree.common.adjective import Adjective
 from panoptes.ling.tree.common.existential_there import ExistentialThere
 from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun
 from panoptes.ling.tree.common.proper_noun import ProperNoun
@@ -30,6 +31,7 @@ class ArgLoader(object):
             DeepDirection,
 
             # Common.
+            Adjective,
             ExistentialThere,
             PersonalPronoun,
             ProperNoun,

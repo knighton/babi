@@ -9,6 +9,7 @@ from panoptes.ling.glue.inflection import Conjugation
 from panoptes.ling.glue.magic_token import A_OR_AN, TIME_PREP
 from panoptes.ling.glue.purpose import EndPunctClassifier
 from panoptes.ling.parse.parse import Parse
+from panoptes.ling.tree.common.adjective import Adjective
 from panoptes.ling.tree.common.existential_there import ExistentialThere
 from panoptes.ling.tree.common.number import Number
 from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun, \
@@ -150,6 +151,7 @@ class ParseToSurface(object):
         self.tag2recognize_arg = {
             'DT': self.recog_dt,
             'EX': self.recog_ex,
+            'JJ': self.recog_jj,
             'JJR': self.recog_jjr,
             'NN': self.recog_nn,
             'NNS': self.recog_nns,
@@ -184,6 +186,9 @@ class ParseToSurface(object):
     def recog_ex(self, root_token):
         p_n = (None, ExistentialThere())
         return [p_n]
+
+    def recog_jj(self, root_token):
+        return [(None, Adjective(root_token.text))]
 
     def recog_jjr(self, root_token):
         if len(root_token.downs) != 1:
