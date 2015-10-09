@@ -21,7 +21,7 @@ class FitsInside(ClauseMeaning):
 
         agent_x, = agent_xx
         inside_x, = inside_xx
-        memory.graph.link(agent_x, 'smaller', inside_x)
+        memory.graph.link(agent_x, 'is_smaller_than', inside_x)
 
         return Response()
 
@@ -44,19 +44,5 @@ class DoesItFitInside(ClauseMeaning):
 
         agent_x, = agent_xx
         inside_x, = inside_xx
-        path = memory.graph.decide_path(agent_x, inside_x)
-        if path is None:
-            return Response('dunno')
-
-        if not path:
-            return Response('same thing')
-
-        rels = set(path)
-        if len(rels) != 1:
-            return Response('unclear')
-
-        rel = rels.pop()
-        if rel == 'bigger':
-            return Response('yes')
-        else:
-            return Response('no')
+        s = memory.graph.is_direction(agent_x, 'is_smaller_than', inside_x)
+        return Response(s)

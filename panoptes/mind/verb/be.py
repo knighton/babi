@@ -11,6 +11,17 @@ from panoptes.mind.verb.base import ClauseMeaning, Response
 BE_LEMMAS = ['be']
 
 
+def get_direction(s):
+    return {
+        'right': 'is_right_of',
+        'left': 'is_left_of',
+        'north': 'is_north_of',
+        'south': 'is_south_of',
+        'east': 'is_east_of',
+        'west': 'is_west_of',
+    }[s]
+
+
 class AgentIsTarget(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.INFO
@@ -33,12 +44,13 @@ class AgentIsTarget(ClauseMeaning):
         if isinstance(agent, Noun) and isinstance(target, Comparative):
             if target.polarity == ComparativePolarity.POS and \
                     target.adjective == 'big':
-                memory.graph.link(agent_x, 'bigger', target.than_x)
+                memory.graph.link(agent_x, 'is_bigger_than', target.than_x)
                 return Response()
             else:
                 pass
         elif isinstance(agent, Noun) and isinstance(target, Direction):
-            memory.graph.link(agent_x, target.which, target.of_x)
+            direction = get_direction(target.which)
+            memory.graph.link(agent_x, direction, target.of_x)
             return Response()
         elif isinstance(agent, Noun) and isinstance(target, Noun):
             agent.assign(target)
@@ -75,7 +87,7 @@ class AgentIsTargetQuestion(ClauseMeaning):
         if isinstance(agent, Noun) and isinstance(target, Comparative):
             if target.polarity == ComparativePolarity.POS and \
                     target.adjective == 'big':
-                path = memory.graph.decide_path(target.than_x, agent_x)
+                path = memory.graph.decide_path(agent_x, target.than_x)
                 if path is None:
                     return Response('dunno')
 
@@ -87,7 +99,7 @@ class AgentIsTargetQuestion(ClauseMeaning):
                     return Response('unclear')
 
                 rel = rels.pop()
-                if rel == 'bigger':
+                if rel == 'is_bigger_than':
                     return Response('yes')
                 else:
                     return Response('no')
@@ -116,7 +128,8 @@ class AgentTargetQuestion(ClauseMeaning):
         target = memory.ideas[target_x]
         if isinstance(agent, Direction) and isinstance(target, Noun):
             if target.query == Query.IDENTITY:
-                xx = memory.graph.look_toward_direction(agent.of_x, agent.which)
+                direction = get_direction(agent.which)
+                xx = memory.graph.look_toward_direction(agent.of_x, direction)
                 rr = []
                 for x in xx:
                     idea = memory.ideas[x]
@@ -138,7 +151,8 @@ class AgentTargetQuestion(ClauseMeaning):
         elif isinstance(agent, Noun) and isinstance(target, Direction):
             of = memory.ideas[target.of_x]
             if of.query == Query.IDENTITY:
-                xx = memory.graph.look_from_direction(agent_x, target.which)
+                direction = get_direction(target.which)
+                xx = memory.graph.look_from_direction(agent_x, direction)
                 rr = []
                 for x in xx:
                     idea = memory.ideas[x]
@@ -179,26 +193,6 @@ def a_direction_b(memory, agent_xx, relation, what_xx):
     return Response()
 
 
-def is_path_direction(memory, path, direction):
-    if path is None:
-        return Response('dunno')
-
-    if not path:
-        return Response('same thing')
-
-    rels = set(path)
-    opposite = memory.graph.direction2inverse[direction]
-    if direction in rels:
-        if opposite in rels:
-            r = 'no'
-        else:
-            r = 'yes'
-    else:
-        r = 'no'
-
-    return Response(r)
-
-
 def is_a_direction_b(memory, a_xx, relation, b_xx):
     if len(a_xx) != 1:
         return None
@@ -216,8 +210,8 @@ def is_a_direction_b(memory, a_xx, relation, b_xx):
     if not isinstance(b, Noun):
         return None
 
-    path = memory.graph.decide_path(b_x, a_x)
-    return is_path_direction(memory, path, relation)
+    s = memory.graph.is_direction(a_x, relation, b_x)
+    return Response(s)
 
 
 class AgentIsTo(ClauseMeaning):
@@ -242,7 +236,8 @@ class AgentIsTo(ClauseMeaning):
         to = memory.ideas[to_x]
 
         if isinstance(agent, Noun) and isinstance(to, Direction):
-            memory.graph.link(agent_x, to.which, to.of_x)
+            direction = get_direction(to.which)
+            memory.graph.link(agent_x, direction, to.of_x)
             return Response()
         else:
             return None
@@ -270,7 +265,8 @@ class IsAgentToQuestion(ClauseMeaning):
         to = memory.ideas[to_x]
 
         if isinstance(agent, Noun) and isinstance(to, Direction):
-            return is_a_direction_b(memory, [agent_x], to.which, [to.of_x])
+            direction = get_direction(to.which)
+            return is_a_direction_b(memory, [agent_x], direction, [to.of_x])
         else:
             return None
 
@@ -284,7 +280,7 @@ class AgentIsAbove(ClauseMeaning):
         ]
 
     def handle(self, c, memory, (agent_xx, above_xx)):
-        return a_direction_b(memory, agent_xx, 'above', above_xx)
+        return a_direction_b(memory, agent_xx, 'is_above', above_xx)
 
 
 class AgentIsBelow(ClauseMeaning):
@@ -296,7 +292,7 @@ class AgentIsBelow(ClauseMeaning):
         ]
 
     def handle(self, c, memory, (agent_xx, below_xx)):
-        return a_direction_b(memory, agent_xx, 'below', below_xx)
+        return a_direction_b(memory, agent_xx, 'is_below', below_xx)
 
 
 class IsAgentAbove(ClauseMeaning):
@@ -308,7 +304,7 @@ class IsAgentAbove(ClauseMeaning):
         ]
 
     def handle(self, c, memory, (agent_xx, above_xx)):
-        return is_a_direction_b(memory, agent_xx, 'above', above_xx)
+        return is_a_direction_b(memory, agent_xx, 'is_above', above_xx)
 
 
 class IsAgentBelow(ClauseMeaning):
@@ -320,7 +316,7 @@ class IsAgentBelow(ClauseMeaning):
         ]
 
     def handle(self, c, memory, (agent_xx, below_xx)):
-        return is_a_direction_b(memory, agent_xx, 'below', below_xx)
+        return is_a_direction_b(memory, agent_xx, 'is_below', below_xx)
 
 
 class AgentPlaceQuestion(ClauseMeaning):

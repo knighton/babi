@@ -17,20 +17,20 @@ class Graph(object):
     def __init__(self):
         self.x2node = {}
         self.direction2inverse = {
-            'north': 'south',
-            'south': 'north',
-            'east': 'west',
-            'west': 'east',
+            'is_north_of': 'is_south_of',
+            'is_south_of': 'is_north_of',
+            'is_east_of': 'is_west_of',
+            'is_west_of': 'is_east_of',
 
-            'smaller': 'bigger',
-            'bigger': 'smaller',
+            'is_smaller_than': 'is_bigger_than',
+            'is_bigger_than': 'is_smaller_than',
 
-            'above': 'below',
-            'below': 'above',
-            'left': 'right',
-            'right': 'left',
-            'front': 'behind',
-            'behind': 'front',
+            'is_above': 'is_below',
+            'is_below': 'is_above',
+            'is_left_of': 'is_right_of',
+            'is_right_of': 'is_left_of',
+            'is_in_front_of': 'is_behind',
+            'is_behind': 'is_in_front_of',
         }
 
     def dump(self):
@@ -50,6 +50,7 @@ class Graph(object):
         return self.x2node[name]
 
     def link(self, from_x, direction, to_x):
+        assert direction in self.direction2inverse
         from_node = self.get(from_x)
         from_node.add_link(direction, to_x)
         inverse_direction = self.direction2inverse[direction]
@@ -66,6 +67,7 @@ class Graph(object):
         return rr
 
     def look_from_direction(self, from_x, direction):
+        assert direction in self.direction2inverse
         node = self.get(from_x)
         rr = []
         for link_direction, to_x in node.links:
@@ -96,4 +98,23 @@ class Graph(object):
         if not path:
             return path
 
-        return map(lambda s: self.direction2inverse[s], path)
+        return path
+
+    def is_direction(self, from_x, direction, to_x):
+        path = self.decide_path(from_x, to_x)
+        if path is None:
+            return 'dunno'
+
+        if not path:
+            return 'same_thing'
+
+        rels = set(path)
+        opposite = self.direction2inverse[direction]
+        if direction in rels:
+            if opposite in rels:
+                r = 'no'
+            else:
+                r=  'yes'
+        else:
+            r = 'no'
+        return r
