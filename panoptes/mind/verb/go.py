@@ -115,7 +115,7 @@ class HowGoFromToQuestion(ClauseMeaning):
         if to.query:
             return None
 
-        ss = memory.graph.decide_path(source_x, to_x)
+        ss = memory.graph.shortest_path(source_x, to_x)
         ss = map(lambda s: s[0], ss)
         s = ','.join(ss)
         return Response(s)

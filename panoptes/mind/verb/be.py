@@ -87,22 +87,9 @@ class AgentIsTargetQuestion(ClauseMeaning):
         if isinstance(agent, Noun) and isinstance(target, Comparative):
             if target.polarity == ComparativePolarity.POS and \
                     target.adjective == 'big':
-                path = memory.graph.decide_path(agent_x, target.than_x)
-                if path is None:
-                    return Response('dunno')
-
-                if not path:
-                    return Response('same thing')
-
-                rels = set(path)
-                if len(rels) != 1:
-                    return Response('unclear')
-
-                rel = rels.pop()
-                if rel == 'is_bigger_than':
-                    return Response('yes')
-                else:
-                    return Response('no')
+                s = memory.graph.is_direction(
+                    agent_x, 'is_bigger_than', target.than_x)
+                return Response(s)
 
         return None
 

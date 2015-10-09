@@ -93,7 +93,7 @@ class Graph(object):
                 best_path = path
         return best_path
 
-    def decide_path(self, from_x, to_x):
+    def shortest_path(self, from_x, to_x):
         path = self.sub_decide_path(from_x, to_x, [])
         if not path:
             return path
@@ -101,7 +101,7 @@ class Graph(object):
         return path
 
     def is_direction(self, from_x, direction, to_x):
-        path = self.decide_path(from_x, to_x)
+        path = self.shortest_path(from_x, to_x)
         if path is None:
             return 'dunno'
 
