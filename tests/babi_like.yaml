@@ -367,8 +367,23 @@
         out: "no"
   - name: task18_must_parse_too
     pairs:
-     - in: Is the box of chocolates bigger than the box?
-       out: dunno
+      - in: Is the box of chocolates bigger than the box?
+        out: dunno
+  - name: task18_must_get_right
+    pairs:
+      - in: The container fits inside the suitcase.
+      - in: The container is bigger than the box of chocolates.
+      - in: Does the box of chocolates fit in the suitcase?
+        out: "yes"
+  - name: task18_must_coref_right
+    pairs:
+      - in: The chocolate fits inside the box of chocolates.
+      - in: The container fits inside the suitcase.
+      - in: The container is bigger than the box of chocolates.
+      - in: The container is bigger than the chocolate.
+      - in: The suitcase is bigger than the chocolate.
+      - in: Does the box of chocolates fit in the suitcase?
+        out: "yes"
   - name: task19_normal
     pairs:
       - in: The garden is west of the bathroom.
