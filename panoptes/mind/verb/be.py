@@ -3,7 +3,7 @@ from panoptes.ling.glue.relation import Relation
 from panoptes.ling.morph.comparative.comparative import ComparativePolarity
 from panoptes.mind.idea.comparative import Comparative
 from panoptes.mind.idea.direction import Direction
-from panoptes.mind.idea.noun import Noun, Query
+from panoptes.mind.idea.noun import Noun, NounFeatures, Query
 from panoptes.mind.know.location import At, NotAt, AtOneOf
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
@@ -94,6 +94,22 @@ class AgentIsTargetQuestion(ClauseMeaning):
         return None
 
 
+COLORS = """
+    black
+    white
+    red
+    orange
+    yellow
+    green
+    blue
+    violet
+""".split()
+
+
+def is_color(s):
+    return s in COLORS
+
+
 class AgentTargetQuestion(ClauseMeaning):
     def __init__(self):
         self.purpose = Purpose.WH_Q
@@ -156,6 +172,24 @@ class AgentTargetQuestion(ClauseMeaning):
 
                 r = ','.join(rr)
                 return Response(r)
+            else:
+                return None
+        elif isinstance(agent, Noun) and isinstance(target, Noun):
+            if not agent.query and target.query == Query.IDENTITY:
+                if target.kind == 'color':
+                    for s in agent.attributes:
+                        if is_color(s):
+                            return Response(s)
+
+                    features = NounFeatures(kind=agent.kind)
+                    for n in memory.resolve_each_noun(features):
+                        for s in n.attributes:
+                            if is_color(s):
+                                return Response(s)
+
+                    return Response('dunno')
+                else:
+                    return None
             else:
                 return None
         else:

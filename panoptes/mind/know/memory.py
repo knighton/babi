@@ -7,6 +7,7 @@ from panoptes.ling.glue.inflection import Declension, Gender
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
 from panoptes.ling.morph.gender.gender import GenderClassifier
+from panoptes.ling.tree.common.adjective import Adjective
 from panoptes.ling.tree.common.util.selector import Correlative
 from panoptes.ling.tree.common.personal_pronoun import PersonalPronoun
 from panoptes.ling.tree.common.proper_noun import ProperNoun
@@ -64,6 +65,7 @@ class Memory(object):
         self.ideas = []
 
         self.type2decode = {
+            Adjective: self.decode_adjective,
             DeepCommonNoun: self.decode_common_noun,
             DeepComparative: self.decode_comparative,
             DeepConjunction: self.decode_conjunction,
@@ -151,6 +153,21 @@ class Memory(object):
         x = self.add_idea(idea)
         return [x]
 
+    def resolve_each_noun(self, features):
+        true_ii = set()
+        for i in xrange(len(self.ideas) - 1, -1, -1):
+            idea = self.ideas[i]
+            if not idea:
+                continue
+            if idea.matches_noun_features(
+                    features, self.ideas, self.place_kinds):
+                true_i = self.go_to_the_source(i)
+                if true_i in true_ii:
+                    continue
+                true_ii.add(true_i)
+                n = self.ideas[true_i]
+                yield n
+
     def resolve_plural_noun(self, features):
         rr = []
         for i in xrange(len(self.ideas) - 1, -1, -1):
@@ -179,6 +196,12 @@ class Memory(object):
                 return i
 
         return None
+
+    def decode_adjective(self, deep_ref, from_xx, to_xx):
+        adj = deep_ref.arg.s
+        noun = Noun(attributes=[adj])
+        x = self.add_idea(noun)
+        return [[x]]
 
     def decode_conjunction(self, deep_ref, from_xx, to_xx):
         xxx = []
