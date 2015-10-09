@@ -69,7 +69,7 @@ class Noun(Idea):
 
     def dump(self):
         rel2xxx = {}
-        for rel, xx in self.rel2xxx.iteritems():
+        for rel, xxx in self.rel2xxx.iteritems():
             rel2xxx[Relation.to_str[rel]] = xxx
         return {
             'type': 'Noun',
