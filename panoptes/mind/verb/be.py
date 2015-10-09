@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
 from panoptes.ling.morph.comparative.comparative import ComparativePolarity
@@ -96,6 +98,8 @@ class AgentIsTargetQuestion(ClauseMeaning):
 
 COLORS = """
     black
+    gray
+    grey
     white
     red
     orange
@@ -103,11 +107,27 @@ COLORS = """
     green
     blue
     violet
+    purple
+    pink
 """.split()
 
 
 def is_color(s):
     return s in COLORS
+
+
+def majority_vote(aa):
+    assert aa
+    a2count = defaultdict(int)
+    for a in aa:
+        a2count[a] += 1
+    max_count = None
+    max_a = None
+    for a, count in a2count.iteritems():
+        if max_count is None or max_count < count:
+            max_count = count
+            max_a = a
+    return max_a
 
 
 class AgentTargetQuestion(ClauseMeaning):
@@ -181,11 +201,16 @@ class AgentTargetQuestion(ClauseMeaning):
                         if is_color(s):
                             return Response(s)
 
+                    rr = []
                     features = NounFeatures(kind=agent.kind)
                     for n in memory.resolve_each_noun(features):
                         for s in n.attributes:
                             if is_color(s):
-                                return Response(s)
+                                rr.append(s)
+
+                    if rr:
+                        s = majority_vote(rr)
+                        return Response(s)
 
                     return Response('dunno')
                 else:

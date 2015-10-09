@@ -259,13 +259,39 @@
         out: mouse
       - in: What is jessica afraid of?
         out: cat
-  - name: task16
+  - name: task16_basic
     pairs:
       - in: Bernhard is a lion.
       - in: Bernhard is white.
       - in: Brian is a lion.
       - in: What color is Brian?
         out: white
+  - name: task16_full_example
+    pairs:
+      - in: Lily is a rhino.
+      - in: Greg is a lion.
+      - in: Brian is a lion.
+      - in: Bernhard is a frog.
+      - in: Julius is a swan.
+      - in: Lily is green.
+      - in: Julius is gray.
+      - in: Brian is gray.
+      - in: Bernhard is green.
+      - in: What color is Greg?
+        out: gray
+  - name: task16_majority_vote
+    pairs:
+      - in: Greg is a frog.
+      - in: Bernhard is a swan.
+      - in: Julius is a frog.
+      - in: Bernhard is white.
+      - in: Julius is green.
+      - in: Lily is a frog.
+      - in: Brian is a frog.
+      - in: Lily is gray.
+      - in: Brian is gray.
+      - in: What color is Greg?
+        out: gray
   - name: task17_to_the_left_right
     pairs:
       - in: The pink rectangle is to the left of the triangle.
