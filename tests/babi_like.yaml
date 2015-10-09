@@ -259,13 +259,13 @@
         out: mouse
       - in: What is jessica afraid of?
         out: cat
-#  - name: task16
-#    pairs:
-#      - in: Bernhard is a lion.
-#      - in: Bernhard is white.
-#      - in: Brian is a lion.
-#      - in: What color is Brian?
-#        out: white
+  - name: task16
+    pairs:
+      - in: Bernhard is a lion.
+      - in: Bernhard is white.
+      - in: Brian is a lion.
+      - in: What color is Brian?
+        out: white
   - name: task17_to_the_left_right
     pairs:
       - in: The pink rectangle is to the left of the triangle.
