@@ -94,27 +94,36 @@ class Graph(object):
         return best_path
 
     def shortest_path(self, from_x, to_x):
-        path = self.sub_decide_path(from_x, to_x, [])
-        if not path:
-            return path
+        return self.sub_decide_path(from_x, to_x, [])
 
-        return path
+    def sub_each_path(self, from_x, to_x, visited):
+        if from_x == to_x:
+            yield visited + []
+
+        node = self.get(from_x)
+        for direction, next_x in node.links:
+            if next_x in visited:
+                continue
+            for path in self.sub_each_path(next_x, to_x, visited + [from_x]):
+                yield [direction] + path
+
+    def each_path(self, from_x, to_x):
+        for path in self.sub_each_path(from_x, to_x, []):
+            yield path
 
     def is_direction(self, from_x, direction, to_x):
-        path = self.shortest_path(from_x, to_x)
-        if path is None:
-            return 'dunno'
+        for path in self.each_path(from_x, to_x):
+            if not path:
+                return 'same_thing'
 
-        if not path:
-            return 'same_thing'
-
-        rels = set(path)
-        opposite = self.direction2inverse[direction]
-        if direction in rels:
-            if opposite in rels:
-                r = 'no'
+            rels = set(path)
+            opposite = self.direction2inverse[direction]
+            if direction in rels:
+                if opposite in rels:
+                    continue
+                else:
+                    r = 'yes'
             else:
-                r=  'yes'
-        else:
-            r = 'no'
-        return r
+                r = 'no'
+            return r
+        return 'no'

@@ -368,14 +368,14 @@
   - name: task18_must_parse_too
     pairs:
       - in: Is the box of chocolates bigger than the box?
-        out: dunno
+        out: "no"
   - name: task18_must_get_right
     pairs:
       - in: The container fits inside the suitcase.
       - in: The container is bigger than the box of chocolates.
       - in: Does the box of chocolates fit in the suitcase?
         out: "yes"
-  - name: task18_must_coref_right
+  - name: task18_find_clear_path_not_shortest_path
     pairs:
       - in: The chocolate fits inside the box of chocolates.
       - in: The container fits inside the suitcase.
