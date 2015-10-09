@@ -339,6 +339,7 @@ class Parse(object):
                 if t.tag == 'JJR' and t.up[0] == 'amod':
                     t.up = ('nsubj', t.up[1])
                     reassign_parent(t, self.root)
+            break
 
         # If it starts with a "to be" VBZ, it should be of the form
         #
