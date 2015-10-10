@@ -48,18 +48,55 @@ class Parse(object):
         """
         We completely give up on certain parse shapes.
         """
-        print 'INPUT TO FIXED:'
-        print
-        print
-        print
-        self.dump()
-        print
-        print
-        print
-
         for token in self.tokens:
             if token.tag == 'XX':
                 return None
+
+        # Tokens that descend from sentence-ending punctuation shall be
+        # reassigned to the root.
+        #
+        #   "What is the hallway north of?"
+        while True:
+            t = self.tokens[-1]
+            if t.tag != '.':
+                break
+
+            for rel, child in t.downs:
+                reassign_parent(child, self.root)
+
+            break
+
+        # "The" is not a direct verb argument.
+        #
+        #   "What is the hallway north of?"
+        #
+        # Convert
+        #
+        #   V* -nsubj-> the
+        #
+        # to
+        #
+        #  (token after the) -det-> the
+        for t in self.tokens:
+            rel, parent = t.up
+            if not parent:
+                continue
+            if not parent.tag.startswith('V'):
+                continue
+            if rel != 'nsubj':
+                continue
+            if t.text != 'the':
+                continue
+            if len(self.tokens) < t.index + 1:
+                continue
+            next_token = self.tokens[t.index + 1]
+            next_rel, next_parent = next_token.up
+            if next_rel != 'nmod':
+                continue
+            next_token.up = 'nsubj', next_parent
+            reassign_parent(next_token, next_parent)
+            t.up = 'det', parent
+            reassign_parent(t, self.tokens[t.index + 1])
 
         # "Does (subject) (verb)"-style questions sometimes get parsed like the
         # (verb) is a noun, compounded to the true subject.  Requires much
