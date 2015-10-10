@@ -42,6 +42,7 @@ class VerbSemanticsManager(object):
             GoTo(),
             GoToAfter(),
             GoToAt(),
+            GoWhereQuestion(),
             HowGoFromToQuestion(),
 
             Give(),

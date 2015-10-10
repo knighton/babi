@@ -434,3 +434,8 @@
       - in: The bedroom is east of the bathroom.
       - in: How do you go from the kitchen to the bathroom?
         out: n,w
+  - name: task20_first
+    pairs:
+      - in: Jason is thirsty.
+      - in: Where will Jason go?
+        out: kitchen

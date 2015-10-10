@@ -1,7 +1,9 @@
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
-from panoptes.mind.idea.noun import Query
+from panoptes.ling.verb.verb import Tense
+from panoptes.mind.idea.noun import Noun, Query
 from panoptes.mind.idea.time import RelativeDay
+from panoptes.mind.know.cause_effect import CAUSE2EFFECTS
 from panoptes.mind.know.location import At
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
@@ -49,6 +51,45 @@ class GoTo(ClauseMeaning):
 
     def handle(self, c, memory, (agent_xx, to_xx)):
         return go_common(c, memory, agent_xx, to_xx)
+
+
+class GoWhereQuestion(ClauseMeaning):
+    def __init__(self):
+        self.purpose = Purpose.WH_Q
+        self.lemmas = GO_LEMMAS
+        self.signatures = [
+            [Relation.AGENT, Relation.PLACE],
+        ]
+
+    def handle(self, c, memory, (agent_xx, to_xx)):
+        if len(agent_xx) != 1:
+            return None
+
+        if len(to_xx) != 1:
+            return None
+
+        agent_x, = agent_xx
+        to_x, = to_xx
+        agent = memory.ideas[agent_x]
+        to = memory.ideas[to_x]
+        if isinstance(agent, Noun) and isinstance(to, Noun):
+            if not agent.query and to.query == Query.IDENTITY and \
+                    to.kind == 'place':
+                if c.verb.tense == Tense.FUTURE:
+                    for adj in agent.attributes:
+                        effects = CAUSE2EFFECTS.get(adj)
+                        if not effects:
+                            continue
+                        for verb, target in effects:
+                            if verb == 'go':
+                                return Response(target)
+                    return Response('dunno')
+                else:
+                    return None
+            else:
+                return None
+        else:
+            return None
 
 
 class GoToAfter(ClauseMeaning):
