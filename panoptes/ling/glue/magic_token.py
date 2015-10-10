@@ -14,5 +14,6 @@ POSSESSIVE_MARK = '<APOS_S>'
 # actually common nouns with a zero preposition.  Makes the deep structure a lot
 # saner.
 PLACE_PREP = '<PLACE_PREP>'
+REASON_PREP = '<REASON_PREP>'
 TIME_PREP = '<TIME_PREP>'
 WAY_PREP = '<WAY_PREP>'
