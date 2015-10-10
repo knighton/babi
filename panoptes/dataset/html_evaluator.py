@@ -121,16 +121,19 @@ body {
         lines = []
         for in_s, want_out in episode.pairs:
             delib = agent.put(uid, in_s)
+            """
             line = '%d %d %d %s ' % (
                 len(delib.recognized.parses), len(delib.recognized.ssens),
                 len(delib.recognized.dsens), in_s.encode('utf-8'))
+            """
+            line = in_s.encode('utf-8')
             if want_out or delib.out:
                 if want_out == delib.out:
-                    line += '"%s"' % want_out
+                    line += ' %s' % want_out
                     line = '<span class="correct">%s</span>' % line
                     correct += 1
                 else:
-                    line += 'want "%s" got "%s"' % (want_out, delib.out)
+                    line += ' want %s got %s' % (want_out, delib.out)
                     line = '<span class="wrong">%s</span>' % line
                 total += 1
             line += '<br>\n'
