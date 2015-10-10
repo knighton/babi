@@ -62,6 +62,12 @@
       - in: The bedroom is west of the bathroom.
       - in: What is the bedroom east of?
         out: hallway
+  - name: task4_yet_another_stranded
+    pairs:
+      - in: The garden is north of the hallway.
+      - in: The kitchen is south of the hallway.
+      - in: What is the hallway north of?
+        out: kitchen
   - name: task5_give
     pairs:
       - in: Fred gave the football to Jeff.
