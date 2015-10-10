@@ -444,3 +444,8 @@
       - in: Antoine is bored.
       - in: Where will Antoine go?
         out: garden
+  - name: task20_why
+    pairs:
+      - in: Jason went to the kitchen.
+      - in: Why did jason go to the kitchen?
+        out: thirsty
