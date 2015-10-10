@@ -3,7 +3,7 @@ from panoptes.ling.glue.relation import Relation
 from panoptes.ling.verb.verb import Tense
 from panoptes.mind.idea.noun import Noun, Query
 from panoptes.mind.idea.time import RelativeDay
-from panoptes.mind.know.cause_effect import CAUSE2EFFECTS
+from panoptes.mind.know.cause_effect import CAUSE2EFFECTS, GO2CAUSE
 from panoptes.mind.know.location import At
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
@@ -161,3 +161,39 @@ class HowGoFromToQuestion(ClauseMeaning):
         ss.reverse()
         s = ','.join(ss)
         return Response(s)
+
+
+class WhyGoToQuestion(ClauseMeaning):
+    def __init__(self):
+        self.purpose = Purpose.WH_Q
+        self.lemmas = GO_LEMMAS
+        self.signatures = [
+            [Relation.AGENT, Relation.TO, Relation.REASON],
+            [Relation.AGENT, Relation.TO, Relation.BECAUSE],
+        ]
+
+    def handle(self, c, memory, (agent_xx, to_xx, why_xx)):
+        if len(agent_xx) != 1:
+            return None
+
+        if len(to_xx) != 1:
+            return None
+
+        if len(why_xx) != 1:
+            return None
+
+        agent_x, = agent_xx
+        to_x, = to_xx
+        why_x, = why_xx
+        agent = memory.ideas[agent_x]
+        to = memory.ideas[to_x]
+        why = memory.ideas[why_x]
+        if isinstance(agent, Noun) and isinstance(to, Noun) and \
+                isinstance(why, Noun):
+            if not agent.query and not to.query and why.query == Query.IDENTITY:
+                cause = GO2CAUSE.get(to.kind, 'dunno')
+                return Response(cause)
+            else:
+                return None
+        else:
+            return None
