@@ -60,7 +60,7 @@ class Parse(object):
 
         # Jason is a proper noun.
         for t in self.tokens:
-            if t.text == 'jason' and t.tag == 'NN':
+            if t.text in ('jason', 'antoine', 'sumit', 'yann'):
                 t.tag = 'NNP'
 
         # Tokens that descend from sentence-ending punctuation shall be
