@@ -48,9 +48,14 @@ class Parse(object):
         """
         We completely give up on certain parse shapes.
         """
-        for token in self.tokens:
-            if token.tag == 'XX':
-                return None
+        print 'INPUT TO FIXED:'
+        self.dump()
+
+        for t in self.tokens:
+            if t.tag == 'XX':
+                t.tag = 'NNP'
+                t.up = ('nsubj', t.up[1])
+                reassign_parent(t, t.up[1])
 
         # Tokens that descend from sentence-ending punctuation shall be
         # reassigned to the root.

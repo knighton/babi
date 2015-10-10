@@ -390,6 +390,7 @@ class Memory(object):
 
     def decode_proper_noun(self, deep_ref, from_xx, to_xx):
         name = deep_ref.arg.name
+        name = tuple(map(lambda s: s.lower(), name))
         gender = self.gender_clf.classify(name)
         features = NounFeatures(name=name, gender=gender)
         xx = self.resolve_one_noun(features)

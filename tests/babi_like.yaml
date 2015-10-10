@@ -74,11 +74,11 @@
       - in: What did Fred give to Jeff?
         out: football
       - in: Who gave the football to Jeff?
-        out: Fred
+        out: fred
       - in: Who did Fred give the football to?
-        out: Jeff
+        out: jeff
       - in: Who gave the football?
-        out: Fred
+        out: fred
   - name: task5_pass
     pairs:
       - in: Jeff passed the apple to Fred.
@@ -437,5 +437,10 @@
   - name: task20_first
     pairs:
       - in: Jason is thirsty.
-      - in: Where will Jason go?
+      - in: Where will jason go?
         out: kitchen
+  - name: task20_second
+    pairs:
+      - in: Antoine is bored.
+      - in: Where will Antoine go?
+        out: garden
