@@ -271,7 +271,7 @@ class Memory(object):
             'of_n_min': 'SING',
             'of_n_max': 'SING',
         }:
-            assert False
+            pass  # TODO: actually handle this correctly.
 
         rel2xxx = {}
         for rel, narg in n.rels_nargs:
