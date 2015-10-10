@@ -1,3 +1,4 @@
+from collections import defaultdict
 import yaml
 
 
@@ -11,12 +12,12 @@ for d in dd:
 
 
 GET2CAUSE = {}
-GO2CAUSE = {}
+GO2CAUSES = defaultdict(list)
 for cause, effects in CAUSE2EFFECTS.iteritems():
     for verb, target in effects:
         if verb == 'get':
             GET2CAUSE[target] = cause
         elif verb == 'go':
-            GO2CAUSE[target] = cause
+            GO2CAUSES[target].append(cause)
         else:
             assert False

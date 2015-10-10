@@ -3,7 +3,7 @@ from panoptes.ling.glue.relation import Relation
 from panoptes.ling.verb.verb import Tense
 from panoptes.mind.idea.noun import Noun, Query
 from panoptes.mind.idea.time import RelativeDay
-from panoptes.mind.know.cause_effect import CAUSE2EFFECTS, GO2CAUSE
+from panoptes.mind.know.cause_effect import CAUSE2EFFECTS, GO2CAUSES
 from panoptes.mind.know.location import At
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
@@ -191,8 +191,13 @@ class WhyGoToQuestion(ClauseMeaning):
         if isinstance(agent, Noun) and isinstance(to, Noun) and \
                 isinstance(why, Noun):
             if not agent.query and not to.query and why.query == Query.IDENTITY:
-                cause = GO2CAUSE.get(to.kind, 'dunno')
-                return Response(cause)
+                causes = GO2CAUSES.get(to.kind, 'dunno')
+                if not causes:
+                    return Response('dunno')
+                for cause in causes:
+                    if cause in agent.attributes:
+                        return Response(cause)
+                return Response(causes[0])
             else:
                 return None
         else:
