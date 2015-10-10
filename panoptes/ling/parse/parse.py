@@ -51,11 +51,17 @@ class Parse(object):
         print 'INPUT TO FIXED:'
         self.dump()
 
+        # XX tokens, ugh.
         for t in self.tokens:
             if t.tag == 'XX':
                 t.tag = 'NNP'
                 t.up = ('nsubj', t.up[1])
                 reassign_parent(t, t.up[1])
+
+        # Jason is a proper noun.
+        for t in self.tokens:
+            if t.text == 'jason' and t.tag == 'NN':
+                t.tag = 'NNP'
 
         # Tokens that descend from sentence-ending punctuation shall be
         # reassigned to the root.
