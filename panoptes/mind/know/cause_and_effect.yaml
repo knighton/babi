@@ -1,0 +1,16 @@
+  - cause: bored
+    effects:
+      - get football
+      - go garden
+  - cause: hungry
+    effects:
+      - get apple
+      - go kitchen
+  - cause: thirsty
+    effects:
+      - get milk
+      - go kitchen
+  - cause: tired
+    effects:
+      - get pajama
+      - go bedroom
