@@ -611,6 +611,27 @@ class Parse(object):
                 if rel in ('cc', 'conj'):
                     reassign_parent(child, pobj)
 
+        # Convert
+        #
+        #   V* -*-> NN(s) -advmod-> RB
+        #
+        # to
+        #
+        #   V* -*-> NN(s)
+        #   V* -advmod-> RB
+        for t in self.tokens:
+            if t.tag != 'RB':
+                continue
+            rel, parent = t.up
+            if rel != 'advmod':
+                continue
+            if not parent:
+                continue
+            if not parent.tag.startswith('N'):
+                continue
+            parent_rel, grandparent = parent.up
+            reassign_parent(t, grandparent)
+
         return self
 
     def dump(self):
