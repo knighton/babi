@@ -31,6 +31,7 @@ class VerbSemanticsManager(object):
             Drop(),
             PickUp(),
             CarryingWhatQuestion(),
+            WhyPickUp(),
 
             Befear(),
             Fear(),

@@ -1,6 +1,7 @@
 from panoptes.ling.glue.purpose import Purpose
 from panoptes.ling.glue.relation import Relation
-from panoptes.mind.idea.noun import Query
+from panoptes.mind.idea.noun import Noun, Query
+from panoptes.mind.know.cause_effect import GET2CAUSE
 from panoptes.mind.know.location import At
 from panoptes.mind.verb.base import ClauseMeaning, Response
 
@@ -95,6 +96,43 @@ class PickUp(ClauseMeaning):
                 memory.ideas[x].location_history.set_location(loc)
 
         return Response()
+
+
+class WhyPickUp(ClauseMeaning):
+    def __init__(self):
+        self.purpose = Purpose.WH_Q
+        self.lemmas = ['get', 'grab', 'pick']
+        self.signatures = [
+            [Relation.AGENT, Relation.TARGET, Relation.REASON],
+            [Relation.AGENT, Relation.TARGET, Relation.BECAUSE],
+        ]
+
+    def handle(self, c, memory, (agent_xx, target_xx, why_xx)):
+        if len(agent_xx) != 1:
+            return None
+
+        if len(target_xx) != 1:
+            return None
+
+        if len(why_xx) != 1:
+            return None
+
+        agent_x, = agent_xx
+        target_x, = target_xx
+        why_x, = why_xx
+
+        agent = memory.ideas[agent_x]
+        target = memory.ideas[target_x]
+        why = memory.ideas[why_x]
+
+        if isinstance(agent, Noun) and isinstance(target, Noun) and \
+                isinstance(why, Noun):
+            if not agent.query and not target.query and \
+                    why.query == Query.IDENTITY:
+                cause = GET2CAUSE.get(target.kind, 'dunno')
+                return Response(cause)
+        else:
+            return None
 
 
 def str_from_int(n):

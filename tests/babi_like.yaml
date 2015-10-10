@@ -449,3 +449,18 @@
       - in: Jason went to the kitchen.
       - in: Why did jason go to the kitchen?
         out: thirsty
+  - name: task20_misparsed
+    pairs:
+      - in: Antoine journeyed to the garden.
+      - in: Why did antoine go to the garden?
+        out: bored
+  - name: task20_sumit
+    pairs:
+      - in: Sumit is hungry.
+      - in: Where will sumit go?
+        out: kitchen
+  - name: task20_football
+    pairs:
+      - in: Antoine grabbed the football there.
+      - in: Why did antoine get the football?
+        out: bored
