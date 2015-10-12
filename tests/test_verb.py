@@ -6,7 +6,7 @@ from panoptes.ling.verb.verb_manager import VerbManager
 
 
 def main():
-    conj_f = 'panoptes/config/conjugations.csv'
+    conj_f = 'panoptes/ling/verb/conjugations.csv'
     verb_f = 'data/verbs.json'
     m = VerbManager.from_files(conj_f, verb_f)
 

@@ -32,7 +32,7 @@ class Recognition(object):
 
 class English(object):
     def __init__(self):
-        conj_f = 'panoptes/config/conjugations.csv'
+        conj_f = 'panoptes/ling/verb/conjugations.csv'
         verb_f = 'data/verbs.json'
         verb_mgr = VerbManager.from_files(conj_f, verb_f)
 
