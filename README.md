@@ -1,4 +1,4 @@
-### panoptes
+### panoptes (solution for [fb.ai/babi](https://fb.ai/babi) 20 QA tasks)
 
 #### 1. English pipeline
 
