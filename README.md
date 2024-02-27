@@ -1,5 +1,7 @@
 ### panoptes (solution for [fb.ai/babi](https://fb.ai/babi) 20 QA tasks)
 
+See also: http://jamesknighton.com/2015/babi/
+
 #### 1. Mind
 
 ##### Organization
