@@ -15,8 +15,8 @@ class Mind(object):
     def overhear(self, dsen, from_uids, to_uids):
         checkpoint = self.memory.make_checkpoint()
 
-        from_xx = map(self.user_mgr.get, from_uids)
-        to_xx = map(self.user_mgr.get, to_uids)
+        from_xx = list(map(self.user_mgr.get, from_uids))
+        to_xx = list(map(self.user_mgr.get, to_uids))
         x = self.memory.decode_dsen(dsen, from_xx, to_xx)
 
         if x is None:

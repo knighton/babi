@@ -49,8 +49,8 @@ class Verb(object):
         forms contractions and the other doens't.
         """
         lemma = annotate_as_aux(self.lemma)
-        nonpast = map(annotate_as_aux, self.nonpast)
-        past = map(annotate_as_aux, self.past)
+        nonpast = list(map(annotate_as_aux, self.nonpast))
+        past = list(map(annotate_as_aux, self.past))
         return Verb(lemma, self.pres_part, self.past_part, nonpast, past)
 
     def dump(self):
@@ -67,8 +67,7 @@ def conjugations_from_file(fn):
     rr = []
     with open(fn) as f:
         for line in f:
-            ss = map(lambda s: s if '|' not in s else s.split('|'),
-                     line.split())
+            ss = [s if '|' not in s else s.split('|') for s in line.split()]
             r = Verb(*ss)
             rr.append(r)
     return rr
@@ -118,23 +117,23 @@ class VerbDerivation(object):
 
         pres_part = t(verb.pres_part)
         past_part = t(verb.past_part)
-        nonpast = map(t, verb.nonpast)
-        past = map(t, verb.past)
+        nonpast = list(map(t, verb.nonpast))
+        past = list(map(t, verb.past))
         return VerbDerivation(pres_part, past_part, nonpast, past)
 
     def to_d(self):
         return {
             'pres_part': self.pres_part.to_d(),
             'past_part': self.past_part.to_d(),
-            'nonpast': map(lambda t: t.to_d(), self.nonpast),
-            'past': map(lambda t: t.to_d(), self.past),
+            'nonpast': [t.to_d() for t in self.nonpast],
+            'past': [t.to_d() for t in self.past],
         }
 
     def derive_verb(self, lemma):
         pres_part = self.pres_part.transform(lemma)
         past_part = self.past_part.transform(lemma)
-        nonpast = map(lambda t: t.transform(lemma), self.nonpast)
-        past = map(lambda t: t.transform(lemma), self.past)
+        nonpast = [t.transform(lemma) for t in self.nonpast]
+        past = [t.transform(lemma) for t in self.past]
         return Verb(lemma, pres_part, past_part, nonpast, past)
 
     def identify_word(self, conjugated):
@@ -176,13 +175,13 @@ def collect_verb_derivations(vv):
         s2lemmas[s].add(v.lemma)
 
     # Reorder by usage.
-    counts_derivs = []
+    counts_strs_derivs = []
     for d in unique_derivs:
         s = str(d.to_d())
         count = len(s2lemmas[s])
-        counts_derivs.append((count, d))
-    counts_derivs.sort(reverse=True)
-    derivs = map(lambda (c, d): d, counts_derivs)
+        counts_strs_derivs.append((count, s, d))
+    counts_strs_derivs.sort(reverse=True)
+    derivs = [csd[2] for csd in counts_strs_derivs]
 
     # Build verb -> derivation mapping.
     lemma2deriv_index = {}
@@ -224,8 +223,8 @@ class Conjugator(object):
             return verb
 
         if lemma == MAGIC_INTS_LEMMA:
-            verb = Verb('0', '1', '2', map(str, range(3, 3 + 6)),
-                        map(str, range(9, 9 + 6)))
+            verb = Verb('0', '1', '2', list(map(str, list(range(3, 3 + 6)))),
+                        list(map(str, list(range(9, 9 + 6)))))
         else:
             deriv_index = self.deriv_index_picker.get(lemma)
             deriv = self.verb_derivations[deriv_index]
@@ -262,9 +261,7 @@ class Conjugator(object):
                     has_known = True
                     break
             if has_known:
-                lemmas_indexes = filter(
-                    lambda (lemma, index): lemma in self.lemma2deriv_index,
-                    lemmas_indexes)
+                lemmas_indexes = [lemma_index for lemma_index in lemmas_indexes if lemma_index[0] in self.lemma2deriv_index]
 
         lemmas_indexes.append((word, 0))
 

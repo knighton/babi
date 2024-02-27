@@ -20,7 +20,7 @@ def each_suffix_shortest_first(s):
     """
     Get all possible suffixes in shortest-first order.
     """
-    for i in xrange(len(s) + 1):
+    for i in range(len(s) + 1):
         yield s[len(s) - i:]
 
 
@@ -28,7 +28,7 @@ def each_suffix_longest_first(s):
     """
     Get all possible suffixes in longest-first order.
     """
-    for i in xrange(len(s), -1, -1):
+    for i in range(len(s), -1, -1):
         yield s[len(s) - i:]
 
 
@@ -49,15 +49,15 @@ class SuffixGeneralizingMap(object):
     """
 
     def __init__(self, key2value, pick_value):
-        self.max_key_len = max(map(len, key2value))
+        self.max_key_len = max(list(map(len, key2value)))
 
         for key in key2value:
             assert '^' not in key
 
         # Build list of initial todos, which are (padded key, value).
-        todos = zip(
-            map(lambda s: prepad_str(s, self.max_key_len, '^'), key2value),
-            key2value.itervalues())
+        todos = list(zip(
+            [prepad_str(s, self.max_key_len, '^') for s in key2value],
+            iter(key2value.values())))
 
         # Loop around until done, splitting nodes to resolve conflicts.
         self.suffix2node = {}
@@ -94,8 +94,8 @@ class SuffixGeneralizingMap(object):
                     # Use the provided method to pick which value to keep here,
                     # throw its keys on the next round's todo list, and keep
                     # looking with a longer suffix.
-                    next_todos += zip(list(node.keys),
-                                      [node.value] * len(node.keys))
+                    next_todos += list(zip(list(node.keys),
+                                      [node.value] * len(node.keys)))
                     picked_value = pick_value(value, node.value)
                     is_leaf = False
                     self.suffix2node[suffix] = SuffixGeneralizingMapNode(
@@ -104,7 +104,7 @@ class SuffixGeneralizingMap(object):
 
             # Tree building is done, so there's no more splitting to do, so
             # remove all the partial key lists.
-            for suffix, node in self.suffix2node.iteritems():
+            for suffix, node in self.suffix2node.items():
                 if not node.is_leaf:
                     node.keys = []
 

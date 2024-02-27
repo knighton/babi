@@ -35,7 +35,7 @@ class Graph(object):
 
     def dump(self):
         x2node = {}
-        for x, node in self.x2node.iteritems():
+        for x, node in self.x2node.items():
             x2node[x] = node.dump()
         return {
             'x2node': x2node,

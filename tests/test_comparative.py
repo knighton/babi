@@ -15,9 +15,9 @@ def check(m, base, degree, want_derived):
     try:
         assert want_ss == got_ss
     except:
-        print 'encode() failed.'
-        print 'want:', want_ss
-        print 'got:', got_ss
+        print('encode() failed.')
+        print('want:', want_ss)
+        print('got:', got_ss)
         raise
 
     ok = False
@@ -29,14 +29,14 @@ def check(m, base, degree, want_derived):
             break
 
     if not ok:
-        print 'decode() failed.'
-        print 'input:', want_derived
-        print 'want:', ComparativeDegree.to_str[degree], \
-                ComparativePolarity.to_str[ComparativePolarity.POS], base
-        print 'got:'
+        print('decode() failed.')
+        print('input:', want_derived)
+        print('want:', ComparativeDegree.to_str[degree], \
+                ComparativePolarity.to_str[ComparativePolarity.POS], base)
+        print('got:')
         for deg, pol, got_base in degs_pols_bases:
-            print '-', ComparativeDegree.to_str[deg], \
-                    ComparativePolarity.to_str[pol], got_base
+            print('-', ComparativeDegree.to_str[deg], \
+                    ComparativePolarity.to_str[pol], got_base)
         assert False
 
 
@@ -45,7 +45,7 @@ def main():
     m = ComparativeManager.default(syllable_counter)
 
     fn = 'tests/comparative.yaml'
-    jj = yaml.load(open(fn))
+    jj = yaml.safe_load(open(fn))
 
     for j in jj:
         for base, er, est in j['triples']:

@@ -33,7 +33,7 @@ class AOrAnClassifier(object):
             ('', 'a')                        # Guess "a".
         ]
 
-        self.rules = map(lambda (r, a): (re.compile(r), a), rules)
+        self.rules = [(re.compile(r_a[0]), r_a[1]) for r_a in rules]
 
     def classify(self, next_word):
         for r, a in self.rules:

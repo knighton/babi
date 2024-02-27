@@ -27,11 +27,11 @@ class DeepCommonNoun(DeepArgument):
         assert isinstance(self.attributes, list)
         for s in self.attributes:
             assert s
-            assert isinstance(s, basestring)
+            assert isinstance(s, str)
 
         self.noun = noun
         if self.noun:
-            assert isinstance(self.noun, basestring)
+            assert isinstance(self.noun, str)
             assert self.noun
 
         self.rels_nargs = rels_nargs

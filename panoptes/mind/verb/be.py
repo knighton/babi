@@ -32,7 +32,8 @@ class AgentIsTarget(ClauseMeaning):
             [Relation.AGENT, Relation.TARGET],
         ]
 
-    def handle(self, c, memory, (agent_xx, target_xx)):
+    def handle(self, c, memory, xxx_todo_changeme):
+        (agent_xx, target_xx) = xxx_todo_changeme
         if len(agent_xx) != 1:
             return None
 
@@ -73,7 +74,8 @@ class AgentIsTargetQuestion(ClauseMeaning):
             [Relation.AGENT, Relation.TARGET],
         ]
 
-    def handle(self, c, memory, (agent_xx, target_xx)):
+    def handle(self, c, memory, xxx_todo_changeme1):
+        (agent_xx, target_xx) = xxx_todo_changeme1
         if len(agent_xx) != 1:
             return None
 
@@ -123,7 +125,7 @@ def majority_vote(aa):
         a2count[a] += 1
     max_count = None
     max_a = None
-    for a, count in a2count.iteritems():
+    for a, count in a2count.items():
         if max_count is None or max_count < count:
             max_count = count
             max_a = a
@@ -138,7 +140,8 @@ class AgentTargetQuestion(ClauseMeaning):
             [Relation.AGENT, Relation.TARGET],
         ]
 
-    def handle(self, c, memory, (agent_xx, target_xx)):
+    def handle(self, c, memory, xxx_todo_changeme2):
+        (agent_xx, target_xx) = xxx_todo_changeme2
         if len(agent_xx) != 1:
             return None
 
@@ -222,12 +225,12 @@ class AgentTargetQuestion(ClauseMeaning):
 
 
 def a_direction_b(memory, agent_xx, relation, what_xx):
-    agents = map(lambda x: memory.ideas[x], agent_xx)
+    agents = [memory.ideas[x] for x in agent_xx]
     for n in agents:
         if not isinstance(n, Noun):
             return None
 
-    whats = map(lambda x: memory.ideas[x], what_xx)
+    whats = [memory.ideas[x] for x in what_xx]
     for n in whats:
         if not isinstance(n, Noun):
             return None
@@ -268,7 +271,8 @@ class AgentIsTo(ClauseMeaning):
             [Relation.AGENT, Relation.TO],
         ]
 
-    def handle(self, c, memory, (agent_xx, to_xx)):
+    def handle(self, c, memory, xxx_todo_changeme3):
+        (agent_xx, to_xx) = xxx_todo_changeme3
         if len(agent_xx) != 1:
             return None
 
@@ -297,7 +301,8 @@ class IsAgentToQuestion(ClauseMeaning):
             [Relation.AGENT, Relation.TO],
         ]
 
-    def handle(self, c, memory, (agent_xx, to_xx)):
+    def handle(self, c, memory, xxx_todo_changeme4):
+        (agent_xx, to_xx) = xxx_todo_changeme4
         if len(agent_xx) != 1:
             return None
 
@@ -325,7 +330,8 @@ class AgentIsAbove(ClauseMeaning):
             [Relation.AGENT, Relation.ABOVE],
         ]
 
-    def handle(self, c, memory, (agent_xx, above_xx)):
+    def handle(self, c, memory, xxx_todo_changeme5):
+        (agent_xx, above_xx) = xxx_todo_changeme5
         return a_direction_b(memory, agent_xx, 'is_above', above_xx)
 
 
@@ -337,7 +343,8 @@ class AgentIsBelow(ClauseMeaning):
             [Relation.AGENT, Relation.BELOW],
         ]
 
-    def handle(self, c, memory, (agent_xx, below_xx)):
+    def handle(self, c, memory, xxx_todo_changeme6):
+        (agent_xx, below_xx) = xxx_todo_changeme6
         return a_direction_b(memory, agent_xx, 'is_below', below_xx)
 
 
@@ -349,7 +356,8 @@ class IsAgentAbove(ClauseMeaning):
             [Relation.AGENT, Relation.ABOVE],
         ]
 
-    def handle(self, c, memory, (agent_xx, above_xx)):
+    def handle(self, c, memory, xxx_todo_changeme7):
+        (agent_xx, above_xx) = xxx_todo_changeme7
         return is_a_direction_b(memory, agent_xx, 'is_above', above_xx)
 
 
@@ -361,7 +369,8 @@ class IsAgentBelow(ClauseMeaning):
             [Relation.AGENT, Relation.BELOW],
         ]
 
-    def handle(self, c, memory, (agent_xx, below_xx)):
+    def handle(self, c, memory, xxx_todo_changeme8):
+        (agent_xx, below_xx) = xxx_todo_changeme8
         return is_a_direction_b(memory, agent_xx, 'is_below', below_xx)
 
 
@@ -373,7 +382,8 @@ class AgentPlaceQuestion(ClauseMeaning):
             [Relation.AGENT, Relation.PLACE],
         ]
 
-    def handle(self, c, memory, (agent_xx, loc_xx)):
+    def handle(self, c, memory, xxx_todo_changeme9):
+        (agent_xx, loc_xx) = xxx_todo_changeme9
         if len(agent_xx) != 1:
             return None
 
@@ -403,7 +413,8 @@ class AgentPlaceBeforeQuestion(ClauseMeaning):
             [Relation.AGENT, Relation.PLACE, Relation.BEFORE],
         ]
 
-    def handle(self, c, memory, (what_xx, where_xx, before_xx)):
+    def handle(self, c, memory, xxx_todo_changeme10):
+        (what_xx, where_xx, before_xx) = xxx_todo_changeme10
         if len(what_xx) != 1:
             return None
 
@@ -437,7 +448,8 @@ class AgentIn(ClauseMeaning):
             [Relation.AGENT, Relation.IN],
         ]
 
-    def handle(self, c, memory, (agent_xx, place_xx)):
+    def handle(self, c, memory, xxx_todo_changeme11):
+        (agent_xx, place_xx) = xxx_todo_changeme11
         if len(agent_xx) != 1:
             return None
 
@@ -458,7 +470,8 @@ class AgentIn(ClauseMeaning):
         agent.location_history.set_location(loc)
         return Response()
 
-    def handle_disjunctions(self, c, memory, (agent_xxx, place_xxx)):
+    def handle_disjunctions(self, c, memory, xxx_todo_changeme12):
+        (agent_xxx, place_xxx) = xxx_todo_changeme12
         if len(agent_xxx) != 1:
             return None
         agent_xx, = agent_xxx
@@ -466,7 +479,7 @@ class AgentIn(ClauseMeaning):
         for place_xx in place_xxx:
             if len(place_xx) != 1:
                 return None
-        place_xx = map(lambda xx: xx[0], place_xxx)
+        place_xx = [xx[0] for xx in place_xxx]
 
         for agent_x in agent_xx:
             agent = memory.ideas[agent_x]
@@ -484,7 +497,8 @@ class AgentInQuestion(ClauseMeaning):
             [Relation.AGENT, Relation.IN],
         ]
 
-    def handle(self, c, memory, (agent_xx, place_xx)):
+    def handle(self, c, memory, xxx_todo_changeme13):
+        (agent_xx, place_xx) = xxx_todo_changeme13
         if len(agent_xx) != 1:
             return None
 

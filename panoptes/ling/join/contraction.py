@@ -21,18 +21,18 @@ class ContractionTableParser(object):
         return self.fake2real.get(s, s)
 
     def parse_table(self, text):
-        sss = map(lambda line: line.split(), text.strip().split('\n'))
+        sss = [line.split() for line in text.strip().split('\n')]
 
         n = len(sss[0])
         for ss in sss[1:]:
             assert len(ss) == n + 1
 
-        rows = map(self.fix, map(lambda ss: ss[0], sss[1:]))
-        cols = map(self.fix, sss[0])
+        rows = list(map(self.fix, [ss[0] for ss in sss[1:]]))
+        cols = list(map(self.fix, sss[0]))
 
         rr = set()
-        for i in xrange(len(sss) - 1):
-            for j in xrange(n):
+        for i in range(len(sss) - 1):
+            for j in range(n):
                 row = rows[i]
                 col = cols[j]
                 s = sss[i + 1][j + 1]
@@ -47,9 +47,9 @@ class ContractionTableParser(object):
 
     def parse_dict(self, text):
         r = {}
-        sss = map(lambda line: line.split(), text.strip().split('\n'))
+        sss = [line.split() for line in text.strip().split('\n')]
         for ss in sss:
-            key, value = map(self.fix, ss)
+            key, value = list(map(self.fix, ss))
             r[key] = value
         return r
 
@@ -60,13 +60,13 @@ class EndsWithSSoundDetector(object):
     """
 
     def __init__(self):
-        self.regexes = map(re.compile, [
+        self.regexes = list(map(re.compile, [
             '[sxz]$',
             '[cszt]h$',
             '[iy][sz]ed?$',
             '[aeiourl][cs]e$',
             '[aeiourl]the$'
-        ])
+        ]))
 
     def detect(self, s):
         for r in self.regexes:

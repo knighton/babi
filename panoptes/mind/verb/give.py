@@ -16,13 +16,14 @@ class Give(ClauseMeaning):
             [Relation.AGENT, Relation.TO_RECIPIENT, Relation.TARGET],
         ]
 
-    def handle(self, c, memory, (give_xx, recv_xx, what_xx)):
+    def handle(self, c, memory, xxx_todo_changeme):
+        (give_xx, recv_xx, what_xx) = xxx_todo_changeme
         if len(recv_xx) != 1:
             return None
 
         for give_x in give_xx:
             giver = memory.ideas[give_x]
-            giver.carrying = filter(lambda x: x not in what_xx, giver.carrying)
+            giver.carrying = [x for x in giver.carrying if x not in what_xx]
 
         for recv_x in recv_xx:
             receiver = memory.ideas[recv_x]
@@ -48,7 +49,8 @@ class GiveQuestion(ClauseMeaning):
             [Relation.AGENT, None,                  Relation.TARGET],
         ]
 
-    def handle(self, c, memory, (give_xx, recv_xx, what_xx)):
+    def handle(self, c, memory, xxx_todo_changeme1):
+        (give_xx, recv_xx, what_xx) = xxx_todo_changeme1
         if len(give_xx) != 1:
             return None
 
@@ -128,7 +130,8 @@ class ReceiveQuestion(ClauseMeaning):
             [Relation.AGENT, Relation.TARGET, None],
         ]
 
-    def handle(self, c, memory, (recv_xx, what_xx, source_xx)):
+    def handle(self, c, memory, xxx_todo_changeme2):
+        (recv_xx, what_xx, source_xx) = xxx_todo_changeme2
         if len(recv_xx) != 1:
             return None
 

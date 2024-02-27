@@ -96,7 +96,7 @@ class PurposeManager(object):
 
         # End punct -> purpose.
         self.punct2purposes = defaultdict(list)
-        for info in self.purpose2info.itervalues():
+        for info in self.purpose2info.values():
             self.punct2purposes[info.unstressed_end_punct].append(info.purpose)
             self.punct2purposes[info.stressed_end_punct].append(info.purpose)
 
@@ -111,7 +111,7 @@ class PurposeManager(object):
         ]
         for args in product(*options):
             has_q_args, is_split, is_fronting, is_ind_cond = args
-            for info in self.purpose2info.itervalues():
+            for info in self.purpose2info.values():
                 if has_q_args != info.has_q_args:
                     continue
 
@@ -146,8 +146,8 @@ class PurposeManager(object):
             for purpose in purposes:
                 rr += self.get(purpose).decode_end_punct(end_punct)
         else:
-            purposes = filter(lambda p: p == Purpose.INFO, purposes)
-            rr = map(lambda p: (p, False), purposes)
+            purposes = [p for p in purposes if p == Purpose.INFO]
+            rr = [(p, False) for p in purposes]
         return rr
 
 

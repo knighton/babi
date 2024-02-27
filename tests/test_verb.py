@@ -43,7 +43,7 @@ def main():
 
     sss = ((), ('go',))
     vv = m.parse(sss)
-    assert any(map(lambda v: v.may_match(v_to_say), vv))
+    assert any([v.may_match(v_to_say) for v in vv])
 
     text = """
         sbj_handling: WERE_SBJ
@@ -68,7 +68,7 @@ def main():
             verb_form: FINITE
             is_pro_verb: false
     """
-    j = yaml.load(text)
+    j = yaml.safe_load(text)
     v = SurfaceVerb.load(j)
 
     assert m.say(v) == (['would'], ['[AUX]have', 'gone'])

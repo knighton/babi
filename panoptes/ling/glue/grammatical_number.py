@@ -6,6 +6,7 @@
 from collections import defaultdict
 
 from panoptes.etc.enum import enum
+from functools import reduce
 
 
 N2 = enum('N2 = SING PLUR')
@@ -27,7 +28,7 @@ def join_disjoint_sets(ss):
 def join_disjoint_dicts(k2vs):
     r = {}
     for k2v in k2vs:
-        for k, v in k2v.iteritems():
+        for k, v in k2v.items():
             r[k] = v
     return r
 
@@ -37,8 +38,8 @@ class NX(object):
 
 
 NXS = [N5, N3, N2]
-NX.values = join_disjoint_sets(map(lambda nx: nx.values, NXS))
-NX.to_str = join_disjoint_dicts(map(lambda nx: nx.to_str, NXS))
+NX.values = join_disjoint_sets([nx.values for nx in NXS])
+NX.to_str = join_disjoint_dicts([nx.to_str for nx in NXS])
 
 
 def reduce_spans(aa):
@@ -91,7 +92,7 @@ class GrammaticalNumberManager(object):
         seen_inf = False
         for a, z in self.spans:
             assert 0 <= a
-            assert 0 <= z or z is None
+            assert z is None or 0 <= z
             if z == None:
                 seen_inf = True
             else:
@@ -113,7 +114,7 @@ class GrammaticalNumberManager(object):
 
         # Any nx -> indexes in spans list.
         nx2xx = defaultdict(list)
-        for cols in self.class2col2nx.itervalues():
+        for cols in self.class2col2nx.values():
             for x, col in enumerate(cols):
                 nx2xx[col].append(x)
 
@@ -128,28 +129,28 @@ class GrammaticalNumberManager(object):
 
         # Any nx -> its natural number spans.
         self.nx2spans = {}
-        for nx, xx in nx2xx.iteritems():
-            self.nx2spans[nx] = reduce_spans(map(self.spans.__getitem__, xx))
+        for nx, xx in nx2xx.items():
+            self.nx2spans[nx] = reduce_spans(list(map(self.spans.__getitem__, xx)))
 
         # Any nx -> whether exact (can be only one integer).
         self.nx2isexact = {}
-        for nx, spans in self.nx2spans.iteritems():
+        for nx, spans in self.nx2spans.items():
             self.nx2isexact = (len(self.spans) == 1 and
                                self.spans[0][0] == self.spans[0][1])
 
         # Any nx -> guessed natural number value (some are exact).
         self.nx2guess = {}
-        for nx, xx in nx2xx.iteritems():
+        for nx, xx in nx2xx.items():
             # take the largest, because as NX classes become larger and more
             # refined, the new divisions are on the small end.
-            self.nx2guess[nx] = max(map(self.guesses.__getitem__, xx))
+            self.nx2guess[nx] = max(list(map(self.guesses.__getitem__, xx)))
 
         # Any nx -> list of comparison ints.
         self.nx2compints = {}
-        for nx, xx in nx2xx.iteritems():
+        for nx, xx in nx2xx.items():
             self.nx2compints[nx] = \
                 sorted(reduce(lambda a, b: a + b,
-                              map(self.compint_groups.__getitem__, xx)))
+                              list(map(self.compint_groups.__getitem__, xx))))
 
     # --------------------------------------------------------------------------
     # Conversion to integer.

@@ -32,7 +32,7 @@ def reassign_parent(node, new_parent):
     node.up = rel, new_parent
 
     new_parent.downs.append((rel, node))
-    new_parent.downs.sort(key=lambda (dep, child): child.index)
+    new_parent.downs.sort(key=lambda dep_child9: dep_child9[1].index)
 
 
 class Parse(object):
@@ -48,7 +48,7 @@ class Parse(object):
         """
         We completely give up on certain parse shapes.
         """
-        print 'INPUT TO FIXED:'
+        print('INPUT TO FIXED:')
         self.dump()
 
         # XX tokens, ugh.
@@ -156,7 +156,7 @@ class Parse(object):
                     if compound:
                         compound.downs.append((rel, child))
                         compound.downs.sort(
-                            key=lambda (dep, child): child.index)
+                            key=lambda dep_child: dep_child[1].index)
                     break
 
             break
@@ -190,7 +190,7 @@ class Parse(object):
                     break
             t.up = ('punct', top_verb)
             top_verb.downs.append(('punct', t))
-            top_verb.downs.sort(key=lambda (dep, child): child.index)
+            top_verb.downs.sort(key=lambda dep_child1: dep_child1[1].index)
 
             break
 
@@ -238,7 +238,7 @@ class Parse(object):
                     break
             t.up = (rel, grandparent)
             grandparent.downs.append((rel, t))
-            grandparent.downs.sort(key=lambda (dep, child): child.index)
+            grandparent.downs.sort(key=lambda dep_child2: dep_child2[1].index)
 
         # We don't like adverbial phrases.  We do like prepositional phrases as
         # verb arguments.
@@ -288,7 +288,7 @@ class Parse(object):
                     break
             t.up = (rel, grandparent)
             grandparent.downs.append((rel, t))
-            grandparent.downs.sort(key=lambda (dep, child): child.index)
+            grandparent.downs.sort(key=lambda dep_child3: dep_child3[1].index)
 
         # Usually, preps don't descend from other preps.  If spacy gives us
         # that, attach the child prep to its grandparent instead.
@@ -323,7 +323,7 @@ class Parse(object):
                     break
             t.up = (rel, grandparent)
             grandparent.downs.append((rel, t))
-            grandparent.downs.sort(key=lambda (dep, child): child.index)
+            grandparent.downs.sort(key=lambda dep_child4: dep_child4[1].index)
 
         # Break up compounds of the form (determiner) (noun) (direction) (PP).
         #
@@ -348,7 +348,7 @@ class Parse(object):
                     break
             t.up = (guess_rel, grandparent)
             grandparent.downs.append((guess_rel, t))
-            grandparent.downs.sort(key=lambda (dep, child): child.index)
+            grandparent.downs.sort(key=lambda dep_child5: dep_child5[1].index)
 
             # Reassign its parent's det to it.
             det = None
@@ -360,7 +360,7 @@ class Parse(object):
             if not det:
                 continue
             t.downs.append(('det', det))
-            t.downs.sort(key=lambda (dep, child): child.index)
+            t.downs.sort(key=lambda dep_child6: dep_child6[1].index)
 
         # Possibly the worst hack.
         #
@@ -466,7 +466,7 @@ class Parse(object):
         # Prepositional phrase attachment: should be owned by another arg.
         #
         #   "The hallway is south of the bedroom."
-        for i in xrange(len(self.tokens) - 1):
+        for i in range(len(self.tokens) - 1):
             this = self.tokens[i]
             right = self.tokens[i + 1]
             directions = ['north', 'south', 'east', 'west']
@@ -490,7 +490,7 @@ class Parse(object):
             right.up = (rel, this)
 
             this.downs.append((rel, right))
-            this.downs.sort(key=lambda (rel, child): child.index)
+            this.downs.sort(key=lambda rel_child: rel_child[1].index)
 
         # Prepositional phrase attachment: should be its own arg.
         #
@@ -514,7 +514,7 @@ class Parse(object):
                     break
             parent.up = (rel, grandparent)
             grandparent.downs.append((rel, t))
-            grandparent.downs.sort(key=lambda (dep, child): child.index)
+            grandparent.downs.sort(key=lambda dep_child7: dep_child7[1].index)
 
         # Handle verb args descended from an aux relation.
         for t in self.tokens:
@@ -532,7 +532,7 @@ class Parse(object):
                     break
             t.up = (dep, up_up)
             up_up.downs.append((dep, t))
-            up_up.downs.sort(key=lambda (a, b): b.index)
+            up_up.downs.sort(key=lambda a_b: a_b[1].index)
 
         # Handle advmod descending from a noun (relative clauses?), when at
         # least in bAbi it is always descended from the verb.
@@ -552,7 +552,7 @@ class Parse(object):
                     break
             t.up = dep, up.up[1]
             t.up[1].downs.append((dep, t))
-            t.up[1].downs.sort(key=lambda (a, b): b.index)
+            t.up[1].downs.sort(key=lambda a_b8: a_b8[1].index)
 
         # The parser may give us multiple npadvmod links when what we want is
         # just one npadvmod that compound-links to the "other" one.  In other
@@ -575,7 +575,7 @@ class Parse(object):
             if not parent.tag.startswith('V'):
                 continue
             verb2npadvmods[parent.index].append(t.index)
-        for verb_x, npadvmod_xx in verb2npadvmods.iteritems():
+        for verb_x, npadvmod_xx in verb2npadvmods.items():
             if len(npadvmod_xx) == 1:
                 continue
             elif len(npadvmod_xx) != 2:
@@ -635,19 +635,20 @@ class Parse(object):
         return self
 
     def dump(self):
-        print 'Parse {'
+        print('Parse {')
 
-        print '   ',
+        print('   ', end=' ')
         for t in self.tokens:
-            print '%d=%s/%s' % (t.index, t.text, t.tag),
-        print
+            print('%d=%s/%s' % (t.index, t.text, t.tag), end=' ')
+        print()
 
-        def fix((rel, parent)):
+        def fix(xxx_todo_changeme):
+            (rel, parent) = xxx_todo_changeme
             if parent:
                 parent = parent.index
             return ' '.join(map(str, [rel, parent]))
 
         for t in self.tokens:
-            print '   ', fix(t.up), '->', t.index, '->', map(fix, t.downs)
+            print('   ', fix(t.up), '->', t.index, '->', list(map(fix, t.downs)))
 
-        print '}'
+        print('}')

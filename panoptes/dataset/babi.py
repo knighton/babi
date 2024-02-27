@@ -61,7 +61,7 @@ def task_from_fn(fn):
 
 def load_babi(d):
     ff = glob(d + '/*test.txt')
-    nn_ff = map(lambda f: (int_from_fn(f), f), ff)
+    nn_ff = [(int_from_fn(f), f) for f in ff]
     nn_ff.sort()
     tasks = []
     for n, f in nn_ff:

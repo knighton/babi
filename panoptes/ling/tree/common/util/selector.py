@@ -116,12 +116,12 @@ class Selector(object):
 
     def to_compints(self):
         aa = []
-        for n in xrange(self.n_min, self.n_max + 1):
+        for n in range(self.n_min, self.n_max + 1):
             aa += compints_from_nx(n)
         aa = set(aa)
 
         bb = []
-        for n in xrange(self.of_n_min, self.of_n_max + 1):
+        for n in range(self.of_n_min, self.of_n_max + 1):
             bb += compints_from_nx(n)
         bb = set(bb)
 
@@ -190,7 +190,7 @@ class Selector(object):
 
         # Else, collect the grammatical numbers as N2s.
         gram_nums = set()
-        for n5 in xrange(self.n_min, self.n_max + 1):
+        for n5 in range(self.n_min, self.n_max + 1):
             n2 = nx_to_nx(n5, N2)
             gram_nums.add(n2)
 
@@ -235,8 +235,7 @@ class Selector(object):
         # required grammatical count is singular, it will make the of_n range
         # N5.SING to match the n range).
         count_restriction = cor2res_gno[self.correlative][0]
-        return map(lambda sel: \
-            sel.fitted_to_count_restriction(count_restriction), rr)
+        return [sel.fitted_to_count_restriction(count_restriction) for sel in rr]
 
     def fitted_to_count_restriction(self, count_restriction):
         """
@@ -248,9 +247,9 @@ class Selector(object):
         check = COUNT_RESTRICTION2CHECK[count_restriction]
 
         possible_ns_ofs = []
-        for n5 in xrange(self.n_min, self.n_max + 1):
+        for n5 in range(self.n_min, self.n_max + 1):
             aa = compints_from_nx(n5)
-            for of_n5 in xrange(self.of_n_min, self.of_n_max + 1):
+            for of_n5 in range(self.of_n_min, self.of_n_max + 1):
                 bb = compints_from_nx(of_n5)
                 possible = False
                 for a in aa:
@@ -264,14 +263,14 @@ class Selector(object):
         if not possible_ns_ofs:
             return None
 
-        ns, ofs = map(sorted, map(set, zip(*possible_ns_ofs)))
+        ns, ofs = list(map(sorted, list(map(set, list(zip(*possible_ns_ofs))))))
 
-        assert ns == range(ns[0], ns[-1] + 1)
+        assert ns == list(range(ns[0], ns[-1] + 1))
 
         n_min = ns[0]
         n_max = ns[-1]
 
-        assert ofs == range(ofs[0], ofs[-1] + 1)
+        assert ofs == list(range(ofs[0], ofs[-1] + 1))
 
         of_n_min = ofs[0]
         of_n_max = ofs[-1]

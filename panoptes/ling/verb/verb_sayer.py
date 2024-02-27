@@ -168,7 +168,7 @@ def make_flavor_cond2modals_moods(known_modals):
                 key = (flavor, is_cond)
                 flavor_cond2modals_moods[key].append((modal, mood))
 
-    r_flavors = set(map(lambda (m, _): m, flavor_cond2modals_moods.iterkeys()))
+    r_flavors = set([m__[0] for m__ in iter(flavor_cond2modals_moods.keys())])
     assert r_flavors == ModalFlavor.values
 
     return flavor_cond2modals_moods
@@ -193,10 +193,10 @@ def make_mood2tense2etense():
     }
 
     mood2tense2etense = {}
-    for mood, etenses in mood2etenses.iteritems():
-        mood2tense2etense[mood] = dict(zip(
+    for mood, etenses in mood2etenses.items():
+        mood2tense2etense[mood] = dict(list(zip(
             [Tense.PAST, Tense.PRESENT, Tense.FUTURE],
-            etenses))
+            etenses)))
 
     return mood2tense2etense
 
@@ -326,7 +326,7 @@ class VerbEphemeralizer(object):
                 self.everbform_from_verbform_relcont(
                     v.intrinsics.verb_form, v.relative_cont)
 
-        except VerbConfigError, e:
+        except VerbConfigError as e:
             if ignore_invalid_configs:
                 return
             else:
@@ -432,7 +432,7 @@ class EphemeralSayer(object):
                 'passive')
 
     def get_known_modals(self):
-        return self.modal2indtense2mstr_perf.keys()
+        return list(self.modal2indtense2mstr_perf.keys())
 
     def say(self, v):
         assert isinstance(v, EphemeralVerb)
@@ -633,8 +633,8 @@ def slice_verb_words(v, ss):
 
     # If it's a pro-verb, mark the words as pro-verb words.
     if v.intrinsics.is_pro_verb:
-        a = map(annotate_as_pro_verb, a)
-        b = map(annotate_as_pro_verb, b)
+        a = list(map(annotate_as_pro_verb, a))
+        b = list(map(annotate_as_pro_verb, b))
 
     return a, b
 

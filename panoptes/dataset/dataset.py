@@ -12,26 +12,26 @@ class Episode(object):
 
     def show(self):
         for in_s, out in self.pairs:
-            print '    %s' % in_s.encode('utf-8')
+            print('    %s' % in_s.encode('utf-8'))
             if out:
-                print '        > %s' % out.encode('utf-8')
+                print('        > %s' % out.encode('utf-8'))
 
     def evaluate(self, agent, uid):
         """
         Agent -> (num correct tests, num tests, list of Deliberation)
         """
-        print '\t\t\tEVAL' + '-' * 80
+        print('\t\t\tEVAL' + '-' * 80)
         correct = 0
         total = 0
         delibs = []
         for in_s, expect_out in self.pairs:
-            print '\t\t\tEVAL INPUT:', in_s
+            print('\t\t\tEVAL INPUT:', in_s)
             delib = agent.put(uid, in_s)
             delibs.append(delib)
             if expect_out:
-                print '\t\t\tEVAL EXPECTED OUTPUT: (%s)' % expect_out
+                print('\t\t\tEVAL EXPECTED OUTPUT: (%s)' % expect_out)
             if delib.out:
-                print '\t\t\tEVAL GOT OUTPUT: (%s)' % delib.out
+                print('\t\t\tEVAL GOT OUTPUT: (%s)' % delib.out)
             if expect_out is not None:
                 correct += expect_out == delib.out
                 total += 1
@@ -53,17 +53,17 @@ class Task(object):
         num_ins = 0
         num_outs = 0
         for e in self.episodes:
-            ins, outs = zip(*e.pairs)
+            ins, outs = list(zip(*e.pairs))
             num_ins += len(ins)
-            num_outs += len(filter(bool, outs))
+            num_outs += len(list(filter(bool, outs)))
         return self.name, len(self.episodes), num_ins, num_outs
 
     def preview(self, task_index, num_episodes_to_show):
-        print
-        print '  %d. %s:' % (task_index, self.name.encode('utf-8'))
-        print
+        print()
+        print('  %d. %s:' % (task_index, self.name.encode('utf-8')))
+        print()
         for e in self.episodes[:num_episodes_to_show]:
-            print
+            print()
             e.show()
 
     def evaluate(self, agent, max_num_episodes):
@@ -108,9 +108,9 @@ class Dataset(object):
     def overview(self):
         sss = [('#', 'task', 'episodes', 'inputs', 'questions')]
         for i, task in enumerate(self.tasks):
-            ss = map(str, [i + 1] + list(task.overview()))
+            ss = list(map(str, [i + 1] + list(task.overview())))
             sss.append(ss)
-        zz = map(lambda aa: max(map(len, aa)), zip(*sss))
+        zz = [max(list(map(len, aa))) for aa in zip(*sss)]
         for ss in sss:
             for i, s in enumerate(ss):
                 z = zz[i]
@@ -118,11 +118,11 @@ class Dataset(object):
                     s = s.ljust(z)
                 else:
                     s = s.rjust(z)
-                print s,
-            print
+                print(s, end=' ')
+            print()
 
     def preview(self, num_episodes_to_show=1):
-        print 'Preview of %s:' % self.name.encode('utf-8')
+        print('Preview of %s:' % self.name.encode('utf-8'))
         for i, task in enumerate(self.tasks):
             task.preview(i + 1, num_episodes_to_show)
 
@@ -137,7 +137,7 @@ class Dataset(object):
             delibs_per_task.append(delibs)
 
         if out:
-            names = map(lambda t: t.name, self.tasks)
+            names = [t.name for t in self.tasks]
 
             for name, acc, delibs in zip(names, accs, delibs_per_task):
                 line = '-- %s (%.3f%%)\n' % (name, acc * 100.0)

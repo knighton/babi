@@ -23,7 +23,8 @@ class Befear(ClauseMeaning):
             [Relation.AGENT, Relation.TARGET]
         ]
 
-    def handle(self, c, memory, (agent_xx, target_xx)):
+    def handle(self, c, memory, xxx_todo_changeme):
+        (agent_xx, target_xx) = xxx_todo_changeme
         if len(agent_xx) != 1:
             return None
 
@@ -41,7 +42,8 @@ class Fear(ClauseMeaning):
             [Relation.AGENT, Relation.TARGET]
         ]
 
-    def handle(self, c, memory, (agent_xx, target_xx)):
+    def handle(self, c, memory, xxx_todo_changeme1):
+        (agent_xx, target_xx) = xxx_todo_changeme1
         if len(agent_xx) != 1:
             return None
 
@@ -59,7 +61,8 @@ class BefearQuestion(ClauseMeaning):
             [Relation.AGENT, Relation.TARGET],
         ]
 
-    def handle(self, c, memory, (agent_xx, target_xx)):
+    def handle(self, c, memory, xxx_todo_changeme2):
+        (agent_xx, target_xx) = xxx_todo_changeme2
         if len(agent_xx) != 1:
             return None
 

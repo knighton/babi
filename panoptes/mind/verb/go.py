@@ -49,7 +49,8 @@ class GoTo(ClauseMeaning):
             [Relation.AGENT, Relation.TO_LOCATION],
         ]
 
-    def handle(self, c, memory, (agent_xx, to_xx)):
+    def handle(self, c, memory, xxx_todo_changeme):
+        (agent_xx, to_xx) = xxx_todo_changeme
         return go_common(c, memory, agent_xx, to_xx)
 
 
@@ -61,7 +62,8 @@ class GoWhereQuestion(ClauseMeaning):
             [Relation.AGENT, Relation.PLACE],
         ]
 
-    def handle(self, c, memory, (agent_xx, to_xx)):
+    def handle(self, c, memory, xxx_todo_changeme1):
+        (agent_xx, to_xx) = xxx_todo_changeme1
         if len(agent_xx) != 1:
             return None
 
@@ -101,7 +103,8 @@ class GoToAfter(ClauseMeaning):
             [Relation.AGENT, Relation.TO_LOCATION, Relation.AFTER],
         ]
 
-    def handle(self, c, memory, (agent_xx, to_xx, after_xx)):
+    def handle(self, c, memory, xxx_todo_changeme2):
+        (agent_xx, to_xx, after_xx) = xxx_todo_changeme2
         return go_common(c, memory, agent_xx, to_xx)
 
 
@@ -114,7 +117,8 @@ class GoToAt(ClauseMeaning):
             [Relation.AGENT, Relation.TO_LOCATION, Relation.TIME],
         ]
 
-    def handle(self, c, memory, (agent_xx, to_xx, when_xx)):
+    def handle(self, c, memory, xxx_todo_changeme3):
+        (agent_xx, to_xx, when_xx) = xxx_todo_changeme3
         return go_common(c, memory, agent_xx, to_xx, when_xx)
 
 
@@ -127,7 +131,8 @@ class HowGoFromToQuestion(ClauseMeaning):
              Relation.WAY],
         ]
 
-    def handle(self, c, memory, (agent_xx, source_xx, to_xx, how_xx)):
+    def handle(self, c, memory, xxx_todo_changeme4):
+        (agent_xx, source_xx, to_xx, how_xx) = xxx_todo_changeme4
         if len(source_xx) != 1:
             return None
 
@@ -157,7 +162,7 @@ class HowGoFromToQuestion(ClauseMeaning):
             return None
 
         ss = memory.graph.shortest_path(to_x, source_x)
-        ss = map(lambda s: s.split('_')[1][0], ss)
+        ss = [s.split('_')[1][0] for s in ss]
         ss.reverse()
         s = ','.join(ss)
         return Response(s)
@@ -172,7 +177,8 @@ class WhyGoToQuestion(ClauseMeaning):
             [Relation.AGENT, Relation.TO, Relation.BECAUSE],
         ]
 
-    def handle(self, c, memory, (agent_xx, to_xx, why_xx)):
+    def handle(self, c, memory, xxx_todo_changeme5):
+        (agent_xx, to_xx, why_xx) = xxx_todo_changeme5
         if len(agent_xx) != 1:
             return None
 

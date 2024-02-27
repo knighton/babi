@@ -10,7 +10,7 @@ class DeepComparative(DeepArgument):
 
         self.adjective = adjective
         assert self.adjective
-        assert isinstance(self.adjective, basestring)
+        assert isinstance(self.adjective, str)
 
         self.than = than
         assert isinstance(self.than, DeepArgument)

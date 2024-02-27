@@ -17,7 +17,7 @@ class ComparativeManager(object):
                  erable, not_erable):
         self.syllable_counter = syllable_counter
 
-        self.exception_bases = set(map(lambda ss: ss[0], exception_triples))
+        self.exception_bases = set([ss[0] for ss in exception_triples])
 
         self.exception_degree_base2ss = defaultdict(list)
         self.exception_s2degrees_bases = defaultdict(list)
@@ -47,7 +47,7 @@ class ComparativeManager(object):
 
     @staticmethod
     def from_file(syllable_counter, fn):
-        j = yaml.load(open(fn))
+        j = yaml.safe_load(open(fn))
         exceptions = []
         for line in j['exceptions']:
             base, er, est = line.split()
@@ -215,7 +215,7 @@ class ComparativeManager(object):
         if adverb_degree == ComparativeDegree.BASE and \
                 polarity == ComparativePolarity.POS:
             degrees_bases = self.decode_er_est(word)
-            return map(lambda (deg, base): (deg, polarity, base), degrees_bases)
+            return [(deg_base[0], polarity, deg_base[1]) for deg_base in degrees_bases]
 
         # Has an adverb, so the word is in its base form.
         return [(adverb_degree, polarity, word)]

@@ -17,7 +17,7 @@ setup:
 	virtualenv env --system-site-packages
 	. env/bin/activate
 	pip install -r requirements.txt
-	python -m spacy.en.download
+	python -m spacy.lang.en.download
 
 # ------------------------------------------------------------------------------
 # Views.

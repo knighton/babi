@@ -13,7 +13,7 @@ class ProperNoun(CommonArgument):
         self.name = name
         assert isinstance(self.name, tuple)
         for s in self.name:
-            assert isinstance(s, basestring)
+            assert isinstance(s, str)
 
         self.is_plur = is_plur
         assert isinstance(self.is_plur, bool)

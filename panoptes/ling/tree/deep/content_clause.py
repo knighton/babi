@@ -104,7 +104,7 @@ def transform(orig_preps_vargs, subj_index, is_imperative, argx_to_front,
     vmain_index = len(rr)
 
     # Post-args.
-    for x in xrange(subj_index + 1, len(orig_preps_vargs)):
+    for x in range(subj_index + 1, len(orig_preps_vargs)):
         prep, arg = orig_preps_vargs[x]
         if x == argx_to_front:
             if stranded_prep:
@@ -132,7 +132,7 @@ class DeepContentClause(DeepArgument):
 
         self.adverbs = adverbs
         for s in self.adverbs:
-            assert isinstance(s, basestring)
+            assert isinstance(s, str)
 
         self.rels_vargs = rels_vargs
         assert isinstance(self.rels_vargs, list)
@@ -167,7 +167,7 @@ class DeepContentClause(DeepArgument):
                 assert res != cant_be
             except:
                 import json
-                print json.dumps(self.dump(), indent=4, sort_keys=True)
+                print(json.dumps(self.dump(), indent=4, sort_keys=True))
                 raise
 
         # TODO: crosscheck purpose and wh-arg count.

@@ -45,14 +45,14 @@ class Noun(Idea):
         assert isinstance(self.attributes, list)
         for s in self.attributes:
             assert s
-            assert isinstance(s, basestring)
+            assert isinstance(s, str)
 
         self.kind = kind
         if self.kind:
-            assert isinstance(self.kind, basestring)
+            assert isinstance(self.kind, str)
 
         self.rel2xxx = rel2xxx
-        for rel, xxx in self.rel2xxx.iteritems():
+        for rel, xxx in self.rel2xxx.items():
             assert Relation.is_valid(rel)
             assert isinstance(xxx, list)
             for xx in xxx:
@@ -69,7 +69,7 @@ class Noun(Idea):
 
     def dump(self):
         rel2xxx = {}
-        for rel, xxx in self.rel2xxx.iteritems():
+        for rel, xxx in self.rel2xxx.items():
             rel2xxx[Relation.to_str[rel]] = xxx
         return {
             'type': 'Noun',

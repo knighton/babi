@@ -1,5 +1,4 @@
 from collections import defaultdict
-from spacy.en import English
 import sys
 
 from panoptes.ling.parse.parse import Parse, Token
@@ -22,12 +21,17 @@ def truecase(tokens):
 
 class Parser(object):
     def __init__(self):
-        print 'Initializing spacy...',
+        print('Initializing spacy...', end=' ')
         sys.stdout.flush()
-        self.nlp = English()
-        print 'done'
+        self.nlp = None
+        print('done')
 
     def parse(self, text):
+        from spacy.lang.en import English
+
+        if self.nlp is None:
+            self.nlp = English()
+
         # I'm deciding "afraid" is a passive verb.  Have it parse as such.
         text = text.replace('afraid of', 'seen by')
         text = text.replace('afraid', 'seen')
@@ -53,10 +57,10 @@ class Parser(object):
 
         tokens = self.nlp(text, parse=True)
         words = truecase(tokens)
-        words = map(lambda s: 'Fred' if s == 'Jameson' else s, words)
-        words = map(lambda s: 'thwacked' if s == 'seen' else s, words)
-        words = map(lambda s: 'Emily' if s == 'Elliot' else s, words)
-        words = map(lambda s: 'Winona' if s == 'Ashley' else s, words)
+        words = ['Fred' if s == 'Jameson' else s for s in words]
+        words = ['thwacked' if s == 'seen' else s for s in words]
+        words = ['Emily' if s == 'Elliot' else s for s in words]
+        words = ['Winona' if s == 'Ashley' else s for s in words]
 
         x2dep_x = {}
         x2deps_xx = defaultdict(list)
@@ -84,4 +88,4 @@ class Parser(object):
 
         root = tt[x2deps_xx[None][0][1]]
         parse = Parse(tt, root)
-        return filter(bool, map(lambda p: p.fixed(), [parse]))
+        return list(filter(bool, [p.fixed() for p in [parse]]))

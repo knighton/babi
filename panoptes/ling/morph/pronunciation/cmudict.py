@@ -67,6 +67,6 @@ class CmuDict(object):
     def get_syllable_counts(self, word):
         nn = set()
         for ss in self.word2pronuns[word]:
-            n = sum(map(lambda s: s[-1].isdigit(), ss))
+            n = sum([s[-1].isdigit() for s in ss])
             nn.add(n)
         return sorted(nn)

@@ -79,15 +79,15 @@ def table_from_str(s, row_enum, col_enum, invalid_entry):
     Some text -> mapping of (row, col) -> entry
     """
     ss = s.strip().split('\n')
-    sss = map(lambda s: s.split(), ss)
+    sss = [s.split() for s in ss]
 
     n = len(sss[0])
     for ss in sss[1:]:
         assert len(ss) == n + 1
 
     r = {}
-    for row_index in xrange(len(sss) - 1):
-        for col_index in xrange(n):
+    for row_index in range(len(sss) - 1):
+        for col_index in range(n):
             s = sss[row_index + 1][col_index + 1]
             if s == invalid_entry:
                 continue

@@ -15,10 +15,10 @@ class EnumManager(object):
             assert False
         self.name2ret[class_name] = None
 
-        values = range(self.next_id, self.next_id + len(keys))
-        key2value = dict(zip(keys, values))
+        values = list(range(self.next_id, self.next_id + len(keys)))
+        key2value = dict(list(zip(keys, values)))
         members = dict(key2value)
-        members['to_str'] = dict(zip(values, keys))
+        members['to_str'] = dict(list(zip(values, keys)))
         members['from_str'] = key2value
         members['values'] = set(values)
         first = self.next_id

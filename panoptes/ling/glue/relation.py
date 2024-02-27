@@ -179,8 +179,8 @@ RELATION_TEXT = RELATION_TEXT.replace('<WAY_PREP>', WAY_PREP)
 
 
 def make_relation_enum(relation_text):
-    dd = yaml.load(relation_text)
-    relations = map(lambda d: d['relation'], dd)
+    dd = yaml.safe_load(relation_text)
+    relations = [d['relation'] for d in dd]
     enum_content = 'Relation = %s' % ' '.join(relations)
     return enum(enum_content)
 
@@ -256,10 +256,10 @@ class RelationManager(object):
 
     def __init__(self):
         # Relation -> RelationInfo.
-        dd = yaml.load(RELATION_TEXT)
-        infos = map(RelationInfo.from_config, dd)
+        dd = yaml.safe_load(RELATION_TEXT)
+        infos = list(map(RelationInfo.from_config, dd))
         self.relation2info = \
-            dict(zip(map(lambda info: info.relation, infos), infos))
+            dict(list(zip([info.relation for info in infos], infos)))
 
         # The natural order of the core (non-oblique -- without a preposition)
         # semantic roles when using active voice.
@@ -283,7 +283,7 @@ class RelationManager(object):
 
         # (prep, arg type) -> possible Relations.
         self.prep_rat2relations = defaultdict(list)
-        for relation, info in self.relation2info.iteritems():
+        for relation, info in self.relation2info.items():
             for prep, arg_type in info.preps_types:
                 self.prep_rat2relations[(prep, arg_type)].append(relation)
 
@@ -312,7 +312,7 @@ class RelationManager(object):
 
         # RelationPosition -> list of possible Relations.
         self.core2relations = defaultdict(list)
-        for relation, info in self.relation2info.iteritems():
+        for relation, info in self.relation2info.items():
             self.core2relations[info.core].append(relation)
 
     def decide_preps(self, rels_rats, subject_index):
@@ -322,7 +322,7 @@ class RelationManager(object):
         Used in deep structure -> surface structure.
         """
         # Verify that all rels are unique.
-        rels = map(lambda (rel, rat): rel, rels_rats)
+        rels = [rel_rat[0] for rel_rat in rels_rats]
         assert len(rels) == len(set(rels))
 
         # Verify that core arg positions are unique (deep structure generation
@@ -384,7 +384,7 @@ class RelationManager(object):
         cores = self.isactive_numprepless2positions.get(key, None)
         if not cores:
             return None
-        return map(lambda core: self.core2relations[core], cores)
+        return [self.core2relations[core] for core in cores]
 
     def decide_clause_relation_options(self, preps_rats, is_active_voice):
         """
@@ -412,8 +412,7 @@ class RelationManager(object):
         for x, relations in zip(prepless, relations_per_prepless):
             options_per_arg[x] = relations
 
-        options_per_arg = filter(lambda rr: len(set(rr)) == len(rr),
-                                 options_per_arg)
+        options_per_arg = [rr for rr in options_per_arg if len(set(rr)) == len(rr)]
 
         return options_per_arg
 
@@ -422,13 +421,12 @@ class RelationManager(object):
         for prep, rat in preps_rats:
             rels = self.decode_prep_type(prep, rat)
             if not rels:
-                print 'Unknown preposition + arg type:', prep, \
-                    RelationArgType.to_str[rat]
+                print('Unknown preposition + arg type:', prep, \
+                    RelationArgType.to_str[rat])
                 return None
             options_per_arg.append(rels)
 
-        options_per_arg = filter(lambda rr: len(set(rr)) == len(rr),
-                                 options_per_arg)
+        options_per_arg = [rr for rr in options_per_arg if len(set(rr)) == len(rr)]
 
         return options_per_arg
 

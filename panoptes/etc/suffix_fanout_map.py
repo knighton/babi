@@ -1,5 +1,6 @@
+from functools import reduce
 def each_suffix_shortest_first(s):
-    for i in xrange(len(s) + 1):
+    for i in range(len(s) + 1):
         yield s[len(s) - i:]
 
 
@@ -21,7 +22,7 @@ class SuffixFanoutMap(object):
         self.suffix2value = suffix2value
         self.root_value = root_value
         self.pick_value = pick_value
-        self.max_key_len = max(map(len, suffix2value.iterkeys()))
+        self.max_key_len = max(list(map(len, iter(suffix2value.keys()))))
 
     def get(self, s):
         values = []

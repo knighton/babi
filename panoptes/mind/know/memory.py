@@ -24,6 +24,7 @@ from panoptes.mind.idea.direction import Direction
 from panoptes.mind.idea.noun import Noun, NounFeatures, Query
 from panoptes.mind.idea.reverb import Reverb
 from panoptes.mind.idea.time import RelativeDay
+from functools import reduce
 
 
 class DeepReference(object):
@@ -110,14 +111,14 @@ class Memory(object):
         self.graph = checkpoint.graph
 
     def show(self):
-        print '=' * 80
-        print 'Memory'
-        print '-' * 80
+        print('=' * 80)
+        print('Memory')
+        print('-' * 80)
         for i, idea in enumerate(self.ideas):
-            print '\t\t[%d]' % i
+            print('\t\t[%d]' % i)
             if idea:
-                print json.dumps(idea.dump(), indent=4, sort_keys=True)
-        print '=' * 80
+                print(json.dumps(idea.dump(), indent=4, sort_keys=True))
+        print('=' * 80)
 
     def new_clause_id(self):
         r = self.next_clause_id
@@ -138,7 +139,7 @@ class Memory(object):
         return x
 
     def resolve_one_noun(self, features):
-        for i in xrange(len(self.ideas) - 1, -1, -1):
+        for i in range(len(self.ideas) - 1, -1, -1):
             idea = self.ideas[i]
             if not idea:
                 continue
@@ -155,7 +156,7 @@ class Memory(object):
 
     def resolve_each_noun(self, features):
         true_ii = set()
-        for i in xrange(len(self.ideas) - 1, -1, -1):
+        for i in range(len(self.ideas) - 1, -1, -1):
             idea = self.ideas[i]
             if not idea:
                 continue
@@ -170,7 +171,7 @@ class Memory(object):
 
     def resolve_plural_noun(self, features):
         rr = []
-        for i in xrange(len(self.ideas) - 1, -1, -1):
+        for i in range(len(self.ideas) - 1, -1, -1):
             idea = self.ideas[i]
             if not idea:
                 continue
@@ -188,7 +189,7 @@ class Memory(object):
         return [x]
 
     def resolve_one_clause(self, features):
-        for i in xrange(len(self.ideas) - 1, -1, -1):
+        for i in range(len(self.ideas) - 1, -1, -1):
             idea = self.ideas[i]
             if not idea:
                 continue
@@ -381,8 +382,8 @@ class Memory(object):
             xx = self.resolve_plural_noun(features)
             return [xx]
         else:
-            print 'Unhandled declension, bailing on this dsen:', \
-                Declension.to_str[d]
+            print('Unhandled declension, bailing on this dsen:', \
+                Declension.to_str[d])
             return None
 
         xx = self.resolve_one_noun(features)
@@ -390,7 +391,7 @@ class Memory(object):
 
     def decode_proper_noun(self, deep_ref, from_xx, to_xx):
         name = deep_ref.arg.name
-        name = tuple(map(lambda s: s.title(), name))
+        name = tuple([s.title() for s in name])
         gender = self.gender_clf.classify(name)
         features = NounFeatures(name=name, gender=gender)
         xx = self.resolve_one_noun(features)

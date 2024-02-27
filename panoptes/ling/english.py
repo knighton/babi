@@ -77,9 +77,9 @@ class English(object):
             parses.append(parse)
 
         if verbose:
-            print '-- %d parses' % len(parses)
+            print('-- %d parses' % len(parses))
             for parse in parses:
-                print '-- PARSE'
+                print('-- PARSE')
                 parse.dump()
 
         keys = set()
@@ -93,10 +93,10 @@ class English(object):
         keys_ssens.sort()
 
         if verbose:
-            print '-- %d ssens' % len(keys_ssens)
+            print('-- %d ssens' % len(keys_ssens))
             for i, (key, ssen) in enumerate(keys_ssens):
-                print '-- SSEN %d' % i
-                print key
+                print('-- SSEN %d' % i)
+                print(key)
 
         keys = set()
         keys_dsens = []
@@ -109,13 +109,13 @@ class English(object):
         keys_dsens.sort()
 
         if verbose:
-            print '-- %d dsens' % len(keys_dsens)
+            print('-- %d dsens' % len(keys_dsens))
             for i, (key, dsen) in enumerate(keys_dsens):
-                print '-- DSEN %d' % i
-                print key
+                print('-- DSEN %d' % i)
+                print(key)
 
-        ssens = map(lambda (k, s): s, keys_ssens)
-        dsens = map(lambda (k, d): d, keys_dsens)
+        ssens = [k_s[1] for k_s in keys_ssens]
+        dsens = [k_d[1] for k_d in keys_dsens]
         return Recognition(parses, ssens, dsens)
 
     def say(self, dsen, idiolect):

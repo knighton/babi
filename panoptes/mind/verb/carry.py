@@ -16,7 +16,8 @@ class Take(ClauseMeaning):
             [Relation.AGENT, Relation.TARGET, None],
         ]
 
-    def handle(self, c, memory, (agent_xx, target_xx, to_xx)):
+    def handle(self, c, memory, xxx_todo_changeme):
+        (agent_xx, target_xx, to_xx) = xxx_todo_changeme
         if len(agent_xx) != 1:
             return None
 
@@ -48,14 +49,14 @@ class Drop(ClauseMeaning):
             [Relation.AGENT, Relation.TARGET, None],
         ]
 
-    def handle(self, c, memory, (agent_xx, target_xx, to_xx)):
+    def handle(self, c, memory, xxx_todo_changeme1):
+        (agent_xx, target_xx, to_xx) = xxx_todo_changeme1
         if to_xx and len(to_xx) != 1:
             return None
 
         for x in agent_xx:
             agent = memory.ideas[x]
-            agent.carrying = filter(
-                lambda n: n not in target_xx, agent.carrying)
+            agent.carrying = [n for n in agent.carrying if n not in target_xx]
 
         if to_xx:
             to_x, = to_xx
@@ -76,7 +77,8 @@ class PickUp(ClauseMeaning):
             [Relation.AGENT, Relation.TARGET, None],
         ]
 
-    def handle(self, c, memory, (agent_xx, target_xx, at_xx)):
+    def handle(self, c, memory, xxx_todo_changeme2):
+        (agent_xx, target_xx, at_xx) = xxx_todo_changeme2
         if len(agent_xx) != 1:
             return None
 
@@ -107,7 +109,8 @@ class WhyPickUp(ClauseMeaning):
             [Relation.AGENT, Relation.TARGET, Relation.BECAUSE],
         ]
 
-    def handle(self, c, memory, (agent_xx, target_xx, why_xx)):
+    def handle(self, c, memory, xxx_todo_changeme3):
+        (agent_xx, target_xx, why_xx) = xxx_todo_changeme3
         if len(agent_xx) != 1:
             return None
 
@@ -154,7 +157,8 @@ class CarryingWhatQuestion(ClauseMeaning):
             [Relation.AGENT, Relation.TARGET],
         ]
 
-    def handle(self, c, memory, (agent_xx, what_xx)):
+    def handle(self, c, memory, xxx_todo_changeme4):
+        (agent_xx, what_xx) = xxx_todo_changeme4
         if len(agent_xx) != 1:
             return None
 

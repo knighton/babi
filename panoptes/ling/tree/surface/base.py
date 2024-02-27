@@ -64,7 +64,7 @@ class SayResult(object):
     def check(self):
         assert isinstance(self.tokens, list)
         for s in self.tokens:
-            assert isinstance(s, basestring)
+            assert isinstance(s, str)
 
         if self.conjugation is not None:
             assert Conjugation.is_valid(self.conjugation)

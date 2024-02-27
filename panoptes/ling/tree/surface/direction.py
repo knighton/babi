@@ -7,7 +7,7 @@ class SurfaceDirection(SurfaceArgument):
     def __init__(self, which, of):
         self.which = which
         assert self.which
-        assert isinstance(self.which, basestring)
+        assert isinstance(self.which, str)
 
         self.of = of
         if self.of:

@@ -61,26 +61,26 @@ def parse(det_pronoun_mgr, s, expect_selectors):
         assert ss[-1] == '_'
         f = det_pronoun_mgr.parse_determiner
     got_selectors = f(s)
-    got = map(lambda sel: sel.dump(), got_selectors)
-    expected = map(lambda sel: sel.dump(), expect_selectors)
+    got = [sel.dump() for sel in got_selectors]
+    expected = [sel.dump() for sel in expect_selectors]
 
     try:
         assert got == expected
     except:
         import json
-        print
-        print 'ERROR:', s
-        print
-        print 'Expected:'
+        print()
+        print('ERROR:', s)
+        print()
+        print('Expected:')
 
         for d in expected:
-            print json.dumps(d, indent=4, sort_keys=True)
+            print(json.dumps(d, indent=4, sort_keys=True))
 
-        print
-        print 'Got:'
+        print()
+        print('Got:')
 
         for d in got:
-            print json.dumps(d, indent=4, sort_keys=True)
+            print(json.dumps(d, indent=4, sort_keys=True))
 
         raise
 

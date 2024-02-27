@@ -30,8 +30,7 @@ class DeepConjunction(DeepArgument):
     # From deep.
 
     def to_surface(self, transform_state, say_state, idiolect):
-        aa = map(lambda a: a.to_surface(transform_state, say_state, idiolect),
-                 self.aa)
+        aa = [a.to_surface(transform_state, say_state, idiolect) for a in self.aa]
         return SurfaceConjunction(self.op, aa)
 
     # --------------------------------------------------------------------------

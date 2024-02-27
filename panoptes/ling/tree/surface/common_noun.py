@@ -70,7 +70,7 @@ class SurfaceCommonNoun(SurfaceArgument):
         assert isinstance(self.attributes, list)
         for s in self.attributes:
             assert s
-            assert isinstance(s, basestring)
+            assert isinstance(s, str)
 
         # The word(s) for its type, unit, noun, etc.
         #
@@ -81,7 +81,7 @@ class SurfaceCommonNoun(SurfaceArgument):
         # parsimonious not to.
         self.noun = noun
         if self.noun:
-            assert isinstance(self.noun, basestring)
+            assert isinstance(self.noun, str)
 
         # Descriptive or restrictive child structures coming after the head.
         self.preps_nargs = preps_nargs
@@ -89,7 +89,7 @@ class SurfaceCommonNoun(SurfaceArgument):
         for p, n in self.preps_nargs:
             assert isinstance(p, tuple)
             for s in p:
-                assert isinstance(s, basestring)
+                assert isinstance(s, str)
 
             assert isinstance(n, SurfaceArgument)
 
@@ -349,7 +349,7 @@ class SurfaceCommonNoun(SurfaceArgument):
         try:
             assert r
         except:
-            print self.dump()
+            print(self.dump())
             raise
 
         return r
@@ -385,7 +385,7 @@ class SurfaceCommonNoun(SurfaceArgument):
         possessor = loader.load(d['possessor'])
         selector = Selector.load(d['selector'])
         number = loader.load(d['number'])
-        attributes = map(loader.load, d['attributes'])
+        attributes = list(map(loader.load, d['attributes']))
         noun = d['noun']
 
         preps_nargs = []

@@ -24,7 +24,7 @@ def collapse_int_tuples_to_wildcards(tuples, num_options_per_field):
 
             collapsed_or_not = []
             for wildcarded, options_present in \
-                    wildcarded2options_present.iteritems():
+                    wildcarded2options_present.items():
                 nn = list(wildcarded)
                 if len(options_present) == num_options:
                     nn[field_index] = num_options
@@ -56,7 +56,7 @@ def expand_helper(nn, num_options_per_field, index):
         for tail in expand_helper(nn, num_options_per_field, index + 1):
             yield [nn[index]] + tail
     else:
-        for n in xrange(num_options):
+        for n in range(num_options):
             for tail in expand_helper(nn, num_options_per_field, index + 1):
                 yield [n] + tail
 

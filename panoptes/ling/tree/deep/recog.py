@@ -68,14 +68,14 @@ class SurfaceToDeep(object):
 
         rr = []
         if n.preps_nargs:
-            pp, nn = zip(*n.preps_nargs)
-            tt = map(lambda n: n.relation_arg_type(), nn)
-            preps_rats = zip(pp, tt)
+            pp, nn = list(zip(*n.preps_nargs))
+            tt = [n.relation_arg_type() for n in nn]
+            preps_rats = list(zip(pp, tt))
             rrr = self.relation_mgr.decide_noun_phrase_relation_options(
                 preps_rats)
             if not rrr:
                 return []
-            nnn = map(self.recog_arg, nn)
+            nnn = list(map(self.recog_arg, nn))
 
             for rels in product(*rrr):
                 for nn in product(*nnn):
@@ -83,7 +83,7 @@ class SurfaceToDeep(object):
                         r = DeepCommonNoun(
                             possessor=pos, selector=n.selector, number=n.number,
                             attributes=n.attributes, noun=n.noun,
-                            rels_nargs=zip(rels, nn))
+                            rels_nargs=list(zip(rels, nn)))
                         r = deepcopy(r)
                         rr.append(r)
         else:
@@ -101,7 +101,7 @@ class SurfaceToDeep(object):
         else:
             ofs = []
 
-        return map(lambda of: DeepDirection(n.which, of), ofs)
+        return [DeepDirection(n.which, of) for of in ofs]
 
     def recog_comparative(self, n):
         if n.than:
@@ -149,7 +149,7 @@ class SurfaceToDeep(object):
         rr = hallu_preps_vargs[:front_argx]
         rr.append(hallu_preps_vargs[subj_argx])
         used_fronted = False
-        for i in xrange(subj_argx + 1, len(hallu_preps_vargs)):
+        for i in range(subj_argx + 1, len(hallu_preps_vargs)):
             prep, arg = hallu_preps_vargs[i]
             if arg:
                 if arg.has_hole():
@@ -169,8 +169,7 @@ class SurfaceToDeep(object):
         return rr, subj_argx - 1
 
     def decide_possible_relations(self, unfronted_preps_vargs, voice):
-        preps_types = map(lambda (p, n): (p, n.relation_arg_type()),
-                          unfronted_preps_vargs)
+        preps_types = [(p_n1[0], p_n1[1].relation_arg_type()) for p_n1 in unfronted_preps_vargs]
         return self.relation_mgr.decide_clause_relation_options(
             preps_types, voice == Voice.ACTIVE)
 
@@ -215,8 +214,8 @@ class SurfaceToDeep(object):
                 return []
 
             deep_options_per_arg = \
-                map(self.recog_arg,
-                    map(lambda (p, n): n, unfronted_preps_vargs))
+                list(map(self.recog_arg,
+                    [p_n[1] for p_n in unfronted_preps_vargs]))
 
             for purpose, is_intense in purposes_isstresseds:
                 for deeps in product(*deep_options_per_arg):
@@ -239,7 +238,7 @@ class SurfaceToDeep(object):
                         continue
 
                     for rels in product(*relation_options_per_arg):
-                        rels_vargs = zip(rels, deeps)
+                        rels_vargs = list(zip(rels, deeps))
                         r = DeepContentClause(
                             status, purpose, is_intense, c.verb.intrinsics,
                             c.adverbs, rels_vargs, subj_argx)

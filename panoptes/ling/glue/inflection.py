@@ -9,11 +9,10 @@ Declension = enum("""Declension =
     I WE YOU YALL HE SHE IT THEY1 ONE WHO1 WHO2 THEY2 WHOEVER1 WHOEVER2""")
 
 
-DECLENSION2IS_INTERROGATIVE = dict(zip(
+DECLENSION2IS_INTERROGATIVE = dict(list(zip(
     sorted(Declension.values),
-    map(lambda d: d in (Declension.WHO1, Declension.WHO2, Declension.WHOEVER1,
-                        Declension.WHOEVER2),
-        sorted(Declension.values))))
+    [d in (Declension.WHO1, Declension.WHO2, Declension.WHOEVER1,
+                        Declension.WHOEVER2) for d in sorted(Declension.values)])))
 
 
 Person = enum('Person = FIRST SECOND THIRD')
@@ -22,8 +21,8 @@ Person = enum('Person = FIRST SECOND THIRD')
 Conjugation = enum('Conjugation = S1 S2 S3 P1 P2 P3')
 
 
-CONJ2INDEX = dict(zip(sorted(Conjugation.values),
-                      range(len(Conjugation.values))))
+CONJ2INDEX = dict(list(zip(sorted(Conjugation.values),
+                      list(range(len(Conjugation.values))))))
 
 
 N2_TO_CONJ = {
@@ -187,7 +186,7 @@ class InflectionManager(object):
             else:
                 r = self.special_number2declension[(p.number, p.person)]
         else:
-            persons = map(lambda p: p.person, pp)
+            persons = [p.person for p in pp]
             if Person.FIRST in persons:
                 r = Declension.WE
             elif Person.SECOND in persons:

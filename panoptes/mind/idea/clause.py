@@ -28,10 +28,10 @@ class Clause(Idea):
 
         self.adverbs = adverbs
         for s in self.adverbs:
-            assert isinstance(s, basestring)
+            assert isinstance(s, str)
 
         self.rel2xxx = rel2xxx
-        for rel, xxx in self.rel2xxx.iteritems():
+        for rel, xxx in self.rel2xxx.items():
             assert Relation.is_valid(rel)
             assert isinstance(xxx, list)
             for xx in xxx:
@@ -41,7 +41,7 @@ class Clause(Idea):
 
     def dump(self):
         rel2xxx = {}
-        for rel, xxx in self.rel2xxx.iteritems():
+        for rel, xxx in self.rel2xxx.items():
             rel2xxx[Relation.to_str[rel]] = xxx
         return {
             'type': 'Clause',
@@ -59,7 +59,7 @@ class Clause(Idea):
         if self.verb.lemma not in f.possible_lemmas:
             return False
 
-        for rel, want_xx in f.rel2xx.iteritems():
+        for rel, want_xx in f.rel2xx.items():
             if rel not in self.rel2xxx:
                 continue
 
@@ -82,7 +82,7 @@ class ClauseFeatures(object):
 
     def dump(self):
         rel2xx = {}
-        for rel, xx in self.rel2xx.iteritems():
+        for rel, xx in self.rel2xx.items():
             rel = Relation.to_str[rel]
             rel2xx[rel] = xx
         return {

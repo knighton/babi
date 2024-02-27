@@ -8,7 +8,7 @@ class Deliberation(object):
 
         self.out = None
         if self.out:
-            assert isinstance(self.out, basestring)
+            assert isinstance(self.out, str)
 
 
 class Agent(object):

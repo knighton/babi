@@ -119,7 +119,7 @@ class VerbExtractor(object):
         subtree, then rule out invalid ones.
         """
         for verb_span_pair, vv in self.extract_all(root_token):
-            vv = filter(lambda v: v.can_be_in_root_clause(), vv)
+            vv = [v for v in vv if v.can_be_in_root_clause()]
             if vv:
                 yield verb_span_pair, vv
 
@@ -181,7 +181,7 @@ class ParseToSurface(object):
         for selector in self.det_pronoun_mgr.parse_pronoun(root_token.text):
             n = SurfaceCommonNoun(selector=selector)
             nn.append(n)
-        return map(lambda n: (None, n), nn)
+        return [(None, n) for n in nn]
 
     def recog_ex(self, root_token):
         p_n = (None, ExistentialThere())
@@ -221,8 +221,8 @@ class ParseToSurface(object):
             return []
         pp_nn = r
 
-        pp_nn = filter(lambda (p, n): not p, pp_nn)
-        thans = map(lambda (p, n): n, pp_nn)
+        pp_nn = [p_n3 for p_n3 in pp_nn if not p_n3[0]]
+        thans = [p_n4[1] for p_n4 in pp_nn]
 
         rr = []
         for degree, polarity, base in \
@@ -242,7 +242,7 @@ class ParseToSurface(object):
             return []
 
         rr = self.time_of_day_mgr.decode(pre, root_token.text)
-        return map(lambda r: ((TIME_PREP,), TimeOfDay(*r)), rr)
+        return [((TIME_PREP,), TimeOfDay(*r)) for r in rr]
 
     def recog_how_many_nn_head(self, root_token, noun, n2):
         many = None
@@ -274,8 +274,7 @@ class ParseToSurface(object):
         * (ADJS) NN(S)     "fat mice"
         * DT (ADJS) NN(S)  "the fat mice"
         """
-        downs = filter(lambda (rel, child): rel not in ('cc', 'conj', 'prep'),
-                       root_token.downs)
+        downs = [rel_child5 for rel_child5 in root_token.downs if rel_child5[0] not in ('cc', 'conj', 'prep')]
         if downs:
             dep, child = downs[0]
             if dep != 'det':
@@ -312,15 +311,14 @@ class ParseToSurface(object):
                                   noun=noun)
             nn.append(n)
 
-        return map(lambda n: (None, n), nn)
+        return [(None, n) for n in nn]
 
     def recog_posdet_nn_head(self, root_token, noun, gram_n2):
         """
         * PRP$ (ADJS) NN(S)
         * WP$ (ADJS) NN(S)
         """
-        downs = filter(lambda (rel, child): rel not in ('cc', 'conj', 'prep'),
-                       root_token.downs)
+        downs = [rel_child6 for rel_child6 in root_token.downs if rel_child6[0] not in ('cc', 'conj', 'prep')]
 
         if not downs:
             return []
@@ -349,7 +347,7 @@ class ParseToSurface(object):
                 n = SurfaceCommonNoun(possessor=pos, selector=selector,
                                       attributes=list(attrs), noun=noun)
                 nn.append(n)
-        return map(lambda n: (None, n), nn)
+        return [(None, n) for n in nn]
 
     def recog_shortcut_head(self, root_token):
         pp_nn = []
@@ -381,8 +379,8 @@ class ParseToSurface(object):
             if r is None:
                 return None
             pp_nn = r
-            pp_nn = filter(lambda (p, n): not p, pp_nn)
-            nn = map(lambda (p, n): n, pp_nn)
+            pp_nn = [p_n1 for p_n1 in pp_nn if not p_n1[0]]
+            nn = [p_n2[1] for p_n2 in pp_nn]
             prep = child.text,
             preps_optionss.append((prep, nn))
         return preps_optionss
@@ -396,11 +394,11 @@ class ParseToSurface(object):
             return head_pp_nn
 
         rr = []
-        tail_preps, tail_optionss = zip(*preps_optionss)
+        tail_preps, tail_optionss = list(zip(*preps_optionss))
         for head_p, head_n in head_pp_nn:
             for tail_options in product(*tail_optionss):
                 n = deepcopy(head_n)
-                n.preps_nargs = zip(tail_preps, tail_options)
+                n.preps_nargs = list(zip(tail_preps, tail_options))
                 rr.append((head_p, n))
         return rr
 
@@ -443,8 +441,8 @@ class ParseToSurface(object):
             return None
         pp_nn = r
 
-        pp_nn = filter(lambda (p, n): not p, pp_nn)
-        ofs = map(lambda (p, n): n, pp_nn)
+        pp_nn = [p_n7 for p_n7 in pp_nn if not p_n7[0]]
+        ofs = [p_n8[1] for p_n8 in pp_nn]
 
         pp_nn = []
         for of in ofs:
@@ -492,7 +490,7 @@ class ParseToSurface(object):
         """
         ss = root_token.text,
         nn = self.personal_mgr.perspro_parse(ss)
-        return map(lambda n: (None, n), nn)
+        return [(None, n) for n in nn]
 
     def recog_wp(self, root_token):
         """
@@ -509,7 +507,7 @@ class ParseToSurface(object):
         ss = root_token.text,
         nn += self.personal_mgr.perspro_parse(ss)
 
-        return map(lambda n: (None, n), nn)
+        return [(None, n) for n in nn]
 
     def recog_adverb(self, root_token):
         """
@@ -564,7 +562,7 @@ class ParseToSurface(object):
                 rr = []
                 break
 
-            print 'Unknown tag:', root_token.tag
+            print('Unknown tag:', root_token.tag)
             assert False
 
         if not rr:
@@ -683,7 +681,7 @@ class ParseToSurface(object):
             elif t.tag == 'IN':
                 if t.downs:
                     # Skip the conjunctions.
-                    downs = filter(lambda (rel, child): rel == 'pobj', t.downs)
+                    downs = [rel_child for rel_child in t.downs if rel_child[0] == 'pobj']
                     if len(downs) != 1:
                         continue
                     prep = t.text,
@@ -710,7 +708,7 @@ class ParseToSurface(object):
             """
 
             spoken_preps = [prep] * len(pp_nn)
-            absorbed_preps, vargs = zip(*pp_nn) if pp_nn else ([], [])
+            absorbed_preps, vargs = list(zip(*pp_nn)) if pp_nn else ([], [])
             pp_nn = []
             for spoken_prep, absorbed_prep, varg in \
                     zip(spoken_preps, absorbed_preps, vargs):
@@ -794,7 +792,7 @@ class ParseToSurface(object):
                 self.verb_extractor.extract(root_token, is_root_clause):
             # Hack to compensate for a bug in imperative verb saying.
             if verb_span_pair[0] and not verb_span_pair[1]:
-                vv = filter(lambda v: not v.is_imperative(), vv)
+                vv = [v for v in vv if not v.is_imperative()]
             if not vv:
                 continue
 
@@ -804,7 +802,7 @@ class ParseToSurface(object):
             subj_argx, vmain_index, ppp_nnn, adverbs = r
 
             if subj_argx is None:
-                vv = filter(lambda v: v.is_imperative(), vv)
+                vv = [v for v in vv if v.is_imperative()]
             else:
                 assert 0 <= subj_argx < len(ppp_nnn)
 

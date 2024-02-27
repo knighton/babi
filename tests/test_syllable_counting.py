@@ -22,7 +22,7 @@ def main():
     a = min(off2count)
     z = max(off2count)
     for i in range(a, z + 1):
-        print '%d\t%d' % (i, off2count[i])
+        print('%d\t%d' % (i, off2count[i]))
 
 
 if __name__ == '__main__':

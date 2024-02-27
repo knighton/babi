@@ -17,18 +17,18 @@ class CardinalManager(NumeralManager):
         self.one_names = """zero one two three four five six seven eight nine
             ten eleven twelve thirteen fourteen fifteen sixteen seventeen
             eighteen nineteen""".split()
-        self.one_name2n = dict(zip(self.one_names, range(len(self.one_names))))
+        self.one_name2n = dict(list(zip(self.one_names, list(range(len(self.one_names))))))
 
         self.ten_names = [None, None] + """twenty thirty fourty fifty sixty
             seventy eighty ninety""".split()
-        self.ten_name2n = dict(zip(self.ten_names, range(len(self.ten_names))))
+        self.ten_name2n = dict(list(zip(self.ten_names, list(range(len(self.ten_names))))))
 
         self.thou_pow_names = [None, 'thousand']
         for prefix in 'm b tr quadr quint sext sept oct non dec'.split():
             s = prefix + 'illion'
             self.thou_pow_names.append(s)
-        self.thou_pow_name2n = dict(zip(
-            self.thou_pow_names, range(len(self.thou_pow_names))))
+        self.thou_pow_name2n = dict(list(zip(
+            self.thou_pow_names, list(range(len(self.thou_pow_names))))))
 
         self.use_words_range = (0, 9)
 
@@ -69,7 +69,7 @@ class CardinalManager(NumeralManager):
             rr.append('negative')
 
         max_thou_pow = int(math.log(n, 1000))
-        for thou_pow in reversed(range(max_thou_pow + 1)):
+        for thou_pow in reversed(list(range(max_thou_pow + 1))):
             div = 1000 ** thou_pow
             under_1000 = int(n / div)
             if under_1000:
@@ -118,7 +118,7 @@ class CardinalManager(NumeralManager):
         else:
             ss_hundreds = ss[:x]
             hundreds_nn = self.parse_as_words_under_100(ss_hundreds)
-            hundreds_nn = map(lambda n: n * 100, hundreds_nn)
+            hundreds_nn = [n * 100 for n in hundreds_nn]
 
         # Tens and ones.
         ss_ones = ss[x + 1:]
@@ -163,7 +163,7 @@ class CardinalManager(NumeralManager):
             sub_ss = ss[begin : x]
             sub_nn = self.parse_as_words_under_1000(sub_ss)
             thou_pow = self.thou_pow_name2n[ss[x]]
-            sub_nn = map(lambda n: n * (1000 ** thou_pow), sub_nn)
+            sub_nn = [n * (1000 ** thou_pow) for n in sub_nn]
             if not sub_nn:
                 return []
             new_rr = []
@@ -188,7 +188,7 @@ class CardinalManager(NumeralManager):
             rr = new_rr
 
         if is_neg:
-            rr = map(lambda n: n * -1, rr)
+            rr = [n * -1 for n in rr]
 
         return rr
 

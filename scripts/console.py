@@ -8,8 +8,8 @@ def main():
     agent = PhilosophicalZombie()
     uid = agent.new_user()
     while True:
-        text = raw_input('> ').decode('utf-8')
-        print agent.put(uid, text)
+        text = input('> ').decode('utf-8')
+        print(agent.put(uid, text))
 
 
 if __name__ == '__main__':

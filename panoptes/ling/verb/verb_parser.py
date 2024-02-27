@@ -40,7 +40,7 @@ def wildcardy_int_tuple_from_int(n, num_options_per_field):
     for z in num_options_per_field:
         r = n % (z + 1)
         rr.append(r)
-        n /= (z + 1)
+        n //= (z + 1)
     return rr
 
 
@@ -55,7 +55,7 @@ def unpack_verb_words(s):
 
 
 def to_ints(sss2vv, options_per_field, num_options_per_field, verify=False):
-    print 'Collapsing:'
+    print('Collapsing:')
     s2nn = {}
     for sss in sorted(sss2vv):
         vv = sss2vv[sss]
@@ -70,8 +70,8 @@ def to_ints(sss2vv, options_per_field, num_options_per_field, verify=False):
         collapsed = collapse_int_tuples_to_wildcards(
             nnn, num_options_per_field)
 
-        print '%6d -> %2d: %s' % (
-            len(nnn), len(collapsed), s.replace('|', '...'))
+        print('%6d -> %2d: %s' % (
+            len(nnn), len(collapsed), s.replace('|', '...')))
 
         if verify:
             nnn2 = sorted(expand_int_tuples_from_wildcards(
@@ -93,7 +93,7 @@ def save_lookup_tables(be, pro, deverbed, f):
     """
     verbs_used = ['be', 'see', MAGIC_INTS_LEMMA]
     options_per_field = SurfaceVerb.all_options(verbs_used, [False, True])
-    zz = map(len, options_per_field)
+    zz = list(map(len, options_per_field))
     be_s2nn = to_ints(be, options_per_field, zz)
     pro_verb_s2nn = to_ints(pro, options_per_field, zz)
     deverbed_s2nn = to_ints(deverbed, options_per_field, zz)
@@ -107,12 +107,12 @@ def save_lookup_tables(be, pro, deverbed, f):
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
 
-    json.dump(d, open(f, 'wb'))
+    json.dump(d, open(f, 'w'))
 
 
 def from_ints(s2nn, options_per_field, num_options_per_field):
     sss2vv = defaultdict(list)
-    for s, nn in s2nn.iteritems():
+    for s, nn in s2nn.items():
         sss = unpack_verb_words(s)
         vv = []
         for n in nn:
@@ -129,7 +129,7 @@ def load_lookup_tables(f):
     """
     verbs_used = ['be', 'see', MAGIC_INTS_LEMMA]
     options_per_field = SurfaceVerb.all_options(verbs_used, [False, True])
-    zz = map(len, options_per_field)
+    zz = list(map(len, options_per_field))
     d = json.load(open(f))
     be = from_ints(d['be'], options_per_field, zz)
     pro = from_ints(d['pro-verb'], options_per_field, zz)
@@ -153,13 +153,13 @@ def construct_lookup_tables(sayer):
     """
     None -> be, pro, deverbed
     """
-    print 'Conjugating forms of "to be"...'
+    print('Conjugating forms of "to be"...')
     be = construct_one_lookup_table(sayer, ['be'], [False, True])
-    print 'Conjugating pro-verbs...'
+    print('Conjugating pro-verbs...')
     pro = construct_one_lookup_table(sayer, ['see'], [True])
-    print 'Conjugating all other verbs...'
+    print('Conjugating all other verbs...')
     deverbed = construct_one_lookup_table(sayer, [MAGIC_INTS_LEMMA], [False])
-    print 'Done conjugating.'
+    print('Done conjugating.')
     return be, pro, deverbed
 
 
@@ -189,8 +189,8 @@ class VerbParser(object):
 
         # Used by main_sss2vv parsing.
         self.deverbed_sss_set = \
-            set(filter(bool, map(remove_lemma_specific_word,
-                                 self.deverbed_sss2vv)))
+            set(filter(bool, list(map(remove_lemma_specific_word,
+                                 self.deverbed_sss2vv))))
 
     @staticmethod
     def load(conjugator, f):
@@ -206,10 +206,10 @@ class VerbParser(object):
     @staticmethod
     def load_or_regenerate(verb_sayer, f):
         if os.path.exists(f):
-            print 'Loading from "%s"' % f
+            print('Loading from "%s"' % f)
             return VerbParser.load(verb_sayer.conjugator, f)
         else:
-            print '"%s" does not exist, constructing from scratch' % f
+            print('"%s" does not exist, constructing from scratch' % f)
             return VerbParser.regenerate(verb_sayer, f)
 
     def parse_field_index_replacing(self, sss):

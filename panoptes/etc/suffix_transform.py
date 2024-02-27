@@ -1,7 +1,7 @@
 def final_repeat_len(s):
     assert s
     match = s[-1]
-    for i in xrange(len(s) - 2, -1, -1):
+    for i in range(len(s) - 2, -1, -1):
         if s[i] != match:
             return len(s) - i - 1
     return len(s)

@@ -8,33 +8,33 @@ def main():
     problem = problems[1]
     in_s, want_out = problem[0]
 
-    print 'EVENTUAL INPUT:', in_s
+    print('EVENTUAL INPUT:', in_s)
 
     ss = [
-        u'I was seen by you.',
-        u'I slept because I was tired.',
-        u'Sandra got the football there.',
-        u'I have been being been.',
-        u"Don't you see?",
-        u'I went to my home town.',
-        u'I threw the ball to you.',
+        'I was seen by you.',
+        'I slept because I was tired.',
+        'Sandra got the football there.',
+        'I have been being been.',
+        "Don't you see?",
+        'I went to my home town.',
+        'I threw the ball to you.',
     ]
 
     ss = [
-        u'Tim saw Tom.',
-        u'I watched them.',
-        u'I saw you.',
-        u'I walked.',
-        u'I walked the dog.',
+        'Tim saw Tom.',
+        'I watched them.',
+        'I saw you.',
+        'I walked.',
+        'I walked the dog.',
     ]
 
     a = Agent()
     for s in ss:
-        print
-        print
+        print()
+        print()
         a.put(s)
-        print
-        print
+        print()
+        print()
 
     #got_out = a.put(in_s)
     #assert want_out == got_out

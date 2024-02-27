@@ -18,14 +18,14 @@ ProAdverbColumn = enum("""ProAdverbColumn =
 
 def parse_partial(text):
     lines = text.strip().split('\n')
-    sss = map(lambda line: line.split(), lines)
+    sss = [line.split() for line in lines]
 
     n = len(sss[0])
     for ss in sss[1:]:
         assert len(ss) == n + 1
 
     rows = []
-    for s in map(lambda ss: ss[0], sss[1:]):
+    for s in [ss[0] for ss in sss[1:]]:
         row = Correlative.from_str[s]
         rows.append(row)
     assert set(rows) == Correlative.values
@@ -36,8 +36,8 @@ def parse_partial(text):
         cols.append(col)
 
     mel_sh2ss_archaic = {}
-    for row_index in xrange(len(sss) - 1):
-        for col_index in xrange(n):
+    for row_index in range(len(sss) - 1):
+        for col_index in range(n):
             s = sss[row_index + 1][col_index + 1]
             if s == '-' or s == 'X':
                 continue
@@ -107,15 +107,15 @@ ALT        -         -           -
     c = parse_partial(text_part_three)
 
     r = {}
-    for k, v in a.iteritems():
+    for k, v in a.items():
         r[k] = v
-    for k, v in b.iteritems():
+    for k, v in b.items():
         r[k] = v
-    for k, v in c.iteritems():
+    for k, v in c.items():
         r[k] = v
 
     pro_adverb_cols = set()
-    for (cor, pac), (ss, is_archaic) in r.iteritems():
+    for (cor, pac), (ss, is_archaic) in r.items():
         pro_adverb_cols.add(pac)
     assert pro_adverb_cols == ProAdverbColumn.values
 

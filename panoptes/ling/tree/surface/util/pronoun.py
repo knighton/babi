@@ -34,7 +34,7 @@ def parse_det_pronoun_entry(s, of):
     is_pros = [False, False, True, True]
     is_plurs = [False, True, False, True]
     ss = [sing_det, plur_det, sing_pro, plur_pro]
-    ss = map(lambda s: A_OR_AN if s == 'a' else s, ss)
+    ss = [A_OR_AN if s == 'a' else s for s in ss]
     for is_pro, is_plur, s in zip(is_pros, is_plurs, ss):
         if s == '-':
             continue
@@ -62,7 +62,7 @@ def make_det_pronoun_table():
         ALT        -     -         another         another
     """
 
-    sss = map(lambda s: s.split(), text.strip().split('\n'))
+    sss = [s.split() for s in text.strip().split('\n')]
 
     n = len(sss[0])
     for ss in sss[1:]:
@@ -82,8 +82,8 @@ def make_det_pronoun_table():
     assert set(ofs) == N5.values - set([N5.ZERO])
 
     cor_pro_plur_of2s = {}
-    for row_index in xrange(len(sss) - 1):
-        for col_index in xrange(n):
+    for row_index in range(len(sss) - 1):
+        for col_index in range(n):
             s = sss[row_index + 1][col_index + 1]
             cor = sss[row_index + 1][0]
             cor = Correlative.from_str[cor]
@@ -130,7 +130,7 @@ def combine_entries(aaa, cor2res_gno):
             nn = [N5.ZERO, N5.DUAL, N5.FEW, N5.MANY]
         else:
             nn = [N5.SING]
-        nn = filter(lambda n: n <= of, nn)
+        nn = [n for n in nn if n <= of]
         for n in nn:
             cor_pro2ns_ofs[(correlative, is_pro)].append((n, of))
 
@@ -141,13 +141,13 @@ def combine_entries(aaa, cor2res_gno):
         ns_ofs = cor_pro2ns_ofs[(correlative, is_pro)]
 
         # Collect the variety of how many/out of there are for this word.
-        ns, ofs = map(set, zip(*ns_ofs))
+        ns, ofs = list(map(set, list(zip(*ns_ofs))))
 
         # Require that each out-of range is contiguous.  This is also because it
         # happens to be true and it allows Selectors to contain ranges instead
         # of the insanity of individual N5s.
         ofs = sorted(ofs)
-        assert ofs == range(ofs[0], ofs[-1] + 1)
+        assert ofs == list(range(ofs[0], ofs[-1] + 1))
 
         for n_min, n_max in split_into_ranges(sorted(ns)):
             # Get the possible range of how many they were selected from.
@@ -196,20 +196,20 @@ class DetPronounManager(object):
         self.determiner2selectors = defaultdict(list)
         self.pronoun2selectors = defaultdict(list)
         s2cors_pros_plurs_ofs = v2kk_from_k2v(self.cor_pro_plur_of2s)
-        for s, aaa in s2cors_pros_plurs_ofs.iteritems():
+        for s, aaa in s2cors_pros_plurs_ofs.items():
             dets, pros = combine_entries(aaa, self.cor2res_gno)
             self.determiner2selectors[s] = dets
             self.pronoun2selectors[s] = pros
 
     def show(self):
-        print '-' * 80
-        print 'DetPronounManager'
-        print
+        print('-' * 80)
+        print('DetPronounManager')
+        print()
         for cor, is_pro, is_plur, of_n in sorted(self.cor_pro_plur_of2s):
             s = self.cor_pro_plur_of2s[(cor, is_pro, is_plur, of_n)]
-            print '*', Correlative.to_str[cor], is_pro, is_plur, \
-                N5.to_str[of_n], s
-        print '-' * 80
+            print('*', Correlative.to_str[cor], is_pro, is_plur, \
+                N5.to_str[of_n], s)
+        print('-' * 80)
 
     def say(self, selector, is_pro):
         """

@@ -62,7 +62,7 @@ class SurfaceContentClause(SurfaceArgument):
         assert isinstance(self.verb, SurfaceVerb)
 
         for s in self.adverbs:
-            assert isinstance(s, basestring)
+            assert isinstance(s, str)
 
         missing_args = 0
         for p, n in self.preps_vargs:
@@ -105,7 +105,7 @@ class SurfaceContentClause(SurfaceArgument):
         argument originally was, and still contains its preposition (due to
         preposition stranding) and a None for its argument.
         """
-        for i in xrange(self.vmain_index, len(self.preps_vargs)):
+        for i in range(self.vmain_index, len(self.preps_vargs)):
             p, n = self.preps_vargs[i]
             if not n:
                 return i

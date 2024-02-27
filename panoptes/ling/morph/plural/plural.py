@@ -41,7 +41,7 @@ class Rule(object):
 
 def load_categories(f):
     cat2sings = {}
-    dd = yaml.load(open(f))
+    dd = yaml.safe_load(open(f))
     for d in dd:
         name = d['name']
         words = d['words']
@@ -104,13 +104,13 @@ def singular_suffixes_from_rule(rule, cat2sings):
 
 def plural_suffixes_from_rule(rule, cat2sings):
     if rule.category_only:
-        return map(rule.plur_from_sing, cat2sings[rule.category_only])
+        return list(map(rule.plur_from_sing, cat2sings[rule.category_only]))
     else:
         return [rule.plur_suffix]
 
 
 def each_suffix_shortest_first(s):
-    for i in xrange(len(s) + 1):
+    for i in range(len(s) + 1):
         yield s[len(s) - i:]
 
 
@@ -183,7 +183,7 @@ class PluralManager(object):
         """
         singular, pedantic ok -> plural
         """
-        assert isinstance(s, basestring)
+        assert isinstance(s, str)
         assert s
         assert isinstance(is_pedantic_ok, bool)
 
@@ -218,7 +218,7 @@ class PluralManager(object):
         """
         plural, pedantic ok -> list of possible singulars
         """
-        assert isinstance(s, basestring)
+        assert isinstance(s, str)
         assert s
         assert isinstance(is_pedantic_ok, bool)
 
@@ -258,7 +258,7 @@ class PluralManager(object):
 
         # It has a singular form(s), so it certainly is a plural (and may or
         # may not be its own singular form as well).
-        rr = map(lambda s: (s, True), ss)
+        rr = [(s, True) for s in ss]
 
         same = False
         for s in ss:

@@ -139,7 +139,7 @@ class LocationHistory(object):
 
         Get where we were most recently before we were at the given location.
         """
-        for i in xrange(len(self.spans_items) - 1, -1, -1):
+        for i in range(len(self.spans_items) - 1, -1, -1):
             span, item = self.spans_items[i]
             if not item.is_at_location(loc_x):
                 continue

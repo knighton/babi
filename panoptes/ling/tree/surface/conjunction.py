@@ -30,16 +30,16 @@ class SurfaceConjunction(SurfaceArgument):
         }
 
     def is_interrogative(self):
-        return any(map(lambda a: a.is_interrogative(), self.aa))
+        return any([a.is_interrogative() for a in self.aa])
 
     def is_relative(self):
-        return any(map(lambda a: a.is_relative(), self.aa))
+        return any([a.is_relative() for a in self.aa])
 
     # --------------------------------------------------------------------------
     # From surface.
 
     def has_hole(self):
-        return any(map(lambda a: a.has_hole(), self.aa))
+        return any([a.has_hole() for a in self.aa])
 
     def put_fronted_arg_back(self, n):
         for a in self.aa:

@@ -12,7 +12,8 @@ class FitsInside(ClauseMeaning):
             [Relation.AGENT, Relation.IN],
         ]
 
-    def handle(self, c, memory, (agent_xx, inside_xx)):
+    def handle(self, c, memory, xxx_todo_changeme):
+        (agent_xx, inside_xx) = xxx_todo_changeme
         if len(agent_xx) != 1:
             return None
 
@@ -35,7 +36,8 @@ class DoesItFitInside(ClauseMeaning):
             [Relation.AGENT, Relation.IN],
         ]
 
-    def handle(self, c, memory, (agent_xx, inside_xx)):
+    def handle(self, c, memory, xxx_todo_changeme1):
+        (agent_xx, inside_xx) = xxx_todo_changeme1
         if len(agent_xx) != 1:
             return None
 

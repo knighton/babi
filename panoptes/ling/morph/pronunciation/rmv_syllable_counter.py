@@ -25,7 +25,7 @@ class RmvSyllableCounter(object):
 
     @staticmethod
     def from_file(fn):
-        j = yaml.load(open(fn))
+        j = yaml.safe_load(open(fn))
 
         subsyls = []
         for s in j['subsyls']:
@@ -55,7 +55,7 @@ class RmvSyllableCounter(object):
         # Split on clusters of vowels.
         word = self.vowel_re.sub('', word)
         word_parts = self.word_parts_re.split(word)
-        word_parts = filter(bool, word_parts)
+        word_parts = list(filter(bool, word_parts))
         n = len(word_parts)
 
         # Increment and decrement according to config data.

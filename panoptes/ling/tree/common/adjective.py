@@ -7,7 +7,7 @@ class Adjective(CommonArgument):
     def __init__(self, s):
         self.s = s
         assert self.s
-        assert isinstance(self.s, basestring)
+        assert isinstance(self.s, str)
 
     # --------------------------------------------------------------------------
     # From base.

@@ -41,7 +41,7 @@ class Joiner(object):
     def handle_a_or_an(self, tokens):
         rr = []
 
-        for i in xrange(len(tokens) - 1):
+        for i in range(len(tokens) - 1):
             token = tokens[i]
             next_token = tokens[i + 1]
             if token == A_OR_AN:
@@ -73,7 +73,7 @@ class Joiner(object):
         return False
 
     def do_join(self, tokens):
-        is_puncts = map(self.is_punct, tokens)
+        is_puncts = list(map(self.is_punct, tokens))
 
         rr = []
         for token, is_punct in zip(tokens, is_puncts):
@@ -85,7 +85,7 @@ class Joiner(object):
 
     def join(self, tokens, use_contractions):
         tokens = self.contraction_mgr.contract(tokens, use_contractions)
-        tokens = map(remove_verb_annotations, tokens)
+        tokens = list(map(remove_verb_annotations, tokens))
         tokens = self.handle_apos_or_apos_s(tokens)
         tokens = self.handle_a_or_an(tokens)
         text = self.do_join(tokens)
